@@ -3,4 +3,10 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <!-- Información de proveedor requerida para Facebook -->
+    <string name="facebook_application_id" translatable="false">361927374287912</string>
+    <string name="facebook_login_protocol_scheme" translatable="false">fb361927374287912</string>
+    <!-- Información de proveedor requerida para Twitter -->
+    <string name="twitter_consumer_key" translatable="false">rzhCwVDmQOcJd5Ch6IeILtGej</string>
+    <string name="twitter_consumer_secret" translatable="false">OWuOvmhCskgjYU1llyDL7NHOSEEGQuGTGl4ISauvbPkSaSqYbW</string>
 </resources>

@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "138892178525",
+    "firebase_url": "https://eventi4all-39517.firebaseio.com",
+    "project_id": "eventi4all-39517",
+    "storage_bucket": "eventi4all-39517.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:138892178525:android:84bde3e66ec676dc",
+        "android_client_info": {
+          "package_name": "com.example.tay.eventi4all_def"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "138892178525-tckqrv1k7r7he5ar2gl9jl89v23g0b5j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.tay.eventi4all_def",
+            "certificate_hash": "c9e206c1a68424ea2f1ff22dd66b37c7646d143f"
+          }
+        },
+        {
+          "client_id": "138892178525-mbjrijjmusk04pq2t1ukisii0vnl48u4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCwn4GzUqr7g6Ps45vop9r-tZAHEpKMqU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "138892178525-mbjrijjmusk04pq2t1ukisii0vnl48u4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
