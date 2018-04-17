@@ -32,17 +32,17 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
     //Dependencia Firebase UI precompilada
-    compile 'com.firebaseui:firebase-ui-auth:3.2.2'
+    implementation 'com.firebaseui:firebase-ui-auth:3.2.2'
 
     // SDK Facebook
-    compile('com.facebook.android:facebook-android-sdk:4.27.0')
+    implementation('com.facebook.android:facebook-android-sdk:4.27.0')
 
     // SDK Twitter
-    compile("com.twitter.sdk.android:twitter-core:3.0.0@aar") { transitive = true }
+    implementation("com.twitter.sdk.android:twitter-core:3.0.0@aar") { transitive = true }
 
     //Dependencias core + BBDD Firebase
-    compile 'com.google.firebase:firebase-core:11.8.0'
-    compile 'com.google.firebase:firebase-database:11.8.0'
+    implementation 'com.google.firebase:firebase-core:11.8.0'
+    implementation 'com.google.firebase:firebase-database:11.8.0'
 }
 
 
