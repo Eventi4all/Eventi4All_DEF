@@ -10,6 +10,8 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.example.tay.eventi4all_def.Firebase.AbstractFirebaseAdminListener;
+import com.example.tay.eventi4all_def.Firebase.FirebaseAdmin;
 import com.firebase.ui.auth.AuthUI;
 
 import java.util.Arrays;
@@ -21,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     private MainActivityEvents mainActivityEvents;
     private TextView mTextMessage;
     private SignIn signIn;
+    private FirebaseAdmin firebaseAdmin;
 
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -54,8 +57,15 @@ public class MainActivity extends AppCompatActivity {
         btnLogout = this.findViewById(R.id.btnLogout);
         btnLogout.setOnClickListener(mainActivityEvents);
 
+        //Instancia de FirebaseAdmin
+        this.firebaseAdmin = new FirebaseAdmin();
         //Instancia de la clase SignIn
         this.signIn = new SignIn(this);
+        //Instanciamos el abstractFirebaseAdmin
+        this.firebaseAdmin.setAbstractFirebaseAdminListener(this.mainActivityEvents);
+
+
+
 
 
     }
@@ -67,10 +77,16 @@ public class MainActivity extends AppCompatActivity {
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //super.onActivityResult(requestCode, resultCode, data);
-        System.out.println("RequestCode-------------> " + requestCode);
-        if (requestCode == signIn.getRcSignInGoogle()) {
+
+        if (requestCode == signIn.getRcSignIn()) {
+                this.firebaseAdmin.onCreate();
+                this.firebaseAdmin.checkUserExist();
 
         }
     }
+
+    public FirebaseAdmin getFirebaseAdmin() {
+        return firebaseAdmin;
+    }
+
 }

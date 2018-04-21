@@ -10,7 +10,7 @@ import java.util.List;
 class SignIn {
 
     //Establecemos un request code para para inicio de sesión con Google.
-    private static final int RC_SIGN_IN_GOOGLE = 123;
+    private static final int RC_SIGN_IN = 123;
 
     private Activity activity;
 
@@ -37,13 +37,13 @@ class SignIn {
                         .setTosUrl("https://superapp.example.com/terms-of-service.html")
                         .setPrivacyPolicyUrl("https://superapp.example.com/privacy-policy.html")
                         .build(),
-                RC_SIGN_IN_GOOGLE);
+                RC_SIGN_IN);
 
 
     }
 
-    public static int getRcSignInGoogle() {
-        return RC_SIGN_IN_GOOGLE;
+    public static int getRcSignIn() {
+        return RC_SIGN_IN;
     }
 
 
