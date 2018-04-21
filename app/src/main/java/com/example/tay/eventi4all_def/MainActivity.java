@@ -19,12 +19,9 @@ public class MainActivity extends AppCompatActivity {
 
     private Button btnLogout;
     private MainActivityEvents mainActivityEvents;
-
     private TextView mTextMessage;
+    private SignIn signIn;
 
-    //Establecemos un request code para para inicio de sesión con Google.
-
-    private static final int RC_SIGN_IN_GOOGLE = 123;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -57,20 +54,10 @@ public class MainActivity extends AppCompatActivity {
         btnLogout = this.findViewById(R.id.btnLogout);
         btnLogout.setOnClickListener(mainActivityEvents);
 
+        //Instancia de la clase SignIn
+        this.signIn = new SignIn(this);
 
-        // Creamos un "intent" de tipo acceso con los proveedores de autentificación añadidos a la lista
-        startActivityForResult(
-                AuthUI.getInstance()
-                        .createSignInIntentBuilder()
-                        .setAvailableProviders(Arrays.asList(
-                                new AuthUI.IdpConfig.PhoneBuilder().build(),
-                                new AuthUI.IdpConfig.GoogleBuilder().build(),
-                                new AuthUI.IdpConfig.FacebookBuilder().build(),
-                                new AuthUI.IdpConfig.TwitterBuilder().build()))
-                        .setTosUrl("https://superapp.example.com/terms-of-service.html")
-                        .setPrivacyPolicyUrl("https://superapp.example.com/privacy-policy.html")
-                        .build(),
-                RC_SIGN_IN_GOOGLE);
+
     }
 
 
@@ -82,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         //super.onActivityResult(requestCode, resultCode, data);
         System.out.println("RequestCode-------------> " + requestCode);
-        if (requestCode == RC_SIGN_IN_GOOGLE) {
+        if (requestCode == signIn.getRcSignInGoogle()) {
 
         }
     }
