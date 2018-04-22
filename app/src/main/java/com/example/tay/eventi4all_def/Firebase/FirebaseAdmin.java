@@ -31,7 +31,7 @@ public class FirebaseAdmin {
 
     //Devuelve la instancia de la BBDD
     public void onCreate() {
-        if(this.getmAuth().getCurrentUser()!=null){
+       if(this.getmAuth().getCurrentUser()!=null){
             db = FirebaseFirestore.getInstance();
         }
 
@@ -59,8 +59,10 @@ public class FirebaseAdmin {
                     DocumentSnapshot document = task.getResult();
                     if (document != null && document.exists()) {
                         System.out.println("------------>>>>>>El usuario existe");
+                        abstractFirebaseAdminListener.checkUserExist(true);
                     } else {
                         System.out.println("------------>>>>>>El usuario no existe");
+                        abstractFirebaseAdminListener.checkUserExist(false);
                     }
                 } else {
                     System.out.println("------------>>>>>>No se ha podido comprobar si el usuario existe: " + task.getException());

@@ -9,4 +9,7 @@
     <!-- Información de proveedor requerida para Twitter -->
     <string name="twitter_consumer_key" translatable="false">rzhCwVDmQOcJd5Ch6IeILtGej</string>
     <string name="twitter_consumer_secret" translatable="false">OWuOvmhCskgjYU1llyDL7NHOSEEGQuGTGl4ISauvbPkSaSqYbW</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
