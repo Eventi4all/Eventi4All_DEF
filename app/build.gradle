@@ -39,11 +39,13 @@ dependencies {
     // SDK Twitter
     implementation("com.twitter.sdk.android:twitter-core:3.0.0@aar") { transitive = true }
 
-    //Dependencias core + BBDD Firebase
+    //Dependencias core + Storage Firebase
     implementation 'com.google.firebase:firebase-core:11.8.0'
+    implementation 'com.google.firebase:firebase-storage:11.8.0'
 
-    //Dependencia apra el uso de FireStore
+    //Dependencia para el uso de FireStore
     implementation 'com.google.firebase:firebase-firestore:11.8.0'
+
 }
 
 

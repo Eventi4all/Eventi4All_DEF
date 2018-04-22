@@ -169,7 +169,7 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
             Este recurso es nuestro "newFile" al cual se seteará la imagen que tomemos de la cámara.
              */
             intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(newFile));
-            DataHolder.MyDataHolder.mPath = mPath;
+            DataHolder.MyDataHolder.imgUri = Uri.fromFile(newFile);
             this.mainActivity.startActivityForResult(intent, PHOTO_CODE);
             System.out.println("------------------------------>>>>>>>>>>>START ACTIVITY CAMARA");
         }
@@ -223,8 +223,8 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
     }
 
     @Override
-    public void saveProfileInFirebase(Map<String, Object> profile) {
-
+    public void saveProfileInFirebase(Map<String, Object> user) {
+        this.mainActivity.getFirebaseAdmin().insertDocumentInFirebase(user);
     }
 
 

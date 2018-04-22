@@ -7,9 +7,13 @@ import android.os.Build;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 
+import com.example.tay.eventi4all_def.DataHolder;
 import com.example.tay.eventi4all_def.R;
 
 //Para poder usar los permisos de la cámara hay que importarlos:
+import java.util.HashMap;
+import java.util.Map;
+
 import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
@@ -27,7 +31,9 @@ public class ProfileFragmentEvents implements View.OnClickListener{
             this.showOptions();
         }
         if(v.getId()== R.id.btnCreateProfile){
-
+            Map<String, Object> profile = new HashMap<String, Object>();
+            profile.put("nickname", this.profileFragment.getNickName().getText().toString());
+            this.profileFragment.getiProfileFragmentListener().saveProfileInFirebase(profile);
 
         }
     }

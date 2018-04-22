@@ -9,7 +9,9 @@ import android.graphics.BitmapFactory;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.PersistableBundle;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +27,7 @@ import com.example.tay.eventi4all_def.fragments.MainFragment;
 import com.example.tay.eventi4all_def.fragments.ProfileFragment;
 import com.firebase.ui.auth.AuthUI;
 
+import java.io.File;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
@@ -110,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == signIn.getRcSignIn()) {
             this.firebaseAdmin.onCreate();
             this.firebaseAdmin.checkUserExist();
+            this.firebaseAdmin.getStorageRef();
 
         }
         //Si la respuesta de la cámara o galería es OK
@@ -136,6 +140,9 @@ public class MainActivity extends AppCompatActivity {
                 case 300:
                     //Recibimos la URI de la imagen
                     Uri path = data.getData();
+                    DataHolder.MyDataHolder.imgUri = path;
+
+
                     //Seteamos la imagen
                     this.profileFragment.getImgProfile().setImageURI(path);
                     break;
