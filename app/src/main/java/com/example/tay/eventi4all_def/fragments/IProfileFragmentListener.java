@@ -7,4 +7,5 @@ public interface IProfileFragmentListener {
     public void executeOptions(int option);
     public boolean mayRequestStoragePermission();
     public void saveProfileInFirebase(Map<String, Object> user);
+    public void showExplanation();
 }

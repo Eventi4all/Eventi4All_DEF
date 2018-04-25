@@ -3,6 +3,7 @@ package com.example.tay.eventi4all_def;
 
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -11,6 +12,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
@@ -47,6 +49,9 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
     private final int SELECT_PICTURE =300;
     //Almacenamos la ruta donde se guarda la img
     private String mPath;
+
+    private ProgressDialog progress;
+    private  AlertDialog.Builder builder;
 
     public MainActivityEvents(MainActivity mainActivity) {
 
@@ -93,6 +98,9 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
         if(isLogout){
             System.out.println("----------> SESIÓN CERRADA SATISFACTORIAMENTE <----------");
             this.mainActivity.getSignIn().signInAllProviders();
+
+
+
         }else{
             //Se muestra mensaje de error al usuario
         }
@@ -177,8 +185,11 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
 
 
     //Método para proporcionar permisos a la cámara y galería
+    @TargetApi(Build.VERSION_CODES.M)
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public boolean mayRequestStoragePermission(){
+
         /*
         si la versión del S.0 es inferior a la 6.0, entonces no tenemos que proporcionar permisos porque
           ya los tiene. Dado que en las versiones anteriores de Android directamente busca en el AndroidManifiest
@@ -186,14 +197,17 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
          */
 
         if(Build.VERSION.SDK_INT< Build.VERSION_CODES.M){
+            System.out.println("return true 1--------------------------------->>>>>>>>>>>>>");
             return true;
         }
 
-        //Verificamos is nuestro dispositivo con Android 6.0 ya tiene los permisos configurados
+
+        //Verificamos si nuestro dispositivo con Android 6.0 ya tiene los permisos configurados
         // el de la cámara y el de escritura.
         //Al dar permisos para un tipo de permiso se aceptan automaticamente toos los permisos que estén en el mismo grupo de permisos.
 
         if((this.mainActivity.checkSelfPermission(WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) && (this.mainActivity.checkSelfPermission(CAMERA) == PackageManager.PERMISSION_GRANTED)){
+            System.out.println("return true 2--------------------------------->>>>>>>>>>>>>");
             return true;
         }
 
@@ -214,17 +228,25 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
                     mainActivity.requestPermissions(new String[] {WRITE_EXTERNAL_STORAGE,CAMERA}, MY_PERMISSIONS);
                 }
             }).show();
+            System.out.println("return snackbar--------------------------------->>>>>>>>>>>>>");
 
         //AGREGA LOS PERMISOS POR PRIMERA VEZ (IGUAL QUE EL ANTERIOR PERO EN EL ANTERIOR HAY UN MENSAJE DE INSISTENCIA SI DENIEGA LOS PERMISOS)
         }else {
             mainActivity.requestPermissions(new String[] {WRITE_EXTERNAL_STORAGE,CAMERA}, MY_PERMISSIONS);
+            System.out.println("return ultimo else--------------------------------->>>>>>>>>>>>>");
         }
+
         return false;
     }
 
     @Override
     public void saveProfileInFirebase(Map<String, Object> user) {
-        this.mainActivity.getFirebaseAdmin().insertDocumentInFirebase(user);
+        this.mainActivity.getFirebaseAdmin().checkIfNickNameExist(user);
+        progress = new ProgressDialog(this.mainActivity);
+        progress.setMessage("Estamos creando tu perfil, por favor espere...");
+        progress.show();
+
+
     }
 
 
@@ -232,7 +254,7 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
     Método para crear el alertDialog que explica que si no damos permisos no podemos usar la aplicación
      */
     public void showExplanation() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this.mainActivity);
+        builder = new AlertDialog.Builder(this.mainActivity);
         builder.setTitle("Permisos denegados");
         builder.setMessage("Para usar las funciones de la aplicación necesitas aceptar los permisos");
         builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
@@ -257,13 +279,32 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
-                //no podrá usar la aplicación si los permisos están denegados
-                mainActivity.finish();
+
+
+
             }
         });
 
         builder.show();
 
+    }
+
+    public void insertDocumentIsOK(boolean isInsertOk, String result){
+        if(isInsertOk){
+            progress.dismiss();
+            FragmentTransaction transition = mainActivity.getSupportFragmentManager().beginTransaction();
+            transition.hide(this.mainActivity.getProfileFragment());
+            transition.show(this.mainActivity.getMainFragment());
+            transition.commit();
+
+
+        }else if(!isInsertOk && result.equals("NickName exist")){
+            progress.dismiss();
+            builder = new AlertDialog.Builder(this.mainActivity);
+            builder.setTitle("¡Opps!");
+            builder.setMessage("¡El nombre de usuario ya existe! Prueba con otro.");
+            builder.show();
+        }
     }
 
     public static String getAppDirectory() {
@@ -302,5 +343,11 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
         this.mPath = mPath;
     }
 
+    public ProgressDialog getProgress() {
+        return progress;
+    }
 
+    public void setProgress(ProgressDialog progress) {
+        this.progress = progress;
+    }
 }

@@ -1,19 +1,26 @@
 package com.example.tay.eventi4all_def;
 
 
+import android.annotation.TargetApi;
+import android.app.AlertDialog;
 import android.app.FragmentTransaction;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.PersistableBundle;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.Button;
@@ -153,9 +160,12 @@ public class MainActivity extends AppCompatActivity {
     /*
    Al igual que el OnActivityResut, método propio de los activities que reciben el resultado de aceptar/denegar un permiso
     */
+    @TargetApi(Build.VERSION_CODES.M)
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+
         //preguntamos si el requesCode que llega es el de nuestros permisos (WRITE_EXTERNAL_STORAGE + CAMERA)
         if (requestCode == this.mainActivityEvents.getMY_PERMISSIONS()) {
             /*
@@ -164,12 +174,15 @@ public class MainActivity extends AppCompatActivity {
             Preguntamos si en la posición 0 y 1 tienen permisos garantizados
              */
             if (grantResults.length == 2 && grantResults[0] == PackageManager.PERMISSION_GRANTED &&
-                grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                grantResults[1] == PackageManager.PERMISSION_GRANTED){
                 Toast.makeText(MainActivity.this,"Permisos aceptados",Toast.LENGTH_SHORT).show();
             }else{
                 this.mainActivityEvents.showExplanation();
             }
+
         }
+
+
     }
 
 

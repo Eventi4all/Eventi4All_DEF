@@ -43,6 +43,7 @@ public class ProfileFragment extends Fragment {
        this.nickName = v.findViewById(R.id.txtFieldNickName);
        this.btnCreateProfile = v.findViewById(R.id.btnCreateProfile);
        this.btnCreateProfile.setOnClickListener(this.profileFragmentEvents);
+       this.mRlView= v.findViewById(R.id.relLayoutProfile);
 
         return v;
     }

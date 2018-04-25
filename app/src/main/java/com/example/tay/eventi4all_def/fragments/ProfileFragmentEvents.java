@@ -2,8 +2,11 @@ package com.example.tay.eventi4all_def.fragments;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
+import android.provider.Settings;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 
@@ -27,12 +30,18 @@ public class ProfileFragmentEvents implements View.OnClickListener{
     @Override
     public void onClick(View v) {
         if(v.getId()==R.id.imgViewProfile){
-            this.isPermissionAccepted();
-            this.showOptions();
+
+            if(this.isPermissionAccepted()){
+
+                this.showOptions();
+            }else{
+
+            }
+
         }
         if(v.getId()== R.id.btnCreateProfile){
             Map<String, Object> profile = new HashMap<String, Object>();
-            profile.put("nickname", this.profileFragment.getNickName().getText().toString());
+            profile.put("nickname", this.profileFragment.getNickName().getText().toString().trim());
             this.profileFragment.getiProfileFragmentListener().saveProfileInFirebase(profile);
 
         }
@@ -70,11 +79,12 @@ public class ProfileFragmentEvents implements View.OnClickListener{
         poder abrir la cámara o la galería
         */
 
-        public void isPermissionAccepted(){
+        public boolean isPermissionAccepted(){
+
             if(this.profileFragment.getiProfileFragmentListener().mayRequestStoragePermission()){
-                this.profileFragment.getImgProfile().setEnabled(true);
+                return true;
             }else{
-                this.profileFragment.getImgProfile().setEnabled(false);
+                return false;
             }
 
         }

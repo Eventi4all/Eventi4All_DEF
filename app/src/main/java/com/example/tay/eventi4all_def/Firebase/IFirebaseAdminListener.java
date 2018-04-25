@@ -5,4 +5,5 @@ public interface IFirebaseAdminListener {
     public boolean deleteExistEvent();
     public void logout(boolean isLogout);
     public void checkUserExist(boolean isUserExist);
+    public void insertDocumentIsOK(boolean isInsertok, String result);
 }

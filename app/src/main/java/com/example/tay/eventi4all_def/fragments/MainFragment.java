@@ -30,7 +30,7 @@ public class MainFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_main, container, false);
         mainFragmentEvents = new MainFragmentEvents(this);
-        this.btnLogout = v.findViewById(R.id.btnLogout);
+        this.btnLogout = v.findViewById(R.id.btnLo);
         this.btnLogout.setOnClickListener(this.mainFragmentEvents);
 
 

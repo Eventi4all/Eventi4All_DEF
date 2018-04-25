@@ -30,4 +30,9 @@ public abstract class AbstractFirebaseAdminListener implements IFirebaseAdminLis
     public void setiFirebaseAdminListener(IFirebaseAdminListener iFirebaseAdminListener) {
         this.iFirebaseAdminListener = iFirebaseAdminListener;
     }
+
+    @Override
+    public void insertDocumentIsOK(boolean isInsertok, String result) {
+
+    }
 }
