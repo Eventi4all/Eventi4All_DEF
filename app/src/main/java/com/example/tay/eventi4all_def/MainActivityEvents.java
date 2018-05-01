@@ -84,14 +84,13 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
         if(isUserExist){
             //redirigimos al fragment principal
             transition.show(this.mainActivity.getMainFragment());
+            transition.show(this.mainActivity.getCreateEventFragment());
             transition.hide(this.mainActivity.getProfileFragment());
-            transition.hide(this.mainActivity.getCreateEventFragment());
-
         }else{
             //redirigimos al fragment de creación de perfil
             transition.show(this.mainActivity.getProfileFragment());
-            transition.hide(this.mainActivity.getMainFragment());
             transition.hide(this.mainActivity.getCreateEventFragment());
+            transition.hide(this.mainActivity.getMainFragment());
 
         }
         transition.commit();

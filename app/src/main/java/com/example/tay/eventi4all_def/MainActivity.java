@@ -21,14 +21,18 @@ import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.tay.eventi4all_def.Firebase.AbstractFirebaseAdminListener;
 import com.example.tay.eventi4all_def.Firebase.FirebaseAdmin;
+import com.example.tay.eventi4all_def.adapter.ViewPagerAdapter;
 import com.example.tay.eventi4all_def.fragments.CreateEventFragment;
 import com.example.tay.eventi4all_def.fragments.IMainFragmentListener;
 import com.example.tay.eventi4all_def.fragments.MainFragment;
@@ -43,7 +47,19 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private MainActivityEvents mainActivityEvents;
-    private TextView mTextMessage;
+
+
+    //Slide Between Fragments (Swipe)
+    private ViewPager viewPager;
+
+    //Navigation
+    private MenuItem prevMenuItem;
+
+
+    // Bottom Menu Navigation
+    private BottomNavigationView bottomNavigationView;
+
+
     private SignIn signIn;
     private FirebaseAdmin firebaseAdmin;
     //Atributos fragments
@@ -52,54 +68,13 @@ public class MainActivity extends AppCompatActivity {
     private CreateEventFragment createEventFragment;
 
 
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
-            = new BottomNavigationView.OnNavigationItemSelectedListener() {
-
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.navigation_home:
-                    mTextMessage.setText(R.string.title_home);
-                    return true;
-                case R.id.navigation_dashboard:
-                    mTextMessage.setText(R.string.title_dashboard);
-                    return true;
-                case R.id.navigation_notifications:
-                    mTextMessage.setText(R.string.title_notifications);
-                    return true;
-            }
-            return false;
-        }
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mTextMessage = (TextView) findViewById(R.id.message);
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        bottomNavigationView = findViewById(R.id.navigation);
+
         mainActivityEvents = new MainActivityEvents(this);
-
-
-
-
-        //Instanciamos los fragments asignandoles su componente visual
-
-        this.mainFragment = (MainFragment) getSupportFragmentManager().findFragmentById(R.id.frgMain);
-        this.mainFragment.setiMainFragmentListener(this.mainActivityEvents);
-
-
-        this.profileFragment = (ProfileFragment) getSupportFragmentManager().findFragmentById(R.id.frgProfile);
-        this.profileFragment.setiProfileFragmentListener(this.mainActivityEvents);
-
-        this.createEventFragment = (CreateEventFragment) getSupportFragmentManager().findFragmentById(R.id.frgCreateEvent);
-        this.createEventFragment.setiCreateEventFragmentListener(this.mainActivityEvents);
-
-        android.support.v4.app.FragmentTransaction transition = getSupportFragmentManager().beginTransaction();
-        transition.hide(profileFragment);
-        transition.hide(createEventFragment);
-        transition.show(mainFragment);
 
         //Instancia de la clase SignIn
         this.signIn = new SignIn(this);
@@ -110,8 +85,94 @@ public class MainActivity extends AppCompatActivity {
         this.firebaseAdmin.setAbstractFirebaseAdminListener(this.mainActivityEvents);
 
 
+        viewPager = findViewById(R.id.viewpager);
+        bottomNavigationView = findViewById(R.id.navigation);
+
+// Poner insivile el navbottom
+//        bottomNavigationView.setVisibility(View.INVISIBLE);
+        bottomNavigationView.setOnNavigationItemSelectedListener(
+
+                new BottomNavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.navigation_home:
+                                viewPager.setCurrentItem(0);
+                                break;
+                            case R.id.navigation_dashboard:
+                                viewPager.setCurrentItem(1);
+                                break;
+                            case R.id.navigation_notifications:
+                                viewPager.setCurrentItem(2);
+                                break;
+                        }
+                        return false;
 
 
+                    }
+                });
+
+
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+
+            @Override
+            public void onPageSelected(int position) {
+                if (prevMenuItem != null) {
+                    prevMenuItem.setChecked(false);
+                } else {
+                    bottomNavigationView.getMenu().getItem(0).setChecked(false);
+                }
+                Log.d("page", "onPageSelected: " + position);
+                bottomNavigationView.getMenu().getItem(position).setChecked(true);
+                prevMenuItem = bottomNavigationView.getMenu().getItem(position);
+
+            }
+
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        });
+
+   /*  //Disable ViewPager Swipe
+   viewPager.setOnTouchListener(new View.OnTouchListener()
+    {
+        @Override
+        public boolean onTouch(View v, MotionEvent event)
+        {
+            return true;
+        }
+    });
+    */
+
+        setupViewPager(viewPager);
+
+
+    }
+
+    private void setupViewPager(ViewPager viewPager) {
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+
+
+        mainFragment = new MainFragment();
+        createEventFragment = new CreateEventFragment();
+        profileFragment = new ProfileFragment();
+
+        this.mainFragment.setiMainFragmentListener(this.mainActivityEvents);
+
+        this.profileFragment.setiProfileFragmentListener(this.mainActivityEvents);
+
+        this.createEventFragment.setiCreateEventFragmentListener(this.mainActivityEvents);
+
+
+        adapter.addFragment(mainFragment);
+        adapter.addFragment(createEventFragment);
+        adapter.addFragment(profileFragment);
+        viewPager.setAdapter(adapter);
+        viewPager.setCurrentItem(1);
     }
 
 
@@ -121,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode,resultCode,data);
+        super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == signIn.getRcSignIn()) {
             this.firebaseAdmin.onCreate();
@@ -163,6 +224,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
     /*
    Al igual que el OnActivityResut, método propio de los activities que reciben el resultado de aceptar/denegar un permiso
     */
@@ -180,9 +242,9 @@ public class MainActivity extends AppCompatActivity {
             Preguntamos si en la posición 0 y 1 tienen permisos garantizados
              */
             if (grantResults.length == 2 && grantResults[0] == PackageManager.PERMISSION_GRANTED &&
-                grantResults[1] == PackageManager.PERMISSION_GRANTED){
-                Toast.makeText(MainActivity.this,"Permisos aceptados",Toast.LENGTH_SHORT).show();
-            }else{
+                    grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(MainActivity.this, "Permisos aceptados", Toast.LENGTH_SHORT).show();
+            } else {
                 this.mainActivityEvents.showExplanation();
             }
 
@@ -190,8 +252,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-
-
 
 
     public FirebaseAdmin getFirebaseAdmin() {
@@ -207,13 +267,6 @@ public class MainActivity extends AppCompatActivity {
         this.mainActivityEvents = mainActivityEvents;
     }
 
-    public TextView getmTextMessage() {
-        return mTextMessage;
-    }
-
-    public void setmTextMessage(TextView mTextMessage) {
-        this.mTextMessage = mTextMessage;
-    }
 
     public SignIn getSignIn() {
         return signIn;
@@ -227,13 +280,6 @@ public class MainActivity extends AppCompatActivity {
         this.firebaseAdmin = firebaseAdmin;
     }
 
-    public BottomNavigationView.OnNavigationItemSelectedListener getmOnNavigationItemSelectedListener() {
-        return mOnNavigationItemSelectedListener;
-    }
-
-    public void setmOnNavigationItemSelectedListener(BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener) {
-        this.mOnNavigationItemSelectedListener = mOnNavigationItemSelectedListener;
-    }
 
     public ProfileFragment getProfileFragment() {
         return profileFragment;

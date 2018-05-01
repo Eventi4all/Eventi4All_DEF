@@ -13,8 +13,12 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.Checkable;
+import android.widget.CompoundButton;
 import android.widget.EditText;
-
+import android.widget.ImageView;
+import android.widget.Spinner;
 
 
 import com.example.tay.eventi4all_def.R;
@@ -39,6 +43,9 @@ public class CreateEventFragment extends Fragment {
     private ArrayList<User> arrUsers;
     private Button btnAdd;
     private RecyclerView myList;
+    private Button btnCreateEvent;
+    private Spinner spPax;
+    private CheckBox checkboxPrivate;
 
 
     public CreateEventFragment() {
@@ -54,6 +61,19 @@ public class CreateEventFragment extends Fragment {
         myList = (RecyclerView) v.findViewById(R.id.listOfUsers);
         myList.setLayoutManager(new GridLayoutManager(getContext(),2));
         this.btnAdd = v.findViewById(R.id.btnAddNewFriend);
+        this.btnCreateEvent = v.findViewById(R.id.btnCreateEvent);
+        this.btnCreateEvent.setOnClickListener(this.createEventFragmentEvents);
+        this.checkboxPrivate = v.findViewById(R.id.checkPrivate);
+
+
+        this.spPax = v.findViewById(R.id.spPax);
+
+        String[] items = new String[]{"15", "20", "50", "150", "Sin límites"};
+        ArrayAdapter<String> adapterSp = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_dropdown_item, items);
+        spPax.setAdapter(adapterSp);
+
+
+
         adapter = new ArrayAdapter(getActivity(), simple_list_item_1);
         this.createEventFragmentEvents = new CreateEventFragmentEvents(this);
         this.btnAdd.setOnClickListener(this.createEventFragmentEvents);
@@ -140,5 +160,44 @@ public class CreateEventFragment extends Fragment {
         this.listAdapter = listAdapter;
     }
 
+    public Button getBtnAdd() {
+        return btnAdd;
+    }
+
+    public void setBtnAdd(Button btnAdd) {
+        this.btnAdd = btnAdd;
+    }
+
+    public RecyclerView getMyList() {
+        return myList;
+    }
+
+    public void setMyList(RecyclerView myList) {
+        this.myList = myList;
+    }
+
+    public Button getBtnCreateEvent() {
+        return btnCreateEvent;
+    }
+
+    public void setBtnCreateEvent(Button btnCreateEvent) {
+        this.btnCreateEvent = btnCreateEvent;
+    }
+
+    public Spinner getSpPax() {
+        return spPax;
+    }
+
+    public void setSpPax(Spinner spPax) {
+        this.spPax = spPax;
+    }
+
+    public CheckBox getCheckboxPrivate() {
+        return checkboxPrivate;
+    }
+
+    public void setCheckboxPrivate(CheckBox checkboxPrivate) {
+        this.checkboxPrivate = checkboxPrivate;
+    }
 
 }

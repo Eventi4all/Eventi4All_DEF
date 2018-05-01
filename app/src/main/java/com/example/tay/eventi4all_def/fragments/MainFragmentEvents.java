@@ -24,8 +24,6 @@ public class MainFragmentEvents implements View.OnClickListener {
     public void onClick(View v) {
         if (v.getId() == R.id.btnLo) {
             this.mainFragment.getiMainFragmentListener().callLogoutMainActivity();
-        } else if (v.getId() == R.id.btnCreateEvent) {
-            this.mainFragment.getiMainFragmentListener().openCreateEventFragment();
         }
 
     }

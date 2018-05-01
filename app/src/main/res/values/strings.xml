@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">Eventi4All_DEF</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_home">Perfil</string>
+    <string name="title_dashboard">Añadir</string>
+    <string name="title_notifications">Notificaciones</string>
     <!-- Información de proveedor requerida para Facebook -->
     <string name="facebook_application_id" translatable="false">361927374287912</string>
     <string name="facebook_login_protocol_scheme" translatable="false">fb361927374287912</string>
