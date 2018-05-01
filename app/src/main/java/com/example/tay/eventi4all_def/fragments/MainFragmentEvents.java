@@ -3,7 +3,7 @@ package com.example.tay.eventi4all_def.fragments;
 import android.view.View;
 import com.example.tay.eventi4all_def.R;
 
-public class MainFragmentEvents implements View.OnClickListener{
+public class MainFragmentEvents implements View.OnClickListener {
 
     private MainFragment mainFragment;
 
@@ -22,8 +22,11 @@ public class MainFragmentEvents implements View.OnClickListener{
 
     @Override
     public void onClick(View v) {
-        if(v.getId()== R.id.btnLo){
+        if (v.getId() == R.id.btnLo) {
             this.mainFragment.getiMainFragmentListener().callLogoutMainActivity();
+        } else if (v.getId() == R.id.btnCreateEvent) {
+            this.mainFragment.getiMainFragmentListener().openCreateEventFragment();
         }
+
     }
 }

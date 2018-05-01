@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.net.Uri;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 
 import com.example.tay.eventi4all_def.DataHolder;
+import com.example.tay.eventi4all_def.entity.User;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -17,11 +19,16 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -82,27 +89,34 @@ public class FirebaseAdmin {
 
     }
 
-    public boolean checkIfNickNameExist(final Map user){
-
+    public boolean checkIfDocumentNameExist(final Map collection, String checkDocument){
         final boolean[] result = new boolean[1];
-        result[0]=false;
-        Query check = db.collection("users").whereEqualTo("nickname", user.get("nickname").toString());
-        check.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-         @Override
-         public void onSuccess(QuerySnapshot documentSnapshots) {
+        if(checkDocument.equals("nickName")) {
+            result[0] = false;
+            Query check = db.collection("users").whereEqualTo("nickname", collection.get("nickname").toString());
+            check.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                @Override
+                public void onSuccess(QuerySnapshot documentSnapshots) {
 
-             if(documentSnapshots.getDocuments().size()>0){
-                 abstractFirebaseAdminListener.insertDocumentIsOK(false,"NickName exist");
-             }else{
-                 insertDocumentInFirebase(user);
-             }
-         }
-     });
+                    if (documentSnapshots.getDocuments().size() > 0) {
+                        abstractFirebaseAdminListener.insertDocumentIsOK(false, "NickName exist");
+                        }
+                    else {
+                        insertDocumentInFirebase(collection, "createProfile");
+                    }
+                }
+                    }
+
+
+            );
+        }else if(checkDocument.equals("event")){
+
+        }
       return result[0];
     }
 
-    public void insertDocumentInFirebase(final Map<String, Object> document) {
-
+    public void insertDocumentInFirebase(final Map<String, Object> document,String petition) {
+        if(petition.equals("createProfile")){
             try{
                 final String nameImg = UUID.randomUUID().toString() + ".jpg";
                 final StorageReference mountainImagesRef = storageRef.child("images/profile/" + nameImg);
@@ -140,6 +154,44 @@ public class FirebaseAdmin {
             }
 
 
+        }else if(petition.equals("createEvent")){
+
+        }
+
+
+
+    }
+
+
+    public void getAllUsers(CharSequence sequence){
+        final HashMap<String,User> users = new HashMap<String, User>();
+        String search = sequence.toString().toLowerCase();
+        db.collection("users").orderBy("nickname").startAt(search).endAt(search+'\uf8ff').addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
+                for (final DocumentSnapshot data: documentSnapshots.getDocuments()) {
+                    storageRef.child(data.getData().get("imgProfile").toString()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            users.put(data.getData().get("nickname").toString(),new User(data.getData().get("nickname").toString(),uri.toString()));
+                            abstractFirebaseAdminListener.foundNickName(users);
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Handle any errors
+                        }
+                    });
+
+
+                }
+
+
+
+            }
+
+
+        });
 
 
     }

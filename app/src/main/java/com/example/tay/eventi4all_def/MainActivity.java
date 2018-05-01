@@ -29,6 +29,7 @@ import android.widget.Toast;
 
 import com.example.tay.eventi4all_def.Firebase.AbstractFirebaseAdminListener;
 import com.example.tay.eventi4all_def.Firebase.FirebaseAdmin;
+import com.example.tay.eventi4all_def.fragments.CreateEventFragment;
 import com.example.tay.eventi4all_def.fragments.IMainFragmentListener;
 import com.example.tay.eventi4all_def.fragments.MainFragment;
 import com.example.tay.eventi4all_def.fragments.ProfileFragment;
@@ -48,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     //Atributos fragments
     private ProfileFragment profileFragment;
     private MainFragment mainFragment;
+    private CreateEventFragment createEventFragment;
 
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -91,8 +93,12 @@ public class MainActivity extends AppCompatActivity {
         this.profileFragment = (ProfileFragment) getSupportFragmentManager().findFragmentById(R.id.frgProfile);
         this.profileFragment.setiProfileFragmentListener(this.mainActivityEvents);
 
+        this.createEventFragment = (CreateEventFragment) getSupportFragmentManager().findFragmentById(R.id.frgCreateEvent);
+        this.createEventFragment.setiCreateEventFragmentListener(this.mainActivityEvents);
+
         android.support.v4.app.FragmentTransaction transition = getSupportFragmentManager().beginTransaction();
         transition.hide(profileFragment);
+        transition.hide(createEventFragment);
         transition.show(mainFragment);
 
         //Instancia de la clase SignIn
@@ -245,5 +251,11 @@ public class MainActivity extends AppCompatActivity {
         this.mainFragment = mainFragment;
     }
 
+    public CreateEventFragment getCreateEventFragment() {
+        return createEventFragment;
+    }
 
+    public void setCreateEventFragment(CreateEventFragment createEventFragment) {
+        this.createEventFragment = createEventFragment;
+    }
 }

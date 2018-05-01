@@ -1,5 +1,10 @@
 package com.example.tay.eventi4all_def.Firebase;
 
+import com.example.tay.eventi4all_def.entity.User;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public abstract class AbstractFirebaseAdminListener implements IFirebaseAdminListener{
 
     private IFirebaseAdminListener iFirebaseAdminListener;
@@ -33,6 +38,11 @@ public abstract class AbstractFirebaseAdminListener implements IFirebaseAdminLis
 
     @Override
     public void insertDocumentIsOK(boolean isInsertok, String result) {
+
+    }
+
+    @Override
+    public void foundNickName(HashMap<String,User> users) {
 
     }
 }

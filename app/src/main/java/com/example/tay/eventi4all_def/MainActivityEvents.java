@@ -19,10 +19,14 @@ import android.view.View;
 
 
 import com.example.tay.eventi4all_def.Firebase.AbstractFirebaseAdminListener;
+import com.example.tay.eventi4all_def.entity.User;
+import com.example.tay.eventi4all_def.fragments.ICreateEventFragmentListener;
 import com.example.tay.eventi4all_def.fragments.IMainFragmentListener;
 import com.example.tay.eventi4all_def.fragments.IProfileFragmentListener;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import static android.Manifest.permission.CAMERA;
@@ -33,7 +37,7 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
  * Created by tay on 17/4/18.
  */
 
-public class MainActivityEvents extends AbstractFirebaseAdminListener implements IMainFragmentListener, IProfileFragmentListener{
+public class MainActivityEvents extends AbstractFirebaseAdminListener implements IMainFragmentListener, IProfileFragmentListener, ICreateEventFragmentListener{
     private MainActivity mainActivity;
     //Directorio principal donde se almacenan las imagenes
     private static String APP_DIRECTORY = "Eventy4All/";
@@ -52,10 +56,12 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
 
     private ProgressDialog progress;
     private  AlertDialog.Builder builder;
+    private  FragmentTransaction transition;
 
     public MainActivityEvents(MainActivity mainActivity) {
 
         this.mainActivity = mainActivity;
+
     }
 
 
@@ -74,22 +80,22 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
 
     @Override
     public void checkUserExist(boolean isUserExist) {
-        FragmentTransaction transition = this.mainActivity.getSupportFragmentManager().beginTransaction();
-
+        transition = this.mainActivity.getSupportFragmentManager().beginTransaction();
         if(isUserExist){
             //redirigimos al fragment principal
             transition.show(this.mainActivity.getMainFragment());
             transition.hide(this.mainActivity.getProfileFragment());
-            System.out.println("------------------------------------>>>>>>>>>>>>>EXISTE isUserExist" );
+            transition.hide(this.mainActivity.getCreateEventFragment());
 
         }else{
             //redirigimos al fragment de creación de perfil
             transition.show(this.mainActivity.getProfileFragment());
             transition.hide(this.mainActivity.getMainFragment());
-            System.out.println("------------------------------------>>>>>>>>>>>>> NO EXISTE isUserExist" );
+            transition.hide(this.mainActivity.getCreateEventFragment());
+
         }
         transition.commit();
-        System.out.println("------------------------------------>>>>>>>>>>>>> COMMIT isUserExist" );
+
 
     }
 
@@ -109,6 +115,20 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
     @Override
     public void callLogoutMainActivity() {
         this.mainActivity.getFirebaseAdmin().logoutFirebase(this.mainActivity);
+    }
+
+    @Override
+    public void saveEventFirebase(Map<String, Object> event) {
+        this.mainActivity.getFirebaseAdmin().checkIfDocumentNameExist(event,"event");
+
+    }
+
+    @Override
+    public void openCreateEventFragment() {
+        transition = this.mainActivity.getSupportFragmentManager().beginTransaction();
+        transition.hide(this.mainActivity.getMainFragment());
+        transition.show(this.mainActivity.getCreateEventFragment());
+        transition.commit();
     }
 
     @Override
@@ -241,7 +261,7 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
 
     @Override
     public void saveProfileInFirebase(Map<String, Object> user) {
-        this.mainActivity.getFirebaseAdmin().checkIfNickNameExist(user);
+        this.mainActivity.getFirebaseAdmin().checkIfDocumentNameExist(user,"nickName");
         progress = new ProgressDialog(this.mainActivity);
         progress.setMessage("Estamos creando tu perfil, por favor espere...");
         progress.show();
@@ -350,4 +370,20 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
     public void setProgress(ProgressDialog progress) {
         this.progress = progress;
     }
+
+    @Override
+    public void getUsersFb(CharSequence sequence) {
+        //System.out.println("el texto cambia" + sequence);
+        this.mainActivity.getFirebaseAdmin().getAllUsers(sequence);
+
+    }
+
+
+    @Override
+    public void foundNickName(HashMap<String,User> users) {
+      this.mainActivity.getCreateEventFragment().getCreateEventFragmentEvents().foundNickname(users);
+
+
+    }
+
 }

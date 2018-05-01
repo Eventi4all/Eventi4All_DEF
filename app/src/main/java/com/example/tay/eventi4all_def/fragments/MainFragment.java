@@ -18,6 +18,7 @@ public class MainFragment extends Fragment {
     private MainFragmentEvents mainFragmentEvents;
     private IMainFragmentListener iMainFragmentListener;
     private Button btnLogout;
+    private Button btnCreateEvent;
 
 
     public MainFragment() {
@@ -32,9 +33,8 @@ public class MainFragment extends Fragment {
         mainFragmentEvents = new MainFragmentEvents(this);
         this.btnLogout = v.findViewById(R.id.btnLo);
         this.btnLogout.setOnClickListener(this.mainFragmentEvents);
-
-
-
+        this.btnCreateEvent = v.findViewById(R.id.btnCreateEvent);
+        this.btnCreateEvent.setOnClickListener(this.mainFragmentEvents);
         return v;
     }
 
