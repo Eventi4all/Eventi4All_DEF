@@ -9,8 +9,11 @@ import android.net.Uri;
 
 public class DataHolder {
 
+
+
     public static class MyDataHolder {
         public static Uri imgUri;
+        public static String currentUserNickName;
 
 
 

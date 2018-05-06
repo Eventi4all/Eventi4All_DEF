@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import com.bumptech.glide.Glide;
 import com.example.tay.eventi4all_def.R;
 import com.example.tay.eventi4all_def.entity.User;
-
+import com.example.tay.eventi4all_def.fragments.CreateEventFragment;
 
 
 import java.util.ArrayList;
@@ -23,10 +23,11 @@ import java.util.ArrayList;
 public class ListAdapter extends RecyclerView.Adapter<MyViewHolder> {
     private ArrayList<User> contenidoLista; //declaramos un array que contiene contenido que queremos que s epinte en las celdas de la lista
     private Context context; // esta variable la creamos dado que la librería Glide para cargar imagenes desde firebase necesita una variable de tipo contexto
-    public ListAdapter(ArrayList<User> contenidoLista, Context context) { // ListAdapter recibe como parámetro el context de Glide, en nuestro caso el contexto es el padre donde se encuentra que al fin de cuentas el list se encuentra en el second Activity
-        System.out.println("contenidoLista: " + contenidoLista);
+    private CreateEventFragment createEventFragment;
+    public ListAdapter(ArrayList<User> contenidoLista, Context context, CreateEventFragment createEventFragment) { // ListAdapter recibe como parámetro el context de Glide, en nuestro caso el contexto es el padre donde se encuentra que al fin de cuentas el list se encuentra en el second Activity
         this.contenidoLista = contenidoLista;
         this.context = context;
+        this.createEventFragment=createEventFragment;
     }
 
     @Override
@@ -37,6 +38,7 @@ public class ListAdapter extends RecyclerView.Adapter<MyViewHolder> {
         //antes de meter los contenidos.
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_cell_layout, null); // se pone null porque no tiene padre de jerarquía. Normalmente lo dejaremos a null.
         MyViewHolder viewHolder = new MyViewHolder(view);
+        viewHolder.setMyViewHolderListener(this.getCreateEventFragment().getCreateEventFragmentEvents());
         return viewHolder;
     }
 
@@ -52,12 +54,6 @@ public class ListAdapter extends RecyclerView.Adapter<MyViewHolder> {
         Glide.with(getContext().getApplicationContext()).load(this.getContenidoLista().get(position).urlImgProfile).into(holder.getImageViewProfile());
 
 
-    /*if(position==0){
-        holder.getTxtNombre().setText("Yony");
-    }else if(position==1){
-        holder.getTxtNombre().setText("Javi");
-    }
-    */
 
     }
 
@@ -85,5 +81,12 @@ public class ListAdapter extends RecyclerView.Adapter<MyViewHolder> {
         this.context = context;
     }
 
+    public CreateEventFragment getCreateEventFragment() {
+        return createEventFragment;
+    }
+
+    public void setCreateEventFragment(CreateEventFragment createEventFragment) {
+        this.createEventFragment = createEventFragment;
+    }
 
 }

@@ -13,4 +13,6 @@ public interface IFirebaseAdminListener {
     public void checkUserExist(boolean isUserExist);
     public void insertDocumentIsOK(boolean isInsertok, String result);
     public void foundNickName(HashMap<String,User> users);
+    public void insertEventOk(boolean isInsertOk, String result);
+
 }

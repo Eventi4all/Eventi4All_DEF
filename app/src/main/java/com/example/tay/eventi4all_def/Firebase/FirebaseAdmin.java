@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.net.Uri;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 
 import com.example.tay.eventi4all_def.DataHolder;
@@ -27,7 +26,6 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -68,7 +66,7 @@ public class FirebaseAdmin {
 
     //Comprobar si es la primera vez que se loguea el usuario
     public void checkUserExist() {
-        DocumentReference docRef = db.collection("users").document(this.getUidUser());
+        final DocumentReference docRef = db.collection("users").document(this.getUidUser());
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -76,6 +74,8 @@ public class FirebaseAdmin {
                     DocumentSnapshot document = task.getResult();
                     if (document != null && document.exists()) {
                         System.out.println("------------>>>>>>El usuario existe");
+                        //Guardamos el niockname para cuando lo necesitemos
+                        DataHolder.MyDataHolder.currentUserNickName = task.getResult().getData().get("nickname").toString();
                         abstractFirebaseAdminListener.checkUserExist(true);
                     } else {
                         System.out.println("------------>>>>>>El usuario no existe");
@@ -89,91 +89,97 @@ public class FirebaseAdmin {
 
     }
 
-    public boolean checkIfDocumentNameExist(final Map collection, String checkDocument){
+    public boolean checkIfDocumentNameExist(final Map collection) {
         final boolean[] result = new boolean[1];
-        if(checkDocument.equals("nickName")) {
-            result[0] = false;
-            Query check = db.collection("users").whereEqualTo("nickname", collection.get("nickname").toString());
-            check.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+
+        result[0] = false;
+        Query check = db.collection("users").whereEqualTo("nickname", collection.get("nickname").toString());
+        check.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                             @Override
+                                             public void onSuccess(QuerySnapshot documentSnapshots) {
+
+                                                 if (documentSnapshots.getDocuments().size() > 0) {
+                                                     abstractFirebaseAdminListener.insertDocumentIsOK(false, "NickName exist");
+                                                 } else {
+                                                     insertProfileInFirebase(collection);
+                                                 }
+                                             }
+                                         }
+
+
+        );
+
+        return result[0];
+    }
+
+    public void insertProfileInFirebase(final Map<String, Object> document) {
+
+        try {
+
+            Task uploadTask = (Task) createFile("images/profile/","upload").get("uploadTask");
+            uploadTask.addOnFailureListener(new OnFailureListener() {
                 @Override
-                public void onSuccess(QuerySnapshot documentSnapshots) {
-
-                    if (documentSnapshots.getDocuments().size() > 0) {
-                        abstractFirebaseAdminListener.insertDocumentIsOK(false, "NickName exist");
-                        }
-                    else {
-                        insertDocumentInFirebase(collection, "createProfile");
-                    }
+                public void onFailure(@NonNull Exception exception) {
+                    abstractFirebaseAdminListener.insertDocumentIsOK(false, "Firebase Exception");
                 }
-                    }
+            }).addOnSuccessListener(new OnSuccessListener() {
+                @Override
+                public void onSuccess(Object o) {
+                    document.put("imgProfile", (String) createFile("images/profile/","getUrl").get("urlComplete"));
+                    db.collection("users").document(getUidUser()).set(document).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            DataHolder.MyDataHolder.currentUserNickName = document.get("nickname").toString();
+                            abstractFirebaseAdminListener.insertDocumentIsOK(true, "Document Insert");
+                        }
+                    })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    abstractFirebaseAdminListener.insertDocumentIsOK(false, "Firebase Exception");
+                                }
+                            });
 
 
-            );
-        }else if(checkDocument.equals("event")){
+                }
 
+
+            });
+        } catch (Exception e) {
+            abstractFirebaseAdminListener.insertDocumentIsOK(false, "Firebase Exception");
         }
-      return result[0];
-    }
-
-    public void insertDocumentInFirebase(final Map<String, Object> document,String petition) {
-        if(petition.equals("createProfile")){
-            try{
-                final String nameImg = UUID.randomUUID().toString() + ".jpg";
-                final StorageReference mountainImagesRef = storageRef.child("images/profile/" + nameImg);
-                Uri file = DataHolder.MyDataHolder.imgUri;
-                Task uploadTask = mountainImagesRef.putFile(file);
-                uploadTask.addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        abstractFirebaseAdminListener.insertDocumentIsOK(false,"Firebase Exception");
-                    }
-                }).addOnSuccessListener(new OnSuccessListener() {
-                    @Override
-                    public void onSuccess(Object o) {
-                        document.put("imgProfile", "images/profile/" + nameImg);
-                        db.collection("users").document(getUidUser()).set(document).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                abstractFirebaseAdminListener.insertDocumentIsOK(true,"Document Insert");
-                            }
-                        })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        abstractFirebaseAdminListener.insertDocumentIsOK(false,"Firebase Exception");
-                                    }
-                                });
-
-
-                    }
-
-
-                });
-            }catch(Exception e){
-                abstractFirebaseAdminListener.insertDocumentIsOK(false, "Firebase Exception");
-            }
-
-
-        }else if(petition.equals("createEvent")){
-
-        }
-
 
 
     }
 
+    public HashMap createFile(String url, String action) {
+        final String nameImg = UUID.randomUUID().toString() + ".jpg";
+        HashMap<String, Object> result = new HashMap<>();
+        if(action.equals("upload")){
+            Uri file = DataHolder.MyDataHolder.imgUri;
+            final StorageReference mountainImagesRef = storageRef.child(url + nameImg);
+            result.put("uploadTask", mountainImagesRef.putFile(file));
+        }
+        result.put("urlComplete", url + nameImg);
 
-    public void getAllUsers(CharSequence sequence){
-        final HashMap<String,User> users = new HashMap<String, User>();
+
+
+
+        return result;
+    }
+
+
+    public void getAllUsers(CharSequence sequence) {
+        final HashMap<String, User> users = new HashMap<String, User>();
         String search = sequence.toString().toLowerCase();
-        db.collection("users").orderBy("nickname").startAt(search).endAt(search+'\uf8ff').addSnapshotListener(new EventListener<QuerySnapshot>() {
+        db.collection("users").orderBy("nickname").startAt(search).endAt(search + '\uf8ff').addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
-                for (final DocumentSnapshot data: documentSnapshots.getDocuments()) {
+                for (final DocumentSnapshot data : documentSnapshots.getDocuments()) {
                     storageRef.child(data.getData().get("imgProfile").toString()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
-                            users.put(data.getData().get("nickname").toString(),new User(data.getData().get("nickname").toString(),uri.toString()));
+                            users.put(data.getData().get("nickname").toString(), new User(data.getData().get("nickname").toString(), uri.toString()));
                             abstractFirebaseAdminListener.foundNickName(users);
                         }
                     }).addOnFailureListener(new OnFailureListener() {
@@ -187,7 +193,6 @@ public class FirebaseAdmin {
                 }
 
 
-
             }
 
 
@@ -196,8 +201,46 @@ public class FirebaseAdmin {
 
     }
 
+    public void insertEventInFirebase(HashMap<String, Object> event) {
+
+        try{
+
+        Task uploadTask = (Task) createFile("images/events/","upload").get("uploadTask");
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                abstractFirebaseAdminListener.insertEventOk(false, "Firebase Exception");
+            }
+        }).addOnSuccessListener(new OnSuccessListener() {
+            @Override
+            public void onSuccess(Object o) {
+                event.put("coverImg", (String) createFile("images/events/","getUrl").get("urlComplete"));
+                db.collection("events").document(event.get("uuid").toString()).set(event).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        abstractFirebaseAdminListener.insertEventOk(true, "Document Insert");
+                    }
+                })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                abstractFirebaseAdminListener.insertEventOk(false, "Firebase Exception");
+                            }
+                        });
 
 
+            }
+
+
+        });
+    }catch(Exception e)
+
+    {
+        abstractFirebaseAdminListener.insertDocumentIsOK(false, "Firebase Exception");
+    }
+
+
+}
 
 
     //Devuelva la instancia del uid del usuairo
@@ -249,5 +292,6 @@ public class FirebaseAdmin {
     public void setUidUser(String uidUser) {
         this.uidUser = uidUser;
     }
+
 
 }

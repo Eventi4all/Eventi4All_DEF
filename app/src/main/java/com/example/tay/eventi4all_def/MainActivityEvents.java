@@ -7,6 +7,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -21,11 +22,11 @@ import android.view.View;
 import com.example.tay.eventi4all_def.Firebase.AbstractFirebaseAdminListener;
 import com.example.tay.eventi4all_def.entity.User;
 import com.example.tay.eventi4all_def.fragments.ICreateEventFragmentListener;
+import com.example.tay.eventi4all_def.fragments.IGalleryAndCapturePhotoListener;
 import com.example.tay.eventi4all_def.fragments.IMainFragmentListener;
 import com.example.tay.eventi4all_def.fragments.IProfileFragmentListener;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,7 +38,7 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
  * Created by tay on 17/4/18.
  */
 
-public class MainActivityEvents extends AbstractFirebaseAdminListener implements IMainFragmentListener, IProfileFragmentListener, ICreateEventFragmentListener{
+public class MainActivityEvents extends AbstractFirebaseAdminListener implements IMainFragmentListener, IProfileFragmentListener, ICreateEventFragmentListener, IGalleryAndCapturePhotoListener{
     private MainActivity mainActivity;
     //Directorio principal donde se almacenan las imagenes
     private static String APP_DIRECTORY = "Eventy4All/";
@@ -48,9 +49,11 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
     //Para propocionar un código de permiso para tomar una foto
     private final int MY_PERMISSIONS =100;
     //Para proporcionar permisos para abrir la cámara
-    private final int PHOTO_CODE =200;
-    //Para proporcionar permisos apra abrir la galería
-    private final int SELECT_PICTURE =300;
+    private final int PHOTO_CODE_PROFILE =200;
+    private final int PHOTO_CODE_MAINEVENT=201;
+    //Para proporcionar permisos para abrir la galería
+    private final int SELECT_PICTURE_PROFILE =300;
+    private final int SELECT_PICTURE_MAINEVENT =301;
     //Almacenamos la ruta donde se guarda la img
     private String mPath;
 
@@ -116,24 +119,11 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
         this.mainActivity.getFirebaseAdmin().logoutFirebase(this.mainActivity);
     }
 
-    @Override
-    public void saveEventFirebase(Map<String, Object> event) {
-        this.mainActivity.getFirebaseAdmin().checkIfDocumentNameExist(event,"event");
-
-    }
 
     @Override
-    public void openCreateEventFragment() {
-        transition = this.mainActivity.getSupportFragmentManager().beginTransaction();
-        transition.hide(this.mainActivity.getMainFragment());
-        transition.show(this.mainActivity.getCreateEventFragment());
-        transition.commit();
-    }
-
-    @Override
-    public void executeOptions(int option) {
+    public void executeOptions(int option,String call) {
         if(option == 0){
-           this.openCamera();
+           this.openCamera(call);
         }else if(option == 1){
             /*
             Hacemos un intent abrir la galería(ACTION_PICK es una listas de cosas de las que se puede seleccionar,
@@ -146,14 +136,19 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
             Iniciamos el intent(createChooser es para que me salgan todas las imagenes de cualqueir aplicación
             para poder seleccinarlas
              */
-           this.mainActivity.startActivityForResult(Intent.createChooser(intent, "Elige una imagen de la galería"),SELECT_PICTURE);
+            if(call.equals("profile")){
+                this.mainActivity.startActivityForResult(Intent.createChooser(intent, "Elige una imagen de la galería"), SELECT_PICTURE_PROFILE);
+            }else if(call.equals("coverEvent")){
+                this.mainActivity.startActivityForResult(Intent.createChooser(intent, "Elige una imagen de la galería"), SELECT_PICTURE_MAINEVENT);
+            }
+
 
         }
     }
 
 
 
-    private void openCamera() {
+    private void openCamera(String call) {
         File file = new File(Environment.getExternalStorageDirectory(),MEDIA_DIRECTORY);
         //Nos devuelve true/false si el directorio APP_DIRECTORY está creado
         boolean isDirectoryCreated = file.exists();
@@ -197,7 +192,11 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
              */
             intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(newFile));
             DataHolder.MyDataHolder.imgUri = Uri.fromFile(newFile);
-            this.mainActivity.startActivityForResult(intent, PHOTO_CODE);
+            if(call.equals("profile")){
+                this.mainActivity.startActivityForResult(intent, PHOTO_CODE_PROFILE);
+            }else if(call.equals("coverEvent")){
+                this.mainActivity.startActivityForResult(intent, PHOTO_CODE_MAINEVENT);
+            }
             System.out.println("------------------------------>>>>>>>>>>>START ACTIVITY CAMARA");
         }
     }
@@ -260,7 +259,7 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
 
     @Override
     public void saveProfileInFirebase(Map<String, Object> user) {
-        this.mainActivity.getFirebaseAdmin().checkIfDocumentNameExist(user,"nickName");
+        this.mainActivity.getFirebaseAdmin().checkIfDocumentNameExist(user);
         progress = new ProgressDialog(this.mainActivity);
         progress.setMessage("Estamos creando tu perfil, por favor espere...");
         progress.show();
@@ -324,6 +323,60 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
             builder.setMessage("¡El nombre de usuario ya existe! Prueba con otro.");
             builder.show();
         }
+
+    }
+
+
+
+    @Override
+    public void getUsersFb(CharSequence sequence) {
+        //System.out.println("el texto cambia" + sequence);
+        this.mainActivity.getFirebaseAdmin().getAllUsers(sequence);
+
+    }
+
+    @Override
+    public void saveEventInFirebase(HashMap<String, Object> event) {
+        progress = new ProgressDialog(this.mainActivity);
+        progress.setMessage("Estamos creando el evento, por favor espere...");
+        progress.show();
+        this.mainActivity.getFirebaseAdmin().insertEventInFirebase(event);
+    }
+
+
+    @Override
+    public void foundNickName(HashMap<String,User> users) {
+      this.mainActivity.getCreateEventFragment().getCreateEventFragmentEvents().foundNickname(users);
+
+
+    }
+
+    @Override
+    public void insertEventOk(boolean isInsertOk, String result) {
+        progress.dismiss();
+        if(isInsertOk && result.equals("Document Insert")){
+            builder = new AlertDialog.Builder(this.mainActivity);
+            builder.setTitle("¡Enhorabuena!");
+            builder.setMessage("Has creado el evento: "+ this.mainActivity.getCreateEventFragment().getTxtEventName().getText().toString() + "!");
+            builder.show();
+            this.mainActivity.getCreateEventFragment().getTxtEventName().setText("");
+            this.mainActivity.getCreateEventFragment().getCheckboxPrivate().setChecked(false);
+            DataHolder.MyDataHolder.imgUri= Uri.parse("android.resource://com.example.tay.eventi4all_def/" + R.drawable.com_facebook_profile_picture_blank_square);
+            Drawable myDrawable = this.mainActivity.getResources().getDrawable(R.drawable.com_facebook_profile_picture_blank_square);
+            this.mainActivity.getCreateEventFragment().getEventImgMain().setImageDrawable(myDrawable);
+            this.mainActivity.getCreateEventFragment().getSpPax().setSelection(0);
+            this.mainActivity.getCreateEventFragment().getListAdapter().getContenidoLista().clear();
+            this.mainActivity.getCreateEventFragment().getListAdapter().notifyDataSetChanged();
+
+
+        }else{
+            builder = new AlertDialog.Builder(this.mainActivity);
+            builder.setTitle("¡Opps!");
+            builder.setMessage("Hubo un problema, ¡Vuelve a intentarlo!");
+            builder.show();
+        }
+
+
     }
 
     public static String getAppDirectory() {
@@ -346,12 +399,12 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
         return MY_PERMISSIONS;
     }
 
-    public int getPHOTO_CODE() {
-        return PHOTO_CODE;
+    public int getPHOTO_CODE_PROFILE() {
+        return PHOTO_CODE_PROFILE;
     }
 
-    public int getSELECT_PICTURE() {
-        return SELECT_PICTURE;
+    public int getSELECT_PICTURE_PROFILE() {
+        return SELECT_PICTURE_PROFILE;
     }
 
     public String getmPath() {
@@ -368,21 +421,6 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
 
     public void setProgress(ProgressDialog progress) {
         this.progress = progress;
-    }
-
-    @Override
-    public void getUsersFb(CharSequence sequence) {
-        //System.out.println("el texto cambia" + sequence);
-        this.mainActivity.getFirebaseAdmin().getAllUsers(sequence);
-
-    }
-
-
-    @Override
-    public void foundNickName(HashMap<String,User> users) {
-      this.mainActivity.getCreateEventFragment().getCreateEventFragmentEvents().foundNickname(users);
-
-
     }
 
 }

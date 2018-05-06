@@ -45,4 +45,9 @@ public abstract class AbstractFirebaseAdminListener implements IFirebaseAdminLis
     public void foundNickName(HashMap<String,User> users) {
 
     }
+
+    @Override
+    public void insertEventOk(boolean isInsertOk, String result) {
+
+    }
 }

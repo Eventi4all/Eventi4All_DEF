@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
         viewPager = findViewById(R.id.viewpager);
         bottomNavigationView = findViewById(R.id.navigation);
 
-// Poner insivile el navbottom
+// Poner invisible el navbottom
 //        bottomNavigationView.setVisibility(View.INVISIBLE);
         bottomNavigationView.setOnNavigationItemSelectedListener(
 
@@ -164,8 +164,10 @@ public class MainActivity extends AppCompatActivity {
         this.mainFragment.setiMainFragmentListener(this.mainActivityEvents);
 
         this.profileFragment.setiProfileFragmentListener(this.mainActivityEvents);
+        this.profileFragment.setiGalleryAndCapturePhotoListener(this.mainActivityEvents);
 
         this.createEventFragment.setiCreateEventFragmentListener(this.mainActivityEvents);
+        this.createEventFragment.setiGalleryAndCapturePhotoListener(this.mainActivityEvents);
 
 
         adapter.addFragment(mainFragment);
@@ -192,36 +194,46 @@ public class MainActivity extends AppCompatActivity {
         }
         //Si la respuesta de la cámara o galería es OK
         if (resultCode == RESULT_OK) {
-            switch (requestCode) {
-                //Si el requestCode es igual al PHOTO_CODE
-                case 200:
-                    //Escaneamos la nueva imagen que hemos tomado porque si no, no la encuentra
-                    MediaScannerConnection.scanFile(this, new String[]{this.mainActivityEvents.getmPath()}, null, new MediaScannerConnection.OnScanCompletedListener() {
-                        @Override
-                        public void onScanCompleted(String path, Uri uri) {
-                            System.out.println("Externa Storage scanned " + path + ":");
-                            System.out.println("ExternalStorage Uri:v " + uri);
-                        }
-                    });
-                    //Vamos a meter en el imageView del profileFragment la foto:
+          //  switch (requestCode) {
+            //Si el requestCode es igual al PHOTO_CODE
+            if(requestCode==200 || requestCode==201){
+                //Escaneamos la nueva imagen que hemos tomado porque si no, no la encuentra
+                MediaScannerConnection.scanFile(this, new String[]{this.mainActivityEvents.getmPath()}, null, new MediaScannerConnection.OnScanCompletedListener() {
+                    @Override
+                    public void onScanCompleted(String path, Uri uri) {
+                        System.out.println("Externa Storage scanned " + path + ":");
+                        System.out.println("ExternalStorage Uri:v " + uri);
+                    }
+                });
+                //Vamos a meter en el imageView del profileFragment la foto:
 
-                    //Primero decodificamos la ruta y saca la imagen para guardarla en el bitmap.
-                    Bitmap bitmap = BitmapFactory.decodeFile(this.mainActivityEvents.getmPath());
-                    //Le seteamos el bitmap al imageView
+                //Primero decodificamos la ruta y saca la imagen para guardarla en el bitmap.
+                Bitmap bitmap = BitmapFactory.decodeFile(this.mainActivityEvents.getmPath());
+                //Le seteamos el bitmap al imageView
+                if(requestCode==200){
                     this.profileFragment.getImgProfile().setImageBitmap(bitmap);
-                    break;
+                }else if(requestCode==201){
+                    this.createEventFragment.getEventImgMain().setImageBitmap(bitmap);
+                }
                 //Si el requestCode es el de SELECT_PICTURE
-                case 300:
-                    //Recibimos la URI de la imagen
-                    Uri path = data.getData();
-                    DataHolder.MyDataHolder.imgUri = path;
-
-
-                    //Seteamos la imagen
+            }else if(requestCode==300 || requestCode==301){
+                //Recibimos la URI de la imagen
+                Uri path = data.getData();
+                DataHolder.MyDataHolder.imgUri = path;
+                //Seteamos la imagen
+                if(requestCode==300){
                     this.profileFragment.getImgProfile().setImageURI(path);
-                    break;
+                }else if(requestCode==301){
+                    this.createEventFragment.getEventImgMain().setImageURI(path);
+                }
+
             }
-        }
+
+
+
+
+            }
+
     }
 
 

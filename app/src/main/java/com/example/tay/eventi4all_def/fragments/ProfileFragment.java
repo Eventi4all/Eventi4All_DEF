@@ -22,6 +22,7 @@ public class ProfileFragment extends Fragment {
     private EditText nickName;
     private ProfileFragmentEvents profileFragmentEvents;
     private IProfileFragmentListener iProfileFragmentListener;
+    private IGalleryAndCapturePhotoListener iGalleryAndCapturePhotoListener;
     //Layout que contiene la imageView, el field y el botón de subida
     private RelativeLayout mRlView;
     //Btn para crear el perfil
@@ -98,4 +99,11 @@ public class ProfileFragment extends Fragment {
         this.btnCreateProfile = btnCreateProfile;
     }
 
+    public IGalleryAndCapturePhotoListener getiGalleryAndCapturePhotoListener() {
+        return iGalleryAndCapturePhotoListener;
+    }
+
+    public void setiGalleryAndCapturePhotoListener(IGalleryAndCapturePhotoListener iGalleryAndCapturePhotoListener) {
+        this.iGalleryAndCapturePhotoListener = iGalleryAndCapturePhotoListener;
+    }
 }

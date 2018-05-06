@@ -1,6 +1,9 @@
 package com.example.tay.eventi4all_def.fragments;
 
 
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -21,11 +24,13 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 
 
+import com.example.tay.eventi4all_def.DataHolder;
 import com.example.tay.eventi4all_def.R;
 import com.example.tay.eventi4all_def.adapter.ListAdapter;
 import com.example.tay.eventi4all_def.entity.User;
 
 
+import java.net.URI;
 import java.util.ArrayList;
 
 import static android.R.layout.simple_list_item_1;
@@ -35,6 +40,7 @@ import static android.R.layout.simple_list_item_1;
  */
 public class CreateEventFragment extends Fragment {
     private ICreateEventFragmentListener iCreateEventFragmentListener;
+    private  IGalleryAndCapturePhotoListener iGalleryAndCapturePhotoListener;
     private CreateEventFragmentEvents createEventFragmentEvents;
     private EditText txtEventName;
     private AutoCompleteTextView myFriends;
@@ -46,6 +52,7 @@ public class CreateEventFragment extends Fragment {
     private Button btnCreateEvent;
     private Spinner spPax;
     private CheckBox checkboxPrivate;
+    private ImageView eventImgMain;
 
 
     public CreateEventFragment() {
@@ -57,13 +64,18 @@ public class CreateEventFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_create_event, container, false);
-        this.listAdapter = new ListAdapter(arrUsers,getActivity());
+        this.createEventFragmentEvents = new CreateEventFragmentEvents(this);
+        this.listAdapter = new ListAdapter(arrUsers,getActivity(),this);
+
         myList = (RecyclerView) v.findViewById(R.id.listOfUsers);
         myList.setLayoutManager(new GridLayoutManager(getContext(),2));
         this.btnAdd = v.findViewById(R.id.btnAddNewFriend);
-        this.btnCreateEvent = v.findViewById(R.id.btnCreateEvent);
+        this.btnCreateEvent = v.findViewById(R.id.buttonNewEvent);
         this.btnCreateEvent.setOnClickListener(this.createEventFragmentEvents);
         this.checkboxPrivate = v.findViewById(R.id.checkPrivate);
+        this.eventImgMain = v.findViewById(R.id.eventImgMain);
+        this.eventImgMain.setOnClickListener(this.createEventFragmentEvents);
+        DataHolder.MyDataHolder.imgUri= Uri.parse("android.resource://com.example.tay.eventi4all_def/" + R.drawable.com_facebook_profile_picture_blank_square);
 
 
         this.spPax = v.findViewById(R.id.spPax);
@@ -75,7 +87,7 @@ public class CreateEventFragment extends Fragment {
 
 
         adapter = new ArrayAdapter(getActivity(), simple_list_item_1);
-        this.createEventFragmentEvents = new CreateEventFragmentEvents(this);
+
         this.btnAdd.setOnClickListener(this.createEventFragmentEvents);
         this.txtEventName = v.findViewById(R.id.txtNameEvent);
         this.myFriends = v.findViewById(R.id.txtNameFriend);
@@ -200,4 +212,19 @@ public class CreateEventFragment extends Fragment {
         this.checkboxPrivate = checkboxPrivate;
     }
 
+    public IGalleryAndCapturePhotoListener getiGalleryAndCapturePhotoListener() {
+        return iGalleryAndCapturePhotoListener;
+    }
+
+    public void setiGalleryAndCapturePhotoListener(IGalleryAndCapturePhotoListener iGalleryAndCapturePhotoListener) {
+        this.iGalleryAndCapturePhotoListener = iGalleryAndCapturePhotoListener;
+    }
+
+    public ImageView getEventImgMain() {
+        return eventImgMain;
+    }
+
+    public void setEventImgMain(ImageView eventImgMain) {
+        this.eventImgMain = eventImgMain;
+    }
 }

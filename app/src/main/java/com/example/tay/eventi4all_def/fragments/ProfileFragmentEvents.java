@@ -20,7 +20,7 @@ import java.util.Map;
 import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
-public class ProfileFragmentEvents implements View.OnClickListener{
+public class ProfileFragmentEvents implements View.OnClickListener {
     private ProfileFragment profileFragment;
 
     public ProfileFragmentEvents(ProfileFragment profileFragment) {
@@ -29,25 +29,23 @@ public class ProfileFragmentEvents implements View.OnClickListener{
 
     @Override
     public void onClick(View v) {
-        if(v.getId()==R.id.imgViewProfile){
+        if (v.getId() == R.id.imgViewProfile) {
 
-            if(this.isPermissionAccepted()){
-
+            if (this.isPermissionAccepted()) {
                 this.showOptions();
-            }else{
-
             }
 
         }
-        if(v.getId()== R.id.btnCreateProfile){
+        if (v.getId() == R.id.btnCreateProfile) {
             Map<String, Object> profile = new HashMap<String, Object>();
             profile.put("nickname", this.profileFragment.getNickName().getText().toString().trim());
             this.profileFragment.getiProfileFragmentListener().saveProfileInFirebase(profile);
 
         }
     }
+
     //Abrir un alert Dialog para mostrar las diferentes opciones (cámara/galería)
-    public void showOptions(){
+    public void showOptions() {
         //Contiene todas las opciones. Es un array ordenado de caracteres.
         final CharSequence[] options = {"Tomar foto", "Elegir de Galería", "Cancelar"};
         //Creamos el cuadro de dialogo con estas opciones pasándole coomo contecto el mainActivity
@@ -61,11 +59,11 @@ public class ProfileFragmentEvents implements View.OnClickListener{
                 /*Cuando se seleciona una opción, se llama a este onclick.
                   El parámetro witch representa la opción escogida (0,1,2)
                  */
-                if(options[which]=="Tomar foto"){
-                    profileFragment.getiProfileFragmentListener().executeOptions(0);
-                }else if(options[which]=="Elegir de Galería"){
-                    profileFragment.getiProfileFragmentListener().executeOptions(1);
-                }else{
+                if (options[which] == "Tomar foto") {
+                    profileFragment.getiGalleryAndCapturePhotoListener().executeOptions(0,"profile");
+                } else if (options[which] == "Elegir de Galería") {
+                    profileFragment.getiGalleryAndCapturePhotoListener().executeOptions(1,"profile");
+                } else {
                     dialog.dismiss();
                 }
             }
@@ -79,16 +77,15 @@ public class ProfileFragmentEvents implements View.OnClickListener{
         poder abrir la cámara o la galería
         */
 
-        public boolean isPermissionAccepted(){
+    public boolean isPermissionAccepted() {
 
-            if(this.profileFragment.getiProfileFragmentListener().mayRequestStoragePermission()){
-                return true;
-            }else{
-                return false;
-            }
-
+        if (this.profileFragment.getiGalleryAndCapturePhotoListener().mayRequestStoragePermission()) {
+            return true;
+        } else {
+            return false;
         }
 
+    }
 
 
 }
