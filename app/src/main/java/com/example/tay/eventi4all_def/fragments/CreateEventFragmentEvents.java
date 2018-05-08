@@ -14,7 +14,6 @@ import com.example.tay.eventi4all_def.entity.User;
 
 import java.text.SimpleDateFormat;
 
-import java.util.Arrays;
 import java.util.Calendar;
 
 import java.util.HashMap;
@@ -71,13 +70,15 @@ public class CreateEventFragmentEvents implements View.OnClickListener, IMyViewH
                 builder.show();
             } else {
                 HashMap<String, Object> event = new HashMap<String, Object>();
+                HashMap<String,Object> assistants = new HashMap<>();
                 event.put("uuid", UUID.randomUUID().toString());
                 event.put("title", this.createEventFragment.getTxtEventName().getText().toString().trim());
                 event.put("admin", DataHolder.MyDataHolder.currentUserNickName);
                 event.put("createAt", new SimpleDateFormat("dd-MMM-yyyy").format(Calendar.getInstance().getTime()));
                 event.put("private", this.createEventFragment.getCheckboxPrivate().isChecked());
                 event.put("limit", this.createEventFragment.getSpPax().getSelectedItem().toString());
-                event.put("assistants", Arrays.asList(DataHolder.MyDataHolder.currentUserNickName));
+               assistants.put(DataHolder.MyDataHolder.currentUserNickName,true);
+                event.put("assistants", assistants);
                 this.createEventFragment.getiCreateEventFragmentListener().saveEventInFirebase(event);
             }
 

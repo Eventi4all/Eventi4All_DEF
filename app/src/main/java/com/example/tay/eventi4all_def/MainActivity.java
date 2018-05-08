@@ -2,47 +2,38 @@ package com.example.tay.eventi4all_def;
 
 
 import android.annotation.TargetApi;
-import android.app.AlertDialog;
-import android.app.FragmentTransaction;
-import android.content.DialogInterface;
+
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.PersistableBundle;
-import android.provider.MediaStore;
-import android.provider.Settings;
+
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.BottomNavigationView;
-import android.support.v4.app.ActivityCompat;
+
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
+
+import android.view.Window;
+import android.view.WindowManager;
+
 import android.widget.Toast;
 
-import com.example.tay.eventi4all_def.Firebase.AbstractFirebaseAdminListener;
 import com.example.tay.eventi4all_def.Firebase.FirebaseAdmin;
 import com.example.tay.eventi4all_def.adapter.ViewPagerAdapter;
 import com.example.tay.eventi4all_def.fragments.CreateEventFragment;
-import com.example.tay.eventi4all_def.fragments.IMainFragmentListener;
 import com.example.tay.eventi4all_def.fragments.MainFragment;
 import com.example.tay.eventi4all_def.fragments.ProfileFragment;
-import com.firebase.ui.auth.AuthUI;
-
-import java.io.File;
-import java.net.URI;
-import java.util.Arrays;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -137,21 +128,25 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-   /*  //Disable ViewPager Swipe
-   viewPager.setOnTouchListener(new View.OnTouchListener()
-    {
-        @Override
-        public boolean onTouch(View v, MotionEvent event)
-        {
-            return true;
-        }
-    });
-    */
-
-        setupViewPager(viewPager);
 
 
+
+        Window window = this.getWindow();
+
+// clear FLAG_TRANSLUCENT_STATUS flag:
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+
+// add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+
+// finally change the color
+        window.setStatusBarColor(ContextCompat.getColor(this,R.color.tw__light_gray));
+
+        getSupportActionBar().hide();
     }
+
+
+
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
@@ -162,7 +157,6 @@ public class MainActivity extends AppCompatActivity {
         profileFragment = new ProfileFragment();
 
         this.mainFragment.setiMainFragmentListener(this.mainActivityEvents);
-
         this.profileFragment.setiProfileFragmentListener(this.mainActivityEvents);
         this.profileFragment.setiGalleryAndCapturePhotoListener(this.mainActivityEvents);
 
@@ -175,6 +169,7 @@ public class MainActivity extends AppCompatActivity {
         adapter.addFragment(profileFragment);
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(1);
+
     }
 
 
@@ -190,6 +185,7 @@ public class MainActivity extends AppCompatActivity {
             this.firebaseAdmin.onCreate();
             this.firebaseAdmin.checkUserExist();
             this.firebaseAdmin.getStorageRef();
+            setupViewPager(viewPager);
 
         }
         //Si la respuesta de la cámara o galería es OK

@@ -28,6 +28,7 @@ public class ListAdapter extends RecyclerView.Adapter<MyViewHolder> {
         this.contenidoLista = contenidoLista;
         this.context = context;
         this.createEventFragment=createEventFragment;
+
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.example.tay.eventi4all_def.Firebase;
 
+import com.example.tay.eventi4all_def.entity.Event;
 import com.example.tay.eventi4all_def.entity.User;
 
 import java.util.ArrayList;
@@ -48,6 +49,16 @@ public abstract class AbstractFirebaseAdminListener implements IFirebaseAdminLis
 
     @Override
     public void insertEventOk(boolean isInsertOk, String result) {
+
+    }
+
+    @Override
+    public void returnEventsFirebase(ArrayList<Event> events) {
+
+    }
+
+    @Override
+    public void returnInfoUserFirebase(User user) {
 
     }
 }

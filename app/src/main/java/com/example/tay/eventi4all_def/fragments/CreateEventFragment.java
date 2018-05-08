@@ -40,7 +40,7 @@ import static android.R.layout.simple_list_item_1;
  */
 public class CreateEventFragment extends Fragment {
     private ICreateEventFragmentListener iCreateEventFragmentListener;
-    private  IGalleryAndCapturePhotoListener iGalleryAndCapturePhotoListener;
+    private IGalleryAndCapturePhotoListener iGalleryAndCapturePhotoListener;
     private CreateEventFragmentEvents createEventFragmentEvents;
     private EditText txtEventName;
     private AutoCompleteTextView myFriends;
@@ -56,6 +56,7 @@ public class CreateEventFragment extends Fragment {
 
 
     public CreateEventFragment() {
+
         arrUsers=new ArrayList<User>();
     }
 
@@ -66,7 +67,6 @@ public class CreateEventFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_create_event, container, false);
         this.createEventFragmentEvents = new CreateEventFragmentEvents(this);
         this.listAdapter = new ListAdapter(arrUsers,getActivity(),this);
-
         myList = (RecyclerView) v.findViewById(R.id.listOfUsers);
         myList.setLayoutManager(new GridLayoutManager(getContext(),2));
         this.btnAdd = v.findViewById(R.id.btnAddNewFriend);

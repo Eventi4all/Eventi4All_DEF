@@ -1,6 +1,7 @@
 package com.example.tay.eventi4all_def.Firebase;
 
 
+import com.example.tay.eventi4all_def.entity.Event;
 import com.example.tay.eventi4all_def.entity.User;
 
 import java.util.ArrayList;
@@ -14,5 +15,7 @@ public interface IFirebaseAdminListener {
     public void insertDocumentIsOK(boolean isInsertok, String result);
     public void foundNickName(HashMap<String,User> users);
     public void insertEventOk(boolean isInsertOk, String result);
+    public void returnEventsFirebase(ArrayList<Event> events);
+    public void returnInfoUserFirebase(User user);
 
 }

@@ -19,7 +19,9 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 
 
+import com.bumptech.glide.Glide;
 import com.example.tay.eventi4all_def.Firebase.AbstractFirebaseAdminListener;
+import com.example.tay.eventi4all_def.entity.Event;
 import com.example.tay.eventi4all_def.entity.User;
 import com.example.tay.eventi4all_def.fragments.ICreateEventFragmentListener;
 import com.example.tay.eventi4all_def.fragments.IGalleryAndCapturePhotoListener;
@@ -27,6 +29,7 @@ import com.example.tay.eventi4all_def.fragments.IMainFragmentListener;
 import com.example.tay.eventi4all_def.fragments.IProfileFragmentListener;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -117,6 +120,17 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
     @Override
     public void callLogoutMainActivity() {
         this.mainActivity.getFirebaseAdmin().logoutFirebase(this.mainActivity);
+    }
+
+
+    @Override
+    public void getEvents(String events) {
+        this.mainActivity.getFirebaseAdmin().getEvents(events);
+    }
+
+    @Override
+    public void getUserInfo() {
+        this.mainActivity.getFirebaseAdmin().getUserInfo();
     }
 
 
@@ -377,6 +391,17 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
         }
 
 
+    }
+
+    @Override
+    public void returnInfoUserFirebase(User user) {
+       this.mainActivity.getMainFragment().getUserTxtNickname().setText(user.nickName);
+       Glide.with(this.mainActivity.getApplicationContext()).load(user.urlImgProfile).into(this.mainActivity.getMainFragment().getUserImgProfile());
+    }
+
+    @Override
+    public void returnEventsFirebase(ArrayList<Event> events) {
+        this.mainActivity.getMainFragment().getMainFragmentEvents().setEventsInListAdapter(events);
     }
 
     public static String getAppDirectory() {

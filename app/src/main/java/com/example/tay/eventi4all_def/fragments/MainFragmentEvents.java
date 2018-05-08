@@ -1,9 +1,15 @@
 package com.example.tay.eventi4all_def.fragments;
 
 import android.view.View;
-import com.example.tay.eventi4all_def.R;
+import android.widget.AdapterView;
 
-public class MainFragmentEvents implements View.OnClickListener {
+import com.example.tay.eventi4all_def.R;
+import com.example.tay.eventi4all_def.adapter.ListAdapterMyCreatedEvents;
+import com.example.tay.eventi4all_def.entity.Event;
+
+import java.util.ArrayList;
+
+public class MainFragmentEvents implements View.OnClickListener,AdapterView.OnItemSelectedListener {
 
     private MainFragment mainFragment;
 
@@ -26,5 +32,34 @@ public class MainFragmentEvents implements View.OnClickListener {
             this.mainFragment.getiMainFragmentListener().callLogoutMainActivity();
         }
 
+    }
+
+    public void getEvents(int position) {
+        if(position==0){
+            this.mainFragment.getiMainFragmentListener().getEvents("createEvents");
+        }else if(position==1){
+            this.mainFragment.getiMainFragmentListener().getEvents("allAssistEvents");
+        }
+
+
+    }
+    public void setEventsInListAdapter(ArrayList<Event> events){
+        this.mainFragment.getArrEvents().clear();
+        this.mainFragment.getArrEvents().addAll(events);
+        this.mainFragment.getListAdapter().notifyDataSetChanged();
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        this.getEvents(position);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
+
+    public void getUserInfo(){
+        this.getMainFragment().getiMainFragmentListener().getUserInfo();
     }
 }

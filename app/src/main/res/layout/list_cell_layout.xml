@@ -7,47 +7,59 @@
 
     <android.support.v7.widget.CardView
         android:id="@+id/card_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="119dp"
+        android:layout_margin="1dp"
         android:layout_gravity="center"
-        app:cardBackgroundColor="#e6f2ff"
+        app:cardBackgroundColor="#2D566B"
         app:cardCornerRadius="10dp">
+
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="88dp"
             android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="0dp"
             android:layout_marginVertical="20dp"
             android:orientation="vertical">
 
             <LinearLayout
                 android:id="@+id/linear1"
                 android:layout_width="match_parent"
-                android:layout_height="105dp"
+                android:layout_height="91dp"
                 android:orientation="horizontal">
 
-                <ImageView
-                    android:id="@+id/imgProfile"
-                    android:layout_width="37dp"
-                    android:layout_height="80dp"
-                    android:layout_marginBottom="20dp"
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="84dp"
                     android:layout_weight="1"
-                    app:srcCompat="@drawable/common_google_signin_btn_icon_dark" />
+                    android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/txtUsrNick"
-                    android:layout_width="40dp"
-                    android:layout_height="20dp"
-                    android:layout_marginTop="30dp"
-                    android:layout_weight="1"
-                    android:text="TextView"
-                    android:textAlignment="center" />
+                    <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+                        android:id="@+id/imgProfile"
+                        android:layout_width="match_parent"
+                        android:layout_height="116dp"
+                        android:layout_weight="1"
+                        app:civ_border_color="@color/tw__solid_white"
+                        app:civ_border_width="2dp"
+                        app:srcCompat="@drawable/com_facebook_profile_picture_blank_square" />
+
+                    <TextView
+                        android:id="@+id/txtUsrNick"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:text="TextView"
+                        android:textAlignment="center"
+                        android:textColor="@color/tw__solid_white" />
+                </LinearLayout>
 
                 <ImageView
                     android:id="@+id/btnDeleteUser"
-                    android:layout_width="10dp"
-                    android:layout_height="20dp"
-                    android:layout_marginTop="30dp"
+                    android:layout_width="60dp"
+                    android:layout_height="59dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="15dp"
                     android:layout_weight="1"
                     app:srcCompat="@android:drawable/ic_menu_delete" />
 
