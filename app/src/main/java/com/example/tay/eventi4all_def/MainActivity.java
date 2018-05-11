@@ -5,6 +5,7 @@ import android.annotation.TargetApi;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
@@ -64,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         bottomNavigationView = findViewById(R.id.navigation);
+        //bottomNavigationView.setItemTextColor(getColorStateList(R.color.colorGreen));
 
         mainActivityEvents = new MainActivityEvents(this);
 
@@ -140,7 +142,8 @@ public class MainActivity extends AppCompatActivity {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 
 // finally change the color
-        window.setStatusBarColor(ContextCompat.getColor(this,R.color.tw__light_gray));
+
+        window.setStatusBarColor(ContextCompat.getColor(this,  R.color.colorGreen));
 
         getSupportActionBar().hide();
     }

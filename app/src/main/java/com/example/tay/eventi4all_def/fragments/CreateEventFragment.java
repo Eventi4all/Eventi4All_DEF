@@ -5,6 +5,8 @@ import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -33,6 +35,9 @@ import com.example.tay.eventi4all_def.entity.User;
 import java.net.URI;
 import java.util.ArrayList;
 
+import at.markushi.ui.CircleButton;
+import es.dmoral.toasty.Toasty;
+
 import static android.R.layout.simple_list_item_1;
 
 /**
@@ -47,7 +52,7 @@ public class CreateEventFragment extends Fragment {
     private ArrayAdapter adapter;
     private ListAdapter listAdapter;
     private ArrayList<User> arrUsers;
-    private Button btnAdd;
+    private CircleButton btnAdd;
     private RecyclerView myList;
     private Button btnCreateEvent;
     private Spinner spPax;
@@ -112,6 +117,12 @@ public class CreateEventFragment extends Fragment {
 
 
        this.myList.setAdapter(listAdapter);
+
+
+
+
+        Toasty.Config.getInstance().setErrorColor(getResources().getColor(R.color.colorRed)).setSuccessColor(getResources().getColor(R.color.colorGreen)).setTextColor(getResources().getColor(R.color.tw__solid_white)).apply(); // optional.apply();
+
         return v;
     }
 
@@ -172,11 +183,11 @@ public class CreateEventFragment extends Fragment {
         this.listAdapter = listAdapter;
     }
 
-    public Button getBtnAdd() {
+    public CircleButton getBtnAdd() {
         return btnAdd;
     }
 
-    public void setBtnAdd(Button btnAdd) {
+    public void setBtnAdd(CircleButton btnAdd) {
         this.btnAdd = btnAdd;
     }
 

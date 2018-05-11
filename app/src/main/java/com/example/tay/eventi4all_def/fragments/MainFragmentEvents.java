@@ -30,6 +30,10 @@ public class MainFragmentEvents implements View.OnClickListener,AdapterView.OnIt
     public void onClick(View v) {
         if (v.getId() == R.id.btnLo) {
             this.mainFragment.getiMainFragmentListener().callLogoutMainActivity();
+        }else if(v.getId() == R.id.floatingActionButton){
+
+        }else if(v.getId() == R.id.fabOptions){
+
         }
 
     }

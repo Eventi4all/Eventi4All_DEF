@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 
 import android.content.DialogInterface;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.tay.eventi4all_def.DataHolder;
 import com.example.tay.eventi4all_def.R;
@@ -18,6 +19,8 @@ import java.util.Calendar;
 
 import java.util.HashMap;
 import java.util.UUID;
+
+import es.dmoral.toasty.Toasty;
 
 public class CreateEventFragmentEvents implements View.OnClickListener, IMyViewHolderListener {
 
@@ -64,10 +67,7 @@ public class CreateEventFragmentEvents implements View.OnClickListener, IMyViewH
 
         } else if (v.getId() == R.id.buttonNewEvent) {
             if (this.createEventFragment.getTxtEventName().getText().toString().trim().equals("")) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(this.createEventFragment.getActivity());
-                builder.setTitle("¡Opps!");
-                builder.setMessage("Debes de añadir un título a tu evento");
-                builder.show();
+                Toasty.info(this.createEventFragment.getActivity(), "¡Opps! Debes de añadir un título a tu evento.", Toast.LENGTH_SHORT, true).show();
             } else {
                 HashMap<String, Object> event = new HashMap<String, Object>();
                 HashMap<String,Object> assistants = new HashMap<>();

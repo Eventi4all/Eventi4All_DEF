@@ -37,6 +37,7 @@ public class MainFragment extends Fragment {
     private ImageView userImgProfile;
     private TextView userTxtNickname;
     private FloatingActionButton fab;
+    private FloatingActionButton fabOptions;
 
 
 
@@ -74,24 +75,9 @@ public class MainFragment extends Fragment {
 
 
         fab = v.findViewById(R.id.floatingActionButton);
-        if (fab != null) {
-            fab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-
-
-
-
-
-                }
-            });
-        }
-
-
-
-
-
-
+        fab.setOnClickListener(this.mainFragmentEvents);
+        fabOptions = v.findViewById(R.id.fabOptions);
+        fabOptions.setOnClickListener(this.mainFragmentEvents);
 
         return v;
     }

@@ -183,18 +183,21 @@ public class FirebaseAdmin {
             @Override
             public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
                 for (final DocumentSnapshot data : documentSnapshots.getDocuments()) {
-                    storageRef.child(data.getData().get("imgProfile").toString()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri uri) {
-                            users.put(data.getData().get("nickname").toString(), new User(data.getData().get("nickname").toString(), uri.toString()));
-                            abstractFirebaseAdminListener.foundNickName(users);
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            // Handle any errors
-                        }
-                    });
+                    if(!data.getData().get("nickname").toString().equals(DataHolder.MyDataHolder.currentUserNickName)){
+                        storageRef.child(data.getData().get("imgProfile").toString()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                users.put(data.getData().get("nickname").toString(), new User(data.getData().get("nickname").toString(), uri.toString()));
+                                abstractFirebaseAdminListener.foundNickName(users);
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception exception) {
+                                // Handle any errors
+                            }
+                        });
+                    }
+
 
 
                 }

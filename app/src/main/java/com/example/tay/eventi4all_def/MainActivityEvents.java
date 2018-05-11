@@ -17,6 +17,7 @@ import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
+import android.widget.Toast;
 
 
 import com.bumptech.glide.Glide;
@@ -32,6 +33,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import es.dmoral.toasty.Toasty;
 
 import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
@@ -369,10 +372,7 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
     public void insertEventOk(boolean isInsertOk, String result) {
         progress.dismiss();
         if(isInsertOk && result.equals("Document Insert")){
-            builder = new AlertDialog.Builder(this.mainActivity);
-            builder.setTitle("¡Enhorabuena!");
-            builder.setMessage("Has creado el evento: "+ this.mainActivity.getCreateEventFragment().getTxtEventName().getText().toString() + "!");
-            builder.show();
+            Toasty.success(this.mainActivity, "¡Enhorabuena! Has creado el evento: "+ this.mainActivity.getCreateEventFragment().getTxtEventName().getText().toString() +"!", Toast.LENGTH_SHORT, true).show();
             this.mainActivity.getCreateEventFragment().getTxtEventName().setText("");
             this.mainActivity.getCreateEventFragment().getCheckboxPrivate().setChecked(false);
             DataHolder.MyDataHolder.imgUri= Uri.parse("android.resource://com.example.tay.eventi4all_def/" + R.drawable.com_facebook_profile_picture_blank_square);
