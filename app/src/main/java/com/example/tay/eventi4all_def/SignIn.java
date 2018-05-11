@@ -1,27 +1,26 @@
 package com.example.tay.eventi4all_def;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.PersistableBundle;
+import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
+
 import com.firebase.ui.auth.AuthUI;
 
 import java.util.Arrays;
 import java.util.List;
 
 //Las clases static deben de estar anidadas para su uso
-class SignIn {
+public class SignIn extends AppCompatActivity{
 
     //Establecemos un request code para para inicio de sesión con Google.
     private static final int RC_SIGN_IN = 123;
 
-    private Activity activity;
-
-    public SignIn(Activity activity) {
-        this.activity = activity;
-        this.signInAllProviders();
-    }
-
-
-    public void signInAllProviders() {
-
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         //Añadimos los proveedores de autentificación a una lista
         List<AuthUI.IdpConfig> providers = Arrays.asList(
                 new AuthUI.IdpConfig.PhoneBuilder().build(),
@@ -30,7 +29,7 @@ class SignIn {
                 new AuthUI.IdpConfig.TwitterBuilder().build());
 
         // Creamos un "intent" de tipo acceso con los proveedores
-        this.activity.startActivityForResult(
+        this.startActivityForResult(
                 AuthUI.getInstance()
                         .createSignInIntentBuilder()
                         .setAvailableProviders(providers)
@@ -38,8 +37,28 @@ class SignIn {
                         .setPrivacyPolicyUrl("https://superapp.example.com/privacy-policy.html")
                         .build(),
                 RC_SIGN_IN);
+    }
 
 
+
+
+    public void signInAllProviders() {
+
+
+
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+
+        if (requestCode == this.getRcSignIn()) {
+            System.out.println("cambio manuehh");
+            SignIn.this.startActivity(new Intent(SignIn.this,MainActivity.class));
+            SignIn.this.finish();
+
+        }
     }
 
     public static int getRcSignIn() {
@@ -47,12 +66,5 @@ class SignIn {
     }
 
 
-    public Activity getActivity() {
-        return activity;
-    }
-
-    public void setActivity(Activity activity) {
-        this.activity = activity;
-    }
 }
 

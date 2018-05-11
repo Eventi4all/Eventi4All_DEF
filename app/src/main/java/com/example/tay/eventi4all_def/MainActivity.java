@@ -70,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
         mainActivityEvents = new MainActivityEvents(this);
 
         //Instancia de la clase SignIn
-        this.signIn = new SignIn(this);
         //Instancia de FirebaseAdmin
         this.firebaseAdmin = new FirebaseAdmin();
 
@@ -146,6 +145,9 @@ public class MainActivity extends AppCompatActivity {
         window.setStatusBarColor(ContextCompat.getColor(this,  R.color.colorGreen));
 
         getSupportActionBar().hide();
+
+
+        this.setDataOfActivity();
     }
 
 
@@ -175,6 +177,13 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    public void setDataOfActivity(){
+        this.firebaseAdmin.onCreate();
+        this.firebaseAdmin.checkUserExist();
+        this.firebaseAdmin.getStorageRef();
+        setupViewPager(viewPager);
+    }
+
 
     /*
         Sobreescribimos el método de la clase AppCompatActivity. Recibe todas las respuestas de las llamadas
@@ -184,13 +193,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == signIn.getRcSignIn()) {
-            this.firebaseAdmin.onCreate();
-            this.firebaseAdmin.checkUserExist();
-            this.firebaseAdmin.getStorageRef();
-            setupViewPager(viewPager);
-
-        }
         //Si la respuesta de la cámara o galería es OK
         if (resultCode == RESULT_OK) {
           //  switch (requestCode) {

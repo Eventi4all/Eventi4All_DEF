@@ -111,7 +111,10 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
     public void logout(boolean isLogout) {
         if(isLogout){
             System.out.println("----------> SESIÓN CERRADA SATISFACTORIAMENTE <----------");
-            this.mainActivity.getSignIn().signInAllProviders();
+            this.mainActivity.finish();
+            this.mainActivity.startActivity(this.mainActivity.getIntent());
+           // this.mainActivity.getSignIn().signInAllProviders();
+
 
 
 
@@ -330,6 +333,7 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
             FragmentTransaction transition = mainActivity.getSupportFragmentManager().beginTransaction();
             transition.hide(this.mainActivity.getProfileFragment());
             transition.show(this.mainActivity.getMainFragment());
+            transition.show(this.mainActivity.getCreateEventFragment());
             transition.commit();
 
 
@@ -395,7 +399,7 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
 
     @Override
     public void returnInfoUserFirebase(User user) {
-       this.mainActivity.getMainFragment().getUserTxtNickname().setText(user.nickName);
+       this.mainActivity.getMainFragment().getUserTxtNickname().setText("Eventos de " + user.nickName);
        Glide.with(this.mainActivity.getApplicationContext()).load(user.urlImgProfile).into(this.mainActivity.getMainFragment().getUserImgProfile());
     }
 
