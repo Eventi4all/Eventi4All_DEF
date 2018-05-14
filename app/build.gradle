@@ -71,6 +71,7 @@ dependencies {
     implementation 'jp.wasabeef:glide-transformations:3.3.0'
     //Librería filtros Glide
     implementation 'jp.co.cyberagent.android.gpuimage:gpuimage-library:1.4.1'
+    implementation 'com.github.yalantis:ucrop:2.2.2-native'
 
 
 

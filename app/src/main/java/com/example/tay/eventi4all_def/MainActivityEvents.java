@@ -212,6 +212,7 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
             Este recurso es nuestro "newFile" al cual se seteará la imagen que tomemos de la cámara.
              */
             intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(newFile));
+
             DataHolder.MyDataHolder.imgUri = Uri.fromFile(newFile);
             if(call.equals("profile")){
                 this.mainActivity.startActivityForResult(intent, PHOTO_CODE_PROFILE);
@@ -453,4 +454,11 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
         this.progress = progress;
     }
 
+    public int getPHOTO_CODE_MAINEVENT() {
+        return PHOTO_CODE_MAINEVENT;
+    }
+
+    public int getSELECT_PICTURE_MAINEVENT() {
+        return SELECT_PICTURE_MAINEVENT;
+    }
 }

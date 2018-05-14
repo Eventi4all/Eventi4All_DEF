@@ -35,6 +35,7 @@ import com.example.tay.eventi4all_def.adapter.ViewPagerAdapter;
 import com.example.tay.eventi4all_def.fragments.CreateEventFragment;
 import com.example.tay.eventi4all_def.fragments.MainFragment;
 import com.example.tay.eventi4all_def.fragments.ProfileFragment;
+import com.yalantis.ucrop.UCrop;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -58,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
     private ProfileFragment profileFragment;
     private MainFragment mainFragment;
     private CreateEventFragment createEventFragment;
+    private UCrop uCrop;
+    int request = 0;
 
 
     @Override
@@ -130,8 +133,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
-
         Window window = this.getWindow();
 
 // clear FLAG_TRANSLUCENT_STATUS flag:
@@ -142,15 +143,13 @@ public class MainActivity extends AppCompatActivity {
 
 // finally change the color
 
-        window.setStatusBarColor(ContextCompat.getColor(this,  R.color.colorGreen));
+        window.setStatusBarColor(ContextCompat.getColor(this, R.color.colorGreen));
 
         getSupportActionBar().hide();
 
 
         this.setDataOfActivity();
     }
-
-
 
 
     private void setupViewPager(ViewPager viewPager) {
@@ -177,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void setDataOfActivity(){
+    public void setDataOfActivity() {
         this.firebaseAdmin.onCreate();
         this.firebaseAdmin.checkUserExist();
         this.firebaseAdmin.getStorageRef();
@@ -193,47 +192,68 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+
         //Si la respuesta de la cámara o galería es OK
         if (resultCode == RESULT_OK) {
-          //  switch (requestCode) {
+
             //Si el requestCode es igual al PHOTO_CODE
-            if(requestCode==200 || requestCode==201){
+            if (requestCode == 200 || requestCode == 201) {
+                request = requestCode;
+
                 //Escaneamos la nueva imagen que hemos tomado porque si no, no la encuentra
                 MediaScannerConnection.scanFile(this, new String[]{this.mainActivityEvents.getmPath()}, null, new MediaScannerConnection.OnScanCompletedListener() {
                     @Override
                     public void onScanCompleted(String path, Uri uri) {
                         System.out.println("Externa Storage scanned " + path + ":");
                         System.out.println("ExternalStorage Uri:v " + uri);
+                        //LLamamos al crop activity para recortar la imagen
+
+                        UCrop.of(uri, DataHolder.MyDataHolder.imgUri)
+                                .withAspectRatio(10, 10)
+                                .withMaxResultSize(500, 500)
+                                .start(createEventFragment.getActivity());
+
                     }
                 });
+
+                //Si el requestCode es el de SELECT_PICTURE
+            } else if (requestCode == 300 || requestCode == 301) {
+                request = requestCode;
+                //Recibimos la URI de la imagen
+                Uri path = data.getData();
+                UCrop.of(path, DataHolder.MyDataHolder.imgUri)
+                        .withAspectRatio(10, 10)
+                        .withMaxResultSize(500, 500)
+                        .start(createEventFragment.getActivity());
+
+
+            } else if (requestCode == UCrop.REQUEST_CROP) {
+
+
+                DataHolder.MyDataHolder.imgUri = UCrop.getOutput(data);
                 //Vamos a meter en el imageView del profileFragment la foto:
 
                 //Primero decodificamos la ruta y saca la imagen para guardarla en el bitmap.
-                Bitmap bitmap = BitmapFactory.decodeFile(this.mainActivityEvents.getmPath());
+                Bitmap bitmap = BitmapFactory.decodeFile(DataHolder.MyDataHolder.imgUri.getPath());
                 //Le seteamos el bitmap al imageView
-                if(requestCode==200){
+                if (request == 200) {
                     this.profileFragment.getImgProfile().setImageBitmap(bitmap);
-                }else if(requestCode==201){
+                } else if (request == 201) {
+
                     this.createEventFragment.getEventImgMain().setImageBitmap(bitmap);
+                } else if (request == 300) {
+                    this.profileFragment.getImgProfile().setImageURI(DataHolder.MyDataHolder.imgUri);
+                } else if (request == 301) {
+                    this.createEventFragment.getEventImgMain().setImageURI(DataHolder.MyDataHolder.imgUri);
                 }
-                //Si el requestCode es el de SELECT_PICTURE
-            }else if(requestCode==300 || requestCode==301){
-                //Recibimos la URI de la imagen
-                Uri path = data.getData();
-                DataHolder.MyDataHolder.imgUri = path;
-                //Seteamos la imagen
-                if(requestCode==300){
-                    this.profileFragment.getImgProfile().setImageURI(path);
-                }else if(requestCode==301){
-                    this.createEventFragment.getEventImgMain().setImageURI(path);
-                }
+                request = 0;
+            } else if (resultCode == UCrop.RESULT_ERROR) {
+                final Throwable cropError = UCrop.getError(data);
 
             }
 
 
-
-
-            }
+        }
 
     }
 
