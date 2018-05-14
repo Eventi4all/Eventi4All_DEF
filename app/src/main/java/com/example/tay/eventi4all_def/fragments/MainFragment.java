@@ -1,7 +1,10 @@
 package com.example.tay.eventi4all_def.fragments;
 
 
+
+import android.graphics.Color;
 import android.os.Bundle;
+
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -9,9 +12,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
+
 import android.widget.ArrayAdapter;
-import android.widget.Button;
+
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -19,8 +22,11 @@ import android.widget.TextView;
 import com.example.tay.eventi4all_def.R;
 import com.example.tay.eventi4all_def.adapter.ListAdapterMyCreatedEvents;
 import com.example.tay.eventi4all_def.entity.Event;
+import com.hitomi.cmlibrary.CircleMenu;
+
 
 import java.util.ArrayList;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -29,7 +35,6 @@ public class MainFragment extends Fragment {
 
     private MainFragmentEvents mainFragmentEvents;
     private IMainFragmentListener iMainFragmentListener;
-    private Button btnLogout;
     private ListAdapterMyCreatedEvents listAdapter;
     private ArrayList<Event> arrEvents;
     private RecyclerView myList;
@@ -37,13 +42,23 @@ public class MainFragment extends Fragment {
     private ImageView userImgProfile;
     private TextView userTxtNickname;
     private FloatingActionButton fab;
-    private FloatingActionButton fabOptions;
+    /*
+    Array de iconos para el circle button que será equivalente a
+    la opción seleccionada del circleMenu
+     */
+    private String[] arrIcons={"EditProfile","Logout"};
+    private CircleMenu circleMenu;
+
+
 
 
 
 
     public MainFragment() {
         this.arrEvents=new ArrayList<Event>();
+
+
+
     }
 
 
@@ -54,8 +69,7 @@ public class MainFragment extends Fragment {
         mainFragmentEvents = new MainFragmentEvents(this);
         this.userImgProfile = v.findViewById(R.id.profile_image);
         this.userTxtNickname = v.findViewById(R.id.txtNickNameProfile);
-        this.btnLogout = v.findViewById(R.id.btnLo);
-        this.btnLogout.setOnClickListener(this.mainFragmentEvents);
+
         this.listAdapter = new ListAdapterMyCreatedEvents(arrEvents,getActivity());
         myList = v.findViewById(R.id.myListOfEvents);
         myList.setLayoutManager(new GridLayoutManager(getContext(),1));
@@ -76,8 +90,13 @@ public class MainFragment extends Fragment {
 
         fab = v.findViewById(R.id.floatingActionButton);
         fab.setOnClickListener(this.mainFragmentEvents);
-        fabOptions = v.findViewById(R.id.fabOptions);
-        fabOptions.setOnClickListener(this.mainFragmentEvents);
+
+        this.circleMenu = v.findViewById(R.id.btnOptions);
+        this.circleMenu.setOnClickListener(this.mainFragmentEvents);
+        this.circleMenu.setMainMenu(Color.parseColor("#CDCDCD"),R.drawable.ic_options,R.drawable.cancel).
+                addSubMenu(Color.parseColor("#FF8000"),R.drawable.user).addSubMenu(Color.parseColor("#DF0101"),R.drawable.exit).setOnMenuSelectedListener(this.mainFragmentEvents);
+
+
 
         return v;
     }
@@ -98,13 +117,7 @@ public class MainFragment extends Fragment {
         this.iMainFragmentListener = iMainFragmentListener;
     }
 
-    public Button getBtnLogout() {
-        return btnLogout;
-    }
 
-    public void setBtnLogout(Button btnLogout) {
-        this.btnLogout = btnLogout;
-    }
 
     public ListAdapterMyCreatedEvents getListAdapter() {
         return listAdapter;
@@ -152,5 +165,29 @@ public class MainFragment extends Fragment {
 
     public void setUserTxtNickname(TextView userTxtNickname) {
         this.userTxtNickname = userTxtNickname;
+    }
+
+    public FloatingActionButton getFab() {
+        return fab;
+    }
+
+    public void setFab(FloatingActionButton fab) {
+        this.fab = fab;
+    }
+
+    public String[] getArrIcons() {
+        return arrIcons;
+    }
+
+    public void setArrIcons(String[] arrIcons) {
+        this.arrIcons = arrIcons;
+    }
+
+    public CircleMenu getCircleMenu() {
+        return circleMenu;
+    }
+
+    public void setCircleMenu(CircleMenu circleMenu) {
+        this.circleMenu = circleMenu;
     }
 }

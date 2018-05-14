@@ -11,15 +11,16 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="496dp"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="22dp"
+        android:layout_marginTop="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        android:isScrollContainer="false">
 
 
         <LinearLayout
@@ -28,7 +29,7 @@
             android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="8dp"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -98,9 +99,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
                     android:layout_weight="1"
+                    android:src="@android:drawable/ic_menu_camera"
                     app:civ_border_color="@color/cardview_dark_background"
-                    app:civ_border_width="2dp"
-                    app:srcCompat="@android:drawable/ic_menu_camera" />
+                    app:civ_border_width="2dp" />
             </LinearLayout>
 
             <LinearLayout
@@ -159,7 +160,7 @@
                     android:layout_height="64dip"
                     android:src="@drawable/ic_add"
                     app:cb_color="#99CC00"
-                    app:cb_pressedRingWidth="8dip"/>
+                    app:cb_pressedRingWidth="8dip" />
 
 
             </LinearLayout>
@@ -167,8 +168,7 @@
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/listOfUsers"
                 android:layout_width="match_parent"
-                android:layout_height="120dp"
-                android:layout_marginBottom="16dp"
+                android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:layout_marginStart="8dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -180,16 +180,18 @@
 
             <Button
                 android:id="@+id/buttonNewEvent"
+                style="@style/AppTheme.RoundedCornerMaterialButton"
                 android:layout_width="126dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="bottom|center"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp"
                 android:layout_weight="1"
                 android:text="Crear Evento"
                 android:textAlignment="center"
                 android:textColor="@color/tw__solid_white"
                 tools:layout_editor_absoluteX="8dp"
-                tools:layout_editor_absoluteY="240dp"
-                style="@style/AppTheme.RoundedCornerMaterialButton"/>
+                tools:layout_editor_absoluteY="240dp" />
 
         </LinearLayout>
     </ScrollView>

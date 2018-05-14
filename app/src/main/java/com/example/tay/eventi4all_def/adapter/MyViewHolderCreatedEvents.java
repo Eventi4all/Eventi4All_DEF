@@ -28,7 +28,6 @@ public class MyViewHolderCreatedEvents extends RecyclerView.ViewHolder {
         this.txtTitleEvent = (TextView) itemView.findViewById(R.id.txtTitleMyEvent);
         this.txtCreateAt = (TextView) itemView.findViewById(R.id.txtCreatedAt);
         this.imageViewCover=(ImageView)itemView.findViewById(R.id.imgCoverEvent);
-        System.out.println("SEGUIMIENTO 2");
 
 
     }

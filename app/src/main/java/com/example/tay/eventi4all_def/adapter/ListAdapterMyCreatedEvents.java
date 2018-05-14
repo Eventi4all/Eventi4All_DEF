@@ -8,12 +8,17 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.tay.eventi4all_def.R;
 import com.example.tay.eventi4all_def.entity.Event;
 import com.example.tay.eventi4all_def.entity.User;
 import com.example.tay.eventi4all_def.fragments.CreateEventFragment;
 
 import java.util.ArrayList;
+
+import jp.wasabeef.glide.transformations.CropSquareTransformation;
+import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
 /**
  * Created by tay on 28/11/17.
@@ -40,7 +45,8 @@ public class ListAdapterMyCreatedEvents extends RecyclerView.Adapter<MyViewHolde
     public void onBindViewHolder(MyViewHolderCreatedEvents holder, int position) {
         holder.getTxtTitleEvent().setText(this.contenidoLista.get(position).title);
         holder.getTxtCreateAt().setText(this.contenidoLista.get(position).createAt);
-        Glide.with(getContext().getApplicationContext()).load(this.getContenidoLista().get(position).urlCover).into(holder.getImageViewCover());
+        Glide.with(getContext().getApplicationContext()).load(this.getContenidoLista().get(position).urlCover).apply(new RequestOptions().transforms( new CropSquareTransformation(),new RoundedCornersTransformation(40,15))).into(holder.getImageViewCover());
+
 
     }
 

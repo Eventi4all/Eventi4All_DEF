@@ -111,8 +111,9 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
     public void logout(boolean isLogout) {
         if(isLogout){
             System.out.println("----------> SESIÓN CERRADA SATISFACTORIAMENTE <----------");
-            this.mainActivity.finish();
-            this.mainActivity.startActivity(this.mainActivity.getIntent());
+            Intent intent = new Intent(mainActivity, SignIn.class);
+            mainActivity.startActivity(intent);
+            mainActivity.finish();
            // this.mainActivity.getSignIn().signInAllProviders();
 
 

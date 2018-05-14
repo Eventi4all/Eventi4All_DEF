@@ -1,10 +1,7 @@
 package com.example.tay.eventi4all_def;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.PersistableBundle;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
 import com.firebase.ui.auth.AuthUI;
@@ -33,6 +30,8 @@ public class SignIn extends AppCompatActivity{
                 AuthUI.getInstance()
                         .createSignInIntentBuilder()
                         .setAvailableProviders(providers)
+                        .setLogo(R.drawable.applogo)      // Set logo drawable
+                        .setTheme(R.style.LoginTheme)
                         .setTosUrl("https://superapp.example.com/terms-of-service.html")
                         .setPrivacyPolicyUrl("https://superapp.example.com/privacy-policy.html")
                         .build(),
