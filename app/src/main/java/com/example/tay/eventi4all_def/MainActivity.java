@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.BottomNavigationView;
@@ -36,6 +37,8 @@ import com.example.tay.eventi4all_def.fragments.CreateEventFragment;
 import com.example.tay.eventi4all_def.fragments.MainFragment;
 import com.example.tay.eventi4all_def.fragments.ProfileFragment;
 import com.yalantis.ucrop.UCrop;
+
+import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -191,10 +194,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        //System.out.println("resultCode" + resultCode + "equestcode: " + requestCode + "y request" + request);
 
 
         //Si la respuesta de la cámara o galería es OK
-        if (resultCode == RESULT_OK) {
+        if (resultCode == RESULT_OK || resultCode == 96) {
 
             //Si el requestCode es igual al PHOTO_CODE
             if (requestCode == 200 || requestCode == 201) {
@@ -219,6 +223,12 @@ public class MainActivity extends AppCompatActivity {
                 //Si el requestCode es el de SELECT_PICTURE
             } else if (requestCode == 300 || requestCode == 301) {
                 request = requestCode;
+                Long timestamp = System.currentTimeMillis()/1000;
+                String mPath = Environment.getExternalStorageDirectory() + File.separator + "Eventy4All/Profilepicture" + File.separator + timestamp.toString() + ".jpg";
+
+                //Creamos un archivo pasándole la ruta de escritura de esta imagen. Este archivo será la imagen que capturemos de la cámara
+                File newFile = new File(mPath);
+                DataHolder.MyDataHolder.imgUri= Uri.fromFile(newFile);
                 //Recibimos la URI de la imagen
                 Uri path = data.getData();
                 UCrop.of(path, DataHolder.MyDataHolder.imgUri)
@@ -227,7 +237,10 @@ public class MainActivity extends AppCompatActivity {
                         .start(createEventFragment.getActivity());
 
 
+
+
             } else if (requestCode == UCrop.REQUEST_CROP) {
+
 
 
                 DataHolder.MyDataHolder.imgUri = UCrop.getOutput(data);
@@ -248,7 +261,9 @@ public class MainActivity extends AppCompatActivity {
                 }
                 request = 0;
             } else if (resultCode == UCrop.RESULT_ERROR) {
+
                 final Throwable cropError = UCrop.getError(data);
+                System.out.println("Error:" + cropError.getMessage());
 
             }
 
