@@ -271,6 +271,7 @@ public class FirebaseAdmin {
 
 
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 for (DocumentSnapshot document : task.getResult()) {
@@ -282,11 +283,13 @@ public class FirebaseAdmin {
                             event.setUrlCover(uri.toString());
                             event.setUuid("uuid");
                             arrEvents.add(event);
+
                             abstractFirebaseAdminListener.returnEventsFirebase(arrEvents);
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
+                            System.out.println("Exepcetion: " + e.getMessage());
 
                         }
                     });
@@ -300,7 +303,15 @@ public class FirebaseAdmin {
 
             }
 
+
+
         });
+       query.get().addOnFailureListener(new OnFailureListener() {
+           @Override
+           public void onFailure(@NonNull Exception e) {
+
+           }
+       });
 
 
 

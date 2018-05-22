@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import com.bumptech.glide.Glide;
 import com.example.tay.eventi4all_def.R;
 import com.example.tay.eventi4all_def.entity.User;
-import com.example.tay.eventi4all_def.fragments.CreateEventFragment;
+import com.example.tay.eventi4all_def.fragments.CustomDialogFragment_CreateEvents;
 
 
 import java.util.ArrayList;
@@ -23,8 +23,8 @@ import java.util.ArrayList;
 public class ListAdapter extends RecyclerView.Adapter<MyViewHolder> {
     private ArrayList<User> contenidoLista; //declaramos un array que contiene contenido que queremos que s epinte en las celdas de la lista
     private Context context; // esta variable la creamos dado que la librería Glide para cargar imagenes desde firebase necesita una variable de tipo contexto
-    private CreateEventFragment createEventFragment;
-    public ListAdapter(ArrayList<User> contenidoLista, Context context, CreateEventFragment createEventFragment) { // ListAdapter recibe como parámetro el context de Glide, en nuestro caso el contexto es el padre donde se encuentra que al fin de cuentas el list se encuentra en el second Activity
+    private CustomDialogFragment_CreateEvents createEventFragment;
+    public ListAdapter(ArrayList<User> contenidoLista, Context context, CustomDialogFragment_CreateEvents createEventFragment) { // ListAdapter recibe como parámetro el context de Glide, en nuestro caso el contexto es el padre donde se encuentra que al fin de cuentas el list se encuentra en el second Activity
         this.contenidoLista = contenidoLista;
         this.context = context;
         this.createEventFragment=createEventFragment;
@@ -82,12 +82,11 @@ public class ListAdapter extends RecyclerView.Adapter<MyViewHolder> {
         this.context = context;
     }
 
-    public CreateEventFragment getCreateEventFragment() {
+    public CustomDialogFragment_CreateEvents getCreateEventFragment() {
         return createEventFragment;
     }
 
-    public void setCreateEventFragment(CreateEventFragment createEventFragment) {
+    public void setCreateEventFragment(CustomDialogFragment_CreateEvents createEventFragment) {
         this.createEventFragment = createEventFragment;
     }
-
 }

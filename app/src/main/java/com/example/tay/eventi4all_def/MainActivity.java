@@ -3,12 +3,14 @@ package com.example.tay.eventi4all_def;
 
 import android.annotation.TargetApi;
 
+
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
@@ -29,11 +31,13 @@ import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
 
+
 import android.widget.Toast;
 
 import com.example.tay.eventi4all_def.Firebase.FirebaseAdmin;
 import com.example.tay.eventi4all_def.adapter.ViewPagerAdapter;
-import com.example.tay.eventi4all_def.fragments.CreateEventFragment;
+import com.example.tay.eventi4all_def.fragments.CustomDialogFragment_CreateEvents;
+import com.example.tay.eventi4all_def.fragments.ListPublicEventsFragment;
 import com.example.tay.eventi4all_def.fragments.MainFragment;
 import com.example.tay.eventi4all_def.fragments.ProfileFragment;
 import com.yalantis.ucrop.UCrop;
@@ -61,9 +65,10 @@ public class MainActivity extends AppCompatActivity {
     //Atributos fragments
     private ProfileFragment profileFragment;
     private MainFragment mainFragment;
-    private CreateEventFragment createEventFragment;
+    private ListPublicEventsFragment listPublicEventsFragment;
     private UCrop uCrop;
     int request = 0;
+    private CustomDialogFragment_CreateEvents customDialogFragment_createEvents;
 
 
     @Override
@@ -74,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
         //bottomNavigationView.setItemTextColor(getColorStateList(R.color.colorGreen));
 
         mainActivityEvents = new MainActivityEvents(this);
+        System.out.println("prueba1");
 
         //Instancia de la clase SignIn
         //Instancia de FirebaseAdmin
@@ -82,9 +88,13 @@ public class MainActivity extends AppCompatActivity {
         //Instanciamos el abstractFirebaseAdmin
         this.firebaseAdmin.setAbstractFirebaseAdminListener(this.mainActivityEvents);
 
+        //this.createEventFragment = (CreateEventFragment)this.getSupportFragmentManager().findFragmentById(R.id.createEventFragment);
+
+        customDialogFragment_createEvents= new CustomDialogFragment_CreateEvents();
 
         viewPager = findViewById(R.id.viewpager);
         bottomNavigationView = findViewById(R.id.navigation);
+        System.out.println("prueba2");
 
 // Poner invisible el navbottom
 //        bottomNavigationView.setVisibility(View.INVISIBLE);
@@ -152,6 +162,11 @@ public class MainActivity extends AppCompatActivity {
 
 
         this.setDataOfActivity();
+
+
+
+
+
     }
 
 
@@ -160,30 +175,48 @@ public class MainActivity extends AppCompatActivity {
 
 
         mainFragment = new MainFragment();
-        createEventFragment = new CreateEventFragment();
+        listPublicEventsFragment = new ListPublicEventsFragment();
+        //createEventFragment = new CreateEventFragment();
+
+
         profileFragment = new ProfileFragment();
 
+
         this.mainFragment.setiMainFragmentListener(this.mainActivityEvents);
+
         this.profileFragment.setiProfileFragmentListener(this.mainActivityEvents);
+
         this.profileFragment.setiGalleryAndCapturePhotoListener(this.mainActivityEvents);
 
-        this.createEventFragment.setiCreateEventFragmentListener(this.mainActivityEvents);
-        this.createEventFragment.setiGalleryAndCapturePhotoListener(this.mainActivityEvents);
+
+        this.listPublicEventsFragment.setIListPublicEventsFragmentListener(this.mainActivityEvents);
+
+        this.customDialogFragment_createEvents.setiCreateEventFragmentListener(this.mainActivityEvents);
+
+        this.customDialogFragment_createEvents.setiGalleryAndCapturePhotoListener(this.mainActivityEvents);
+
 
 
         adapter.addFragment(mainFragment);
-        adapter.addFragment(createEventFragment);
+        adapter.addFragment(listPublicEventsFragment);
         adapter.addFragment(profileFragment);
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(1);
+
 
     }
 
     public void setDataOfActivity() {
         this.firebaseAdmin.onCreate();
+
         this.firebaseAdmin.checkUserExist();
+
         this.firebaseAdmin.getStorageRef();
+
+
+
         setupViewPager(viewPager);
+
     }
 
 
@@ -215,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
                         UCrop.of(uri, DataHolder.MyDataHolder.imgUri)
                                 .withAspectRatio(10, 10)
                                 .withMaxResultSize(500, 500)
-                                .start(createEventFragment.getActivity());
+                                .start(customDialogFragment_createEvents.getActivity());
 
                     }
                 });
@@ -234,7 +267,7 @@ public class MainActivity extends AppCompatActivity {
                 UCrop.of(path, DataHolder.MyDataHolder.imgUri)
                         .withAspectRatio(10, 10)
                         .withMaxResultSize(500, 500)
-                        .start(createEventFragment.getActivity());
+                        .start(customDialogFragment_createEvents.getActivity());
 
 
 
@@ -253,11 +286,11 @@ public class MainActivity extends AppCompatActivity {
                     this.profileFragment.getImgProfile().setImageBitmap(bitmap);
                 } else if (request == 201) {
 
-                    this.createEventFragment.getEventImgMain().setImageBitmap(bitmap);
+                    this.customDialogFragment_createEvents.getEventImgMain().setImageBitmap(bitmap);
                 } else if (request == 300) {
                     this.profileFragment.getImgProfile().setImageURI(DataHolder.MyDataHolder.imgUri);
                 } else if (request == 301) {
-                    this.createEventFragment.getEventImgMain().setImageURI(DataHolder.MyDataHolder.imgUri);
+                    this.customDialogFragment_createEvents.getEventImgMain().setImageURI(DataHolder.MyDataHolder.imgUri);
                 }
                 request = 0;
             } else if (resultCode == UCrop.RESULT_ERROR) {
@@ -345,11 +378,13 @@ public class MainActivity extends AppCompatActivity {
         this.mainFragment = mainFragment;
     }
 
-    public CreateEventFragment getCreateEventFragment() {
-        return createEventFragment;
+
+
+    public CustomDialogFragment_CreateEvents getCustomDialogFragment_createEvents() {
+        return customDialogFragment_createEvents;
     }
 
-    public void setCreateEventFragment(CreateEventFragment createEventFragment) {
-        this.createEventFragment = createEventFragment;
+    public void setCustomDialogFragment_createEvents(CustomDialogFragment_CreateEvents customDialogFragment_createEvents) {
+        this.customDialogFragment_createEvents = customDialogFragment_createEvents;
     }
 }

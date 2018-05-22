@@ -24,10 +24,10 @@ import es.dmoral.toasty.Toasty;
 
 public class CreateEventFragmentEvents implements View.OnClickListener, IMyViewHolderListener {
 
-    private CreateEventFragment createEventFragment;
+    private CustomDialogFragment_CreateEvents createEventFragment;
     private HashMap<String, User> users;
 
-    public CreateEventFragmentEvents(CreateEventFragment createEventFragment) {
+    public CreateEventFragmentEvents(CustomDialogFragment_CreateEvents createEventFragment) {
         this.createEventFragment = createEventFragment;
         users = new HashMap<>();
     }
@@ -83,6 +83,9 @@ public class CreateEventFragmentEvents implements View.OnClickListener, IMyViewH
             }
 
 
+        }
+        else if(v.getId()==R.id.btnback){
+            this.createEventFragment.getiCreateEventFragmentListener().hideCreateEventDialogFragment();
         }
 
     }

@@ -1,13 +1,13 @@
 package com.example.tay.eventi4all_def.fragments;
 
-
-import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
+import android.annotation.SuppressLint;
+import android.app.DialogFragment;
+import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.ColorInt;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -15,24 +15,21 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.Checkable;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 
-
 import com.example.tay.eventi4all_def.DataHolder;
+import com.example.tay.eventi4all_def.MainActivity;
 import com.example.tay.eventi4all_def.R;
 import com.example.tay.eventi4all_def.adapter.ListAdapter;
 import com.example.tay.eventi4all_def.entity.User;
 
-
-import java.net.URI;
 import java.util.ArrayList;
 
 import at.markushi.ui.CircleButton;
@@ -40,10 +37,8 @@ import es.dmoral.toasty.Toasty;
 
 import static android.R.layout.simple_list_item_1;
 
-/**
- * A simple {@link Fragment} subclass.
- */
-public class CreateEventFragment extends Fragment {
+public class CustomDialogFragment_CreateEvents extends DialogFragment{
+    private static final String TAG = "MyCustomDialog";
     private ICreateEventFragmentListener iCreateEventFragmentListener;
     private IGalleryAndCapturePhotoListener iGalleryAndCapturePhotoListener;
     private CreateEventFragmentEvents createEventFragmentEvents;
@@ -58,25 +53,35 @@ public class CreateEventFragment extends Fragment {
     private Spinner spPax;
     private CheckBox checkboxPrivate;
     private ImageView eventImgMain;
+    private Context context;
+    private ImageView btnBack;
+
+    public CustomDialogFragment_CreateEvents() {
+        arrUsers = new ArrayList<User>();
+        this.context = getActivity();
 
 
-    public CreateEventFragment() {
-
-        arrUsers=new ArrayList<User>();
     }
 
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_create_event, container, false);
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+
+        View v = inflater.inflate(R.layout.dialog_fragment_create_events,container,false);
+        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
         this.createEventFragmentEvents = new CreateEventFragmentEvents(this);
-        this.listAdapter = new ListAdapter(arrUsers,getActivity(),this);
+        this.listAdapter = new ListAdapter(arrUsers,this.getActivity().getApplicationContext(),this);
+
         myList = (RecyclerView) v.findViewById(R.id.listOfUsers);
-        myList.setLayoutManager(new GridLayoutManager(getContext(),2));
+        myList.setLayoutManager(new GridLayoutManager(this.getActivity().getApplicationContext(),2));
         this.btnAdd = v.findViewById(R.id.btnAddNewFriend);
         this.btnCreateEvent = v.findViewById(R.id.buttonNewEvent);
         this.btnCreateEvent.setOnClickListener(this.createEventFragmentEvents);
+
+        this.btnBack = v.findViewById(R.id.btnback);
+        this.btnBack.setOnClickListener(this.createEventFragmentEvents);
+
         this.checkboxPrivate = v.findViewById(R.id.checkPrivate);
         this.eventImgMain = v.findViewById(R.id.eventImgMain);
         this.eventImgMain.setOnClickListener(this.createEventFragmentEvents);
@@ -91,12 +96,14 @@ public class CreateEventFragment extends Fragment {
 
 
 
+
         adapter = new ArrayAdapter(getActivity(), simple_list_item_1);
 
         this.btnAdd.setOnClickListener(this.createEventFragmentEvents);
         this.txtEventName = v.findViewById(R.id.txtNameEvent);
         this.myFriends = v.findViewById(R.id.txtNameFriend);
         this.myFriends.setAdapter(adapter);
+
         this.myFriends.addTextChangedListener(new TextWatcher() {
 
             @Override
@@ -116,24 +123,19 @@ public class CreateEventFragment extends Fragment {
         });
 
 
-       this.myList.setAdapter(listAdapter);
+        this.myList.setAdapter(listAdapter);
+
 
 
 
 
         Toasty.Config.getInstance().setErrorColor(getResources().getColor(R.color.colorRed)).setSuccessColor(getResources().getColor(R.color.colorGreen)).setTextColor(getResources().getColor(R.color.tw__solid_white)).apply(); // optional.apply();
 
+
         return v;
     }
 
 
-    public ICreateEventFragmentListener getiCreateEventFragmentListener() {
-        return iCreateEventFragmentListener;
-    }
-
-    public void setiCreateEventFragmentListener(ICreateEventFragmentListener iCreateEventFragmentListener) {
-        this.iCreateEventFragmentListener = iCreateEventFragmentListener;
-    }
 
     public CreateEventFragmentEvents getCreateEventFragmentEvents() {
         return createEventFragmentEvents;
@@ -237,5 +239,13 @@ public class CreateEventFragment extends Fragment {
 
     public void setEventImgMain(ImageView eventImgMain) {
         this.eventImgMain = eventImgMain;
+    }
+
+    public ICreateEventFragmentListener getiCreateEventFragmentListener() {
+        return iCreateEventFragmentListener;
+    }
+
+    public void setiCreateEventFragmentListener(ICreateEventFragmentListener iCreateEventFragmentListener) {
+        this.iCreateEventFragmentListener = iCreateEventFragmentListener;
     }
 }

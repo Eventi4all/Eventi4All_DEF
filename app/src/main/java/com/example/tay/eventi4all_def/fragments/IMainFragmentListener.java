@@ -10,5 +10,6 @@ public interface IMainFragmentListener {
     public void callLogoutMainActivity();
     public void getEvents(String events);
     public void getUserInfo();
+    public void openCreateEventsFragment();
 
 }

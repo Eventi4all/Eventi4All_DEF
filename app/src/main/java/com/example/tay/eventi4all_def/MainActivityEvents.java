@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
@@ -24,10 +25,12 @@ import com.bumptech.glide.Glide;
 import com.example.tay.eventi4all_def.Firebase.AbstractFirebaseAdminListener;
 import com.example.tay.eventi4all_def.entity.Event;
 import com.example.tay.eventi4all_def.entity.User;
+import com.example.tay.eventi4all_def.fragments.CustomDialogFragment_CreateEvents;
 import com.example.tay.eventi4all_def.fragments.ICreateEventFragmentListener;
 import com.example.tay.eventi4all_def.fragments.IGalleryAndCapturePhotoListener;
 import com.example.tay.eventi4all_def.fragments.IMainFragmentListener;
 import com.example.tay.eventi4all_def.fragments.IProfileFragmentListener;
+import com.example.tay.eventi4all_def.fragments.IListPublicEventsFragmentListener;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -44,7 +47,7 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
  * Created by tay on 17/4/18.
  */
 
-public class MainActivityEvents extends AbstractFirebaseAdminListener implements IMainFragmentListener, IProfileFragmentListener, ICreateEventFragmentListener, IGalleryAndCapturePhotoListener{
+public class MainActivityEvents extends AbstractFirebaseAdminListener implements IMainFragmentListener, IProfileFragmentListener, ICreateEventFragmentListener, IGalleryAndCapturePhotoListener, IListPublicEventsFragmentListener {
     private MainActivity mainActivity;
     //Directorio principal donde se almacenan las imagenes
     private static String APP_DIRECTORY = "Eventy4All/";
@@ -93,12 +96,11 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
         if(isUserExist){
             //redirigimos al fragment principal
             transition.show(this.mainActivity.getMainFragment());
-            transition.show(this.mainActivity.getCreateEventFragment());
+            this.mainActivity.getMainFragment().getiMainFragmentListener().getEvents("createEvents");
             transition.hide(this.mainActivity.getProfileFragment());
         }else{
             //redirigimos al fragment de creación de perfil
             transition.show(this.mainActivity.getProfileFragment());
-            transition.hide(this.mainActivity.getCreateEventFragment());
             transition.hide(this.mainActivity.getMainFragment());
 
         }
@@ -138,6 +140,14 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
     @Override
     public void getUserInfo() {
         this.mainActivity.getFirebaseAdmin().getUserInfo();
+    }
+
+    @Override
+    public void openCreateEventsFragment() {
+        this.mainActivity.getCustomDialogFragment_createEvents().show(this.mainActivity.getFragmentManager(),"MyCustomDialog");
+
+
+
     }
 
 
@@ -335,7 +345,6 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
             FragmentTransaction transition = mainActivity.getSupportFragmentManager().beginTransaction();
             transition.hide(this.mainActivity.getProfileFragment());
             transition.show(this.mainActivity.getMainFragment());
-            transition.show(this.mainActivity.getCreateEventFragment());
             transition.commit();
 
 
@@ -366,10 +375,15 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
         this.mainActivity.getFirebaseAdmin().insertEventInFirebase(event);
     }
 
+    @Override
+    public void hideCreateEventDialogFragment() {
+        this.mainActivity.getCustomDialogFragment_createEvents().dismiss();
+    }
+
 
     @Override
     public void foundNickName(HashMap<String,User> users) {
-      this.mainActivity.getCreateEventFragment().getCreateEventFragmentEvents().foundNickname(users);
+      this.mainActivity.getCustomDialogFragment_createEvents().getCreateEventFragmentEvents().foundNickname(users);
 
 
     }
@@ -378,15 +392,19 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
     public void insertEventOk(boolean isInsertOk, String result) {
         progress.dismiss();
         if(isInsertOk && result.equals("Document Insert")){
-            Toasty.success(this.mainActivity, "¡Enhorabuena! Has creado el evento: "+ this.mainActivity.getCreateEventFragment().getTxtEventName().getText().toString() +"!", Toast.LENGTH_SHORT, true).show();
-            this.mainActivity.getCreateEventFragment().getTxtEventName().setText("");
-            this.mainActivity.getCreateEventFragment().getCheckboxPrivate().setChecked(false);
+            this.mainActivity.getCustomDialogFragment_createEvents().getCheckboxPrivate().setChecked(false);
             DataHolder.MyDataHolder.imgUri= Uri.parse("android.resource://com.example.tay.eventi4all_def/" + R.drawable.com_facebook_profile_picture_blank_square);
-            Drawable myDrawable = this.mainActivity.getResources().getDrawable(R.drawable.com_facebook_profile_picture_blank_square);
-            this.mainActivity.getCreateEventFragment().getEventImgMain().setImageDrawable(myDrawable);
-            this.mainActivity.getCreateEventFragment().getSpPax().setSelection(0);
-            this.mainActivity.getCreateEventFragment().getListAdapter().getContenidoLista().clear();
-            this.mainActivity.getCreateEventFragment().getListAdapter().notifyDataSetChanged();
+            Drawable myDrawable = this.mainActivity.getResources().getDrawable(R.drawable.com_facebook_profile_picture_blank_square,null);
+            this.mainActivity.getCustomDialogFragment_createEvents().getEventImgMain().setImageDrawable(myDrawable);
+            this.mainActivity.getCustomDialogFragment_createEvents().getSpPax().setSelection(0);
+            this.mainActivity.getCustomDialogFragment_createEvents().getMyFriends().setText("");
+            this.mainActivity.getCustomDialogFragment_createEvents().getListAdapter().getContenidoLista().clear();
+            this.mainActivity.getCustomDialogFragment_createEvents().getListAdapter().notifyDataSetChanged();
+            this.mainActivity.getCustomDialogFragment_createEvents().dismiss();
+            Long aux = this.mainActivity.getMainFragment().getSpEvents().getSelectedItemId();
+            this.mainActivity.getMainFragment().getMainFragmentEvents().getEvents(aux.intValue());
+            Toasty.success(this.mainActivity, "¡Enhorabuena! Has creado el evento: "+ this.mainActivity.getCustomDialogFragment_createEvents().getTxtEventName().getText().toString(), Toast.LENGTH_SHORT, true).show();
+            this.mainActivity.getCustomDialogFragment_createEvents().getTxtEventName().setText("");
 
 
         }else{
@@ -461,4 +479,5 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
     public int getSELECT_PICTURE_MAINEVENT() {
         return SELECT_PICTURE_MAINEVENT;
     }
+
 }

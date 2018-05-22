@@ -2,6 +2,7 @@ package com.example.tay.eventi4all_def.fragments;
 
 import android.os.Handler;
 import android.support.constraint.ConstraintLayout;
+import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
@@ -38,17 +39,14 @@ public class MainFragmentEvents implements View.OnClickListener,AdapterView.OnIt
 
     @Override
     public void onClick(View v) {
-        /*if (v.getId() == R.id.btnLo) {
-            animBtnEffect = AnimationUtils.loadAnimation(this.getMainFragment().getActivity(), R.anim.alpha);
-           // this.mainFragment.getBtnLogout().startAnimation(animBtnEffect);
-            //this.mainFragment.getiMainFragmentListener().callLogoutMainActivity();
-        }else if(v.getId() == R.id.floatingActionButton){
 
-        }else if(v.getId() == R.id.btnOptions){
-
-
+        if (v.getId() == R.id.floatingActionButton) {
+           this.mainFragment.getiMainFragmentListener().openCreateEventsFragment();
         }
-        */
+
+
+
+
 
     }
 
@@ -65,6 +63,7 @@ public class MainFragmentEvents implements View.OnClickListener,AdapterView.OnIt
         this.mainFragment.getArrEvents().clear();
         this.mainFragment.getArrEvents().addAll(events);
         this.mainFragment.getListAdapter().notifyDataSetChanged();
+
     }
 
     @Override

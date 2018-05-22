@@ -2,13 +2,10 @@ package com.example.tay.eventi4all_def.adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.tay.eventi4all_def.R;
-import com.example.tay.eventi4all_def.fragments.CreateEventFragment;
 
 /**
  * Created by tay on 17/12/17.
