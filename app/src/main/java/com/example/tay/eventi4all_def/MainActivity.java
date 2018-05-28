@@ -36,6 +36,7 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.example.tay.eventi4all_def.Firebase.FirebaseAdmin;
+import com.example.tay.eventi4all_def.Firebase.MyFirebaseInstanceIDService;
 import com.example.tay.eventi4all_def.adapter.ViewPagerAdapter;
 import com.example.tay.eventi4all_def.fragments.CustomDialogFragment_CreateEvents;
 import com.example.tay.eventi4all_def.fragments.ListPublicEventsFragment;
@@ -72,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
     private UCrop uCrop;
     int request = 0;
     private CustomDialogFragment_CreateEvents customDialogFragment_createEvents;
+    private MyFirebaseInstanceIDService myFirebaseInstanceIDService;
 
 
     @Override
@@ -222,6 +224,9 @@ public class MainActivity extends AppCompatActivity {
 
 
         setupViewPager(viewPager);
+        if(DataHolder.MyDataHolder.token!=null){
+            this.firebaseAdmin.insertDeviceToken(DataHolder.MyDataHolder.token);
+        }
 
     }
 

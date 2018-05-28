@@ -52,7 +52,7 @@ public class ListPublicEventsFragment extends Fragment {
         myList.setItemAnimator(new DefaultItemAnimator());
         myList.setAdapter(listAdapter);
         int spanCount = 2; //num de columnas
-        int spacing = 40; //espaciado entre columnas
+        int spacing = 30; //espaciado entre columnas
         boolean includeEdge = true;
         myList.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, includeEdge));
         this.search = v.findViewById(R.id.searchEvent);

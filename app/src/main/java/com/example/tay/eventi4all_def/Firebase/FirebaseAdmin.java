@@ -24,6 +24,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.gson.JsonObject;
@@ -367,7 +368,11 @@ public class FirebaseAdmin {
                         storageRef.child(document.getData().get("imgProfile").toString()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                             @Override
                             public void onSuccess(Uri uri) {
-                                abstractFirebaseAdminListener.returnInfoUserFirebase(new User(DataHolder.MyDataHolder.currentUserNickName,uri.toString()));
+                                User user = new User(DataHolder.MyDataHolder.currentUserNickName,uri.toString());
+                               if(document.getData().get("token")!=null){
+                                   user.setToken(document.getData().get("token").toString());
+                               }
+                                abstractFirebaseAdminListener.returnInfoUserFirebase(user);
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
@@ -384,6 +389,20 @@ public class FirebaseAdmin {
                 }
             }
         });
+    }
+
+
+    public void insertDeviceToken(String token){
+        HashMap<String, String> hsToken = new HashMap<String, String>();
+        hsToken.put("token",token);
+        //Hacemos un merge apra que no borre el contenido de este usuario y solamente añada el token cada vez que cambie
+        Task<Void> docRef = db.collection("users").document(this.getUidUser()).set(hsToken, SetOptions.merge()).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+
+            }
+        });
+
     }
 
 

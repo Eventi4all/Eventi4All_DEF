@@ -10,7 +10,6 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
@@ -25,7 +24,6 @@ import com.bumptech.glide.Glide;
 import com.example.tay.eventi4all_def.Firebase.AbstractFirebaseAdminListener;
 import com.example.tay.eventi4all_def.entity.Event;
 import com.example.tay.eventi4all_def.entity.User;
-import com.example.tay.eventi4all_def.fragments.CustomDialogFragment_CreateEvents;
 import com.example.tay.eventi4all_def.fragments.ICreateEventFragmentListener;
 import com.example.tay.eventi4all_def.fragments.IGalleryAndCapturePhotoListener;
 import com.example.tay.eventi4all_def.fragments.IMainFragmentListener;
@@ -442,6 +440,11 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
 
     }
 
+
+    public void sendTokenReceived(String token) {
+        this.mainActivity.getFirebaseAdmin().insertDeviceToken(token);
+    }
+
     public static String getAppDirectory() {
         return APP_DIRECTORY;
     }
@@ -493,6 +496,7 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
     public int getSELECT_PICTURE_MAINEVENT() {
         return SELECT_PICTURE_MAINEVENT;
     }
+
 
 
 }
