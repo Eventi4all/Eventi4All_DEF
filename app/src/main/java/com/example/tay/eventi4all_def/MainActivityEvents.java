@@ -97,6 +97,7 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
             //redirigimos al fragment principal
             transition.show(this.mainActivity.getMainFragment());
             this.mainActivity.getMainFragment().getiMainFragmentListener().getEvents("createEvents");
+            this.mainActivity.getListPublicEventsFragment().getIListPublicEventsFragmentListener().callGetPublicEvents();
             transition.hide(this.mainActivity.getProfileFragment());
         }else{
             //redirigimos al fragment de creación de perfil
@@ -424,8 +425,21 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
     }
 
     @Override
-    public void returnEventsFirebase(ArrayList<Event> events) {
-        this.mainActivity.getMainFragment().getMainFragmentEvents().setEventsInListAdapter(events);
+    public void returnEventsFirebase(ArrayList<Event> events, String destination) {
+        System.out.println("size de events" + events.size());
+        if(destination.equals("mainFragment")){
+            this.mainActivity.getMainFragment().getMainFragmentEvents().setEventsInListAdapter(events);
+
+        }else if(destination.equals("listPublicEventsFragment")){
+            this.mainActivity.getListPublicEventsFragment().getListPublicEventsFragmentEvents().setEventsInListAdapter(events);
+        }
+
+    }
+
+    @Override
+    public void callGetPublicEvents() {
+        this.mainActivity.getFirebaseAdmin().getEvents("publicEvents");
+
     }
 
     public static String getAppDirectory() {
@@ -479,5 +493,6 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
     public int getSELECT_PICTURE_MAINEVENT() {
         return SELECT_PICTURE_MAINEVENT;
     }
+
 
 }

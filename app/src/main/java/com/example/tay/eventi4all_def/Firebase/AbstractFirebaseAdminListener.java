@@ -53,7 +53,7 @@ public abstract class AbstractFirebaseAdminListener implements IFirebaseAdminLis
     }
 
     @Override
-    public void returnEventsFirebase(ArrayList<Event> events) {
+    public void returnEventsFirebase(ArrayList<Event> events, String destination) {
 
     }
 

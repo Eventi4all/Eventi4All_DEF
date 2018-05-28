@@ -24,6 +24,7 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.AndroidException;
 import android.util.Log;
 
 import android.view.MenuItem;
@@ -43,6 +44,8 @@ import com.example.tay.eventi4all_def.fragments.ProfileFragment;
 import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
+import java.util.UUID;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -79,7 +82,6 @@ public class MainActivity extends AppCompatActivity {
         //bottomNavigationView.setItemTextColor(getColorStateList(R.color.colorGreen));
 
         mainActivityEvents = new MainActivityEvents(this);
-        System.out.println("prueba1");
 
         //Instancia de la clase SignIn
         //Instancia de FirebaseAdmin
@@ -94,7 +96,6 @@ public class MainActivity extends AppCompatActivity {
 
         viewPager = findViewById(R.id.viewpager);
         bottomNavigationView = findViewById(R.id.navigation);
-        System.out.println("prueba2");
 
 // Poner invisible el navbottom
 //        bottomNavigationView.setVisibility(View.INVISIBLE);
@@ -175,8 +176,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         mainFragment = new MainFragment();
-        listPublicEventsFragment = new ListPublicEventsFragment();
-        //createEventFragment = new CreateEventFragment();
+        listPublicEventsFragment = new ListPublicEventsFragment(); //createEventFragment = new CreateEventFragment();
 
 
         profileFragment = new ProfileFragment();
@@ -202,6 +202,12 @@ public class MainActivity extends AppCompatActivity {
         adapter.addFragment(profileFragment);
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(1);
+        /*
+        PARA ESTABLECER EL NUMERO DE PAGINAS QUE SE QUEDARÁN EN SEGUNDO PLANO
+        Y DE ESTA FORMA QUE NO ESTÉ RECARGANDO
+         */
+
+        viewPager.setOffscreenPageLimit(2);
 
 
     }
@@ -230,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
         //System.out.println("resultCode" + resultCode + "equestcode: " + requestCode + "y request" + request);
 
 
-        //Si la respuesta de la cámara o galería es OK
+        //Si la respuesta de la cámara o galería es OK o se llama al crop
         if (resultCode == RESULT_OK || resultCode == 96) {
 
             //Si el requestCode es igual al PHOTO_CODE
@@ -243,11 +249,11 @@ public class MainActivity extends AppCompatActivity {
                     public void onScanCompleted(String path, Uri uri) {
                         System.out.println("Externa Storage scanned " + path + ":");
                         System.out.println("ExternalStorage Uri:v " + uri);
-                        //LLamamos al crop activity para recortar la imagen
 
+                        DataHolder.MyDataHolder.imgUri = Uri.parse(Environment.getExternalStorageDirectory() + File.separator + "Eventy4All/" + "ProfilePicture" + File.separator + UUID.randomUUID().toString() + ".jpg");
                         UCrop.of(uri, DataHolder.MyDataHolder.imgUri)
                                 .withAspectRatio(10, 10)
-                                .withMaxResultSize(500, 500)
+                                .withMaxResultSize(250, 250)
                                 .start(customDialogFragment_createEvents.getActivity());
 
                     }
@@ -259,20 +265,27 @@ public class MainActivity extends AppCompatActivity {
                 Long timestamp = System.currentTimeMillis()/1000;
                 String mPath = Environment.getExternalStorageDirectory() + File.separator + "Eventy4All/Profilepicture" + File.separator + timestamp.toString() + ".jpg";
 
-                //Creamos un archivo pasándole la ruta de escritura de esta imagen. Este archivo será la imagen que capturemos de la cámara
-                File newFile = new File(mPath);
-                DataHolder.MyDataHolder.imgUri= Uri.fromFile(newFile);
+
+                //Antes de pasarle la uri de la imagen vamos a  comprimirla para que no ocupe tanto espacio y nos de una excepción de memoria
+                File compressedImageFile=null;
+
                 //Recibimos la URI de la imagen
                 Uri path = data.getData();
+
+                DataHolder.MyDataHolder.imgUri = Uri.parse(Environment.getExternalStorageDirectory() + File.separator + "Eventy4All/" + "ProfilePicture" + File.separator + UUID.randomUUID().toString() + ".jpg");
                 UCrop.of(path, DataHolder.MyDataHolder.imgUri)
                         .withAspectRatio(10, 10)
-                        .withMaxResultSize(500, 500)
+                        .withMaxResultSize(250, 250)
                         .start(customDialogFragment_createEvents.getActivity());
 
 
 
-
             } else if (requestCode == UCrop.REQUEST_CROP) {
+
+
+
+
+
 
 
 
@@ -304,6 +317,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
+
+
 
 
     /*
@@ -386,5 +402,13 @@ public class MainActivity extends AppCompatActivity {
 
     public void setCustomDialogFragment_createEvents(CustomDialogFragment_CreateEvents customDialogFragment_createEvents) {
         this.customDialogFragment_createEvents = customDialogFragment_createEvents;
+    }
+
+    public ListPublicEventsFragment getListPublicEventsFragment() {
+        return listPublicEventsFragment;
+    }
+
+    public void setListPublicEventsFragment(ListPublicEventsFragment listPublicEventsFragment) {
+        this.listPublicEventsFragment = listPublicEventsFragment;
     }
 }

@@ -26,6 +26,8 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.gson.JsonObject;
+import com.google.gson.internal.bind.ArrayTypeAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -257,19 +259,26 @@ public class FirebaseAdmin {
 
 
     public void getEvents(String events) {
-        final ArrayList<Event> arrEvents = new ArrayList<Event>();
+        String destination="";
+        final HashMap<String,Event> hsEvents = new HashMap<>();
         Query query=null;
+
         if(events.equals("createEvents")){
             query = db.collection("events").whereEqualTo("admin",DataHolder.MyDataHolder.currentUserNickName);
-
+            destination="mainFragment";
 
         }else if(events.equals("allAssistEvents")){
             query = db.collection("events").whereEqualTo("assistants."+DataHolder.MyDataHolder.currentUserNickName,true);
+            destination="mainFragment";
+        }else if(events.equals("publicEvents")){
 
+            query = db.collection("events").whereEqualTo("private",false);
+
+            destination="listPublicEventsFragment";
         }
 
 
-
+        String finalDestination = destination;
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
 
             @Override
@@ -281,15 +290,42 @@ public class FirebaseAdmin {
                             Event event = new Event(document.get("title").toString(),(boolean)document.get("private"),document.get("limit").toString());
                             event.setCreateAt(document.get("createAt").toString());
                             event.setUrlCover(uri.toString());
-                            event.setUuid("uuid");
-                            arrEvents.add(event);
+                            event.setUuid(document.get("uuid").toString());
 
-                            abstractFirebaseAdminListener.returnEventsFirebase(arrEvents);
+                            hsEvents.put(document.get("uuid").toString(),event);
+                            if(finalDestination.equals("listPublicEventsFragment")){
+                                Query queryAux= queryAux = db.collection("events").whereEqualTo("assistants."+DataHolder.MyDataHolder.currentUserNickName,true);
+                                queryAux.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                        for (DocumentSnapshot document : task.getResult()) {
+
+                                            if(hsEvents.containsKey(document.get("uuid").toString())){
+                                                hsEvents.remove(document.get("uuid").toString());
+
+                                            }
+
+
+
+                                        }
+                                        abstractFirebaseAdminListener.returnEventsFirebase(new ArrayList<Event>(hsEvents.values()), finalDestination);
+                                    }
+
+                                });
+
+                            }else{
+                                abstractFirebaseAdminListener.returnEventsFirebase(new ArrayList<Event>(hsEvents.values()), finalDestination);
+                            }
+
+
+
+
+
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            System.out.println("Exepcetion: " + e.getMessage());
+                            System.out.println("Exception: " + e.getMessage());
 
                         }
                     });
@@ -301,6 +337,8 @@ public class FirebaseAdmin {
 
                 }
 
+
+
             }
 
 
@@ -309,7 +347,7 @@ public class FirebaseAdmin {
        query.get().addOnFailureListener(new OnFailureListener() {
            @Override
            public void onFailure(@NonNull Exception e) {
-
+                System.out.println("Onfailure: " + e.getMessage());
            }
        });
 

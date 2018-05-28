@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Eventy4All</string>
-    <string name="title_home">Perfil</string>
-    <string name="title_dashboard">Añadir</string>
+    <string name="title_home">Mis eventos</string>
+    <string name="title_dashboard">Eventos públicos</string>
     <string name="title_notifications">Notificaciones</string>
     <!-- Información de proveedor requerida para Facebook -->
     <string name="facebook_application_id" translatable="false">361927374287912</string>

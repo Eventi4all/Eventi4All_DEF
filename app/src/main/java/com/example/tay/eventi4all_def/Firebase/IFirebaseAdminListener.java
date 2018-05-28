@@ -15,7 +15,7 @@ public interface IFirebaseAdminListener {
     public void insertDocumentIsOK(boolean isInsertok, String result);
     public void foundNickName(HashMap<String,User> users);
     public void insertEventOk(boolean isInsertOk, String result);
-    public void returnEventsFirebase(ArrayList<Event> events);
+    public void returnEventsFirebase(ArrayList<Event> events, String destination);
     public void returnInfoUserFirebase(User user);
 
 }
