@@ -9,6 +9,8 @@
     <!-- Para poder seleccionar imagenes de la galería -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
+
 
     <!-- Para que actualice la galería con la foto tomada -->
     <protected-broadcast android:name="android.intent.action.MEDIA_MOUNTED" />
@@ -58,6 +60,7 @@
             android:name=".Firebase.MyFirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+
             </intent-filter>
         </service>
     </application>

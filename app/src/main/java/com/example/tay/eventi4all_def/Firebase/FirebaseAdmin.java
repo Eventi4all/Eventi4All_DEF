@@ -191,6 +191,7 @@ public class FirebaseAdmin {
                             @Override
                             public void onSuccess(Uri uri) {
                                 users.put(data.getData().get("nickname").toString(), new User(data.getData().get("nickname").toString(), uri.toString()));
+                                System.out.println("algo encuentra: " + users.get(data.getData().get("nickname").toString()).getNickName());
                                 abstractFirebaseAdminListener.foundNickName(users);
                             }
                         }).addOnFailureListener(new OnFailureListener() {

@@ -111,6 +111,7 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
     @Override
     public void logout(boolean isLogout) {
         if(isLogout){
+            DataHolder.MyDataHolder.token=null;
             System.out.println("----------> SESIÓN CERRADA SATISFACTORIAMENTE <----------");
             Intent intent = new Intent(mainActivity, SignIn.class);
             mainActivity.startActivity(intent);
@@ -382,6 +383,7 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
 
     @Override
     public void foundNickName(HashMap<String,User> users) {
+        System.out.println("Algo encuentra2: " +users.size());
       this.mainActivity.getCustomDialogFragment_createEvents().getCreateEventFragmentEvents().foundNickname(users);
 
 

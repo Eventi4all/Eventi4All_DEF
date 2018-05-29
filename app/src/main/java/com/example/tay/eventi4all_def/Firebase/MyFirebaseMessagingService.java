@@ -84,6 +84,36 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         // Check if message contains a notification payload.
         if (remoteMessage.getNotification() != null) {
             Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
+            System.out.println("el remoteMessage que recibo es: " + remoteMessage);
+            //Convertimos los datos recibidos del mensaje en un jsonObject
+            Map<String, String> params;
+            JSONObject objectData;
+            params = remoteMessage.getData();
+            objectData = new JSONObject(params);
+            //Creamos un intent apra abrir la aplicación cuandro rpesionemos la notificación
+            Intent intent = new Intent(this,MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+            //Con autocanal hacemos que la notificación se elimine automaticamente al presionar sobre ella
+            try{
+                NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this,"Default")
+                        .setSmallIcon(R.drawable.applogo)
+                        .setContentTitle(objectData.get("title").toString())
+                        .setContentText(objectData.get("body").toString())
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT).setContentIntent(pendingIntent)
+                        .setAutoCancel(true).addAction(R.drawable.common_full_open_on_phone, "Aceptar la invitación",
+                                pendingIntent).addAction(R.drawable.common_full_open_on_phone, "Declinar la invitación",
+                                pendingIntent);
+                ;
+
+
+                //Mediante  NotificationManagerCompat mostramos la notificación
+                NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+
+                notificationManager.notify(Integer.parseInt(objectData.get("badge").toString()), mBuilder.build());
+            }catch (Exception e){
+                System.out.println("Error al recibir la notificacion: "  + e.getMessage());
+            }
 
 
 

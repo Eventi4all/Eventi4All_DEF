@@ -53,6 +53,7 @@ public class CreateEventFragmentEvents implements View.OnClickListener, IMyViewH
 
             } else {
                 if (!(this.createEventFragment.getMyFriends().getText().toString().trim().equals("")) && users.containsKey(this.createEventFragment.getMyFriends().getText().toString().trim())) {
+                    System.out.println("haahha");
                     this.createEventFragment.getArrUsers().add(users.get(this.createEventFragment.getMyFriends().getText().toString().trim()));
                     this.createEventFragment.getListAdapter().notifyDataSetChanged();
                     this.createEventFragment.getMyFriends().setText("");
@@ -98,10 +99,13 @@ public class CreateEventFragmentEvents implements View.OnClickListener, IMyViewH
     }
 
     public void foundNickname(HashMap<String, User> users) {
+
+
         this.users = users;
         this.createEventFragment.getAdapter().clear();
         this.createEventFragment.getAdapter().addAll(users.keySet());
         this.createEventFragment.getAdapter().notifyDataSetChanged();
+
     }
 
 

@@ -4,6 +4,9 @@ package com.example.tay.eventi4all_def;
 import android.annotation.TargetApi;
 
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -17,12 +20,15 @@ import android.os.Build;
 import android.os.Bundle;
 
 import android.os.Environment;
+import android.os.PowerManager;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.BottomNavigationView;
 
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.AndroidException;
 import android.util.Log;
@@ -35,6 +41,9 @@ import android.view.WindowManager;
 
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.Theme;
 import com.example.tay.eventi4all_def.Firebase.FirebaseAdmin;
 import com.example.tay.eventi4all_def.Firebase.MyFirebaseInstanceIDService;
 import com.example.tay.eventi4all_def.adapter.ViewPagerAdapter;
@@ -46,6 +55,9 @@ import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
 import java.util.UUID;
+
+import static android.Manifest.permission.CAMERA;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -165,6 +177,14 @@ public class MainActivity extends AppCompatActivity {
 
 
         this.setDataOfActivity();
+        //Permisos de notificación que solo se piden al instalar la aplicación
+        if(DataHolder.MyDataHolder.token!=null){
+            notificationSettings(this);
+            notificationApp(this);
+            openPowerSettings(this);
+            enableAutoStart();
+        }
+
 
 
 
@@ -212,7 +232,296 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setOffscreenPageLimit(2);
 
 
+
+
+
+
+
     }
+
+    private void notificationApp(Context context) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Para un uso óptimo de Eventy4All, proporcione los permisos: 'Vista de prioridades', " +
+                "'Banners' y 'Pantalla de bloqueo' que se encuentran en el apartado 'Notificaciones'.")
+                .setCancelable(false)
+                .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        try{
+                            Intent intent = new Intent();
+                            intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                            Uri uri = Uri.fromParts("package", getPackageName(), null);
+                            intent.setData(uri);
+                            startActivity(intent);
+                        }catch(Exception e){
+                        }
+
+                    }
+                }).setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
+
+    }
+
+    private void notificationSettings(Context context) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Es recomendable proporcionar permisos a 'Permitir vista previa'.")
+                .setCancelable(false)
+                .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        try{
+                            Intent intent = new Intent();
+                            intent.setAction("android.settings.APP_NOTIFICATION_SETTINGS");
+
+
+                            intent.putExtra("app_package", getPackageName());
+                            intent.putExtra("app_uid", getApplicationInfo().uid);
+
+
+                            intent.putExtra("android.provider.extra.APP_PACKAGE", getPackageName());
+
+                            startActivity(intent);
+                        }catch(Exception e){
+                        }
+
+                    }
+                }).setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
+
+    }
+
+
+    private void openPowerSettings(Context context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Para recibir notificaciones cuando la aplicación esté cerrada, " +
+                "necesitamos que proporcione permisos de omisión de ahorro de batería. Marque 'se permite' para Eventy4All")
+                .setCancelable(false)
+                .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Intent intent = new Intent();
+                        intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+                        context.startActivity(intent);
+                    }
+                }).setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
+
+
+    }
+
+    private void enableAutoStart() {
+        if (Build.BRAND.equalsIgnoreCase("xiaomi")) {
+            new MaterialDialog.Builder(MainActivity.this).title("Proporcione permisos para poder ejecutar la aplicación en segundo plano.")
+                    .content(
+                            "Para el correcto funcionamiento de Eventy4All necesitamos que proporcione permisos a esta aplicación para que pueda ejecutarse en segundo plano cuando la pantalla de tu dispositivo esté apagada." +
+                                    "Añada la aplicación a la lista de aplicaciones protegidas.")
+                    .theme(Theme.LIGHT)
+                    .positiveText("Aceptar")
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+
+                            Intent intent = new Intent();
+                            intent.setComponent(new ComponentName("com.miui.securitycenter",
+                                    "com.miui.permcenter.autostart.AutoStartManagementActivity"));
+                            startActivity(intent);
+                        }
+                    })
+                    .show();
+        } else if (Build.BRAND.equalsIgnoreCase("Letv")) {
+            new MaterialDialog.Builder(MainActivity.this).title("Proporcione permisos para poder ejecutar la aplicación en segundo plano.")
+                    .content(
+                            "Para el correcto funcionamiento de Eventy4All necesitamos que proporcione permisos a esta aplicación para que pueda ejecutarse en segundo plano cuando la pantalla de tu dispositivo esté apagada." +
+                                    "Añada la aplicación a la lista de aplicaciones protegidas.")
+                    .theme(Theme.LIGHT)
+                    .positiveText("Aceptar")
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+
+                            Intent intent = new Intent();
+                            intent.setComponent(new ComponentName("com.letv.android.letvsafe",
+                                    "com.letv.android.letvsafe.AutobootManageActivity"));
+                            startActivity(intent);
+                        }
+                    })
+                    .show();
+        }else if (Build.BRAND.equalsIgnoreCase("Huawei")) {
+            new MaterialDialog.Builder(MainActivity.this).title("Proporcione permisos para poder ejecutar la aplicación en segundo plano.")
+                    .content(
+                            "Para el correcto funcionamiento de Eventy4All necesitamos que proporcione permisos a esta aplicación para que pueda ejecutarse en segundo plano cuando la pantalla de tu dispositivo esté apagada." +
+                                    "Añada la aplicación a la lista de aplicaciones protegidas.")
+                    .theme(Theme.LIGHT)
+                    .positiveText("Aceptar")
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+
+                            Intent intent = new Intent();
+                            intent.setComponent(new ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity"));
+                            startActivity(intent);
+                        }
+                    })
+                    .show();
+        } else if (Build.BRAND.equalsIgnoreCase("Asus")) {
+            new MaterialDialog.Builder(MainActivity.this).title("Proporcione permisos para poder ejecutar la aplicación en segundo plano.")
+                    .content(
+                            "Para el correcto funcionamiento de Eventy4All necesitamos que proporcione permisos a esta aplicación para que pueda ejecutarse en segundo plano cuando la pantalla de tu dispositivo esté apagada." +
+                                    "Añada la aplicación a la lista de aplicaciones protegidas.")
+                    .theme(Theme.LIGHT)
+                    .positiveText("Aceptar")
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+
+                            Intent intent = new Intent();
+                            intent.setComponent(new ComponentName("com.asus.mobilemanager", "com.asus.mobilemanager.MainActivity"));
+                            startActivity(intent);
+                        }
+                    })
+                    .show();
+        }else if (Build.BRAND.equalsIgnoreCase("Igoo")) {
+            new MaterialDialog.Builder(MainActivity.this).title("Proporcione permisos para poder ejecutar la aplicación en segundo plano.")
+                    .content(
+                            "Para el correcto funcionamiento de Eventy4All necesitamos que proporcione permisos a esta aplicación para que pueda ejecutarse en segundo plano cuando la pantalla de tu dispositivo esté apagada." +
+                                    "Añada la aplicación a la lista de aplicaciones protegidas.")
+                    .theme(Theme.LIGHT)
+                    .positiveText("Aceptar")
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            try{
+                                Intent intent = new Intent();
+                                intent.setComponent(new ComponentName("com.iqoo.secure", "com.iqoo.secure.ui.phoneoptimize.AddWhiteListActivity"));
+                                startActivity(intent);
+                            }catch(Exception e){
+                                try{
+                                    Intent intent = new Intent();
+                                    intent.setComponent(  new ComponentName("com.iqoo.secure", "com.iqoo.secure.ui.phoneoptimize.BgStartUpManager"));
+                                    startActivity(intent);
+                                }catch(Exception ex){
+
+                                }
+
+
+                            }
+
+                        }
+                    })
+                    .show();
+        }else if (Build.BRAND.equalsIgnoreCase("Honor")) {
+            new MaterialDialog.Builder(MainActivity.this).title("Proporcione permisos para poder ejecutar la aplicación en segundo plano.")
+                    .content(
+                            "Para el correcto funcionamiento de Eventy4All necesitamos que proporcione permisos a esta aplicación para que pueda ejecutarse en segundo plano cuando la pantalla de tu dispositivo esté apagada." +
+                                    "Añada la aplicación a la lista de aplicaciones protegidas.")
+                    .theme(Theme.LIGHT)
+                    .positiveText("Aceptar")
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            Intent intent = new Intent();
+                            intent.setComponent(new ComponentName("com.huawei.systemmanager",
+                                    "com.huawei.systemmanager.optimize.process.ProtectActivity"));
+                            startActivity(intent);
+                        }
+                    })
+                    .show();
+        } else if (Build.MANUFACTURER.equalsIgnoreCase("oppo")) {
+            new MaterialDialog.Builder(MainActivity.this).title("Proporcione permisos para poder ejecutar la aplicación en segundo plano.")
+                    .content(
+                            "Para el correcto funcionamiento de Eventy4All necesitamos que proporcione permisos a esta aplicación para que pueda ejecutarse en segundo plano cuando la pantalla de tu dispositivo esté apagada." +
+                                    "Añada la aplicación a la lista de aplicaciones protegidas.")
+                    .theme(Theme.LIGHT)
+                    .positiveText("Aceptar")
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            try {
+                                Intent intent = new Intent();
+                                intent.setClassName("com.coloros.safecenter",
+                                        "com.coloros.safecenter.permission.startup.StartupAppListActivity");
+                                startActivity(intent);
+                            } catch (Exception e) {
+                                try {
+                                    Intent intent = new Intent();
+                                    intent.setClassName("com.oppo.safe",
+                                            "com.oppo.safe.permission.startup.StartupAppListActivity");
+                                    startActivity(intent);
+                                } catch (Exception ex) {
+                                    try {
+                                        Intent intent = new Intent();
+                                        intent.setClassName("com.coloros.safecenter",
+                                                "com.coloros.safecenter.startupapp.StartupAppListActivity");
+                                        startActivity(intent);
+                                    } catch (Exception exx) {
+
+                                    }
+                                }
+                            }
+                        }
+                    })
+                    .show();
+        } else if (Build.MANUFACTURER.contains("vivo")) {
+            new MaterialDialog.Builder(MainActivity.this).title("Proporcione permisos para poder ejecutar la aplicación en segundo plano.")
+                    .content(
+                            "Para el correcto funcionamiento de Eventy4All necesitamos que proporcione permisos a esta aplicación para que pueda ejecutarse en segundo plano cuando la pantalla de tu dispositivo esté apagada." +
+                                    "Añada la aplicación a la lista de aplicaciones protegidas.")
+                    .theme(Theme.LIGHT)
+                    .positiveText("Aceptar")
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            try {
+                                Intent intent = new Intent();
+                                intent.setComponent(new ComponentName("com.iqoo.secure",
+                                        "com.iqoo.secure.ui.phoneoptimize.AddWhiteListActivity"));
+                                startActivity(intent);
+                            } catch (Exception e) {
+                                try {
+                                    Intent intent = new Intent();
+                                    intent.setComponent(new ComponentName("com.vivo.permissionmanager",
+                                            "com.vivo.permissionmanager.activity.BgStartUpManagerActivity"));
+                                    startActivity(intent);
+                                } catch (Exception ex) {
+                                    try {
+                                        Intent intent = new Intent();
+                                        intent.setClassName("com.iqoo.secure",
+                                                "com.iqoo.secure.ui.phoneoptimize.BgStartUpManager");
+                                        startActivity(intent);
+                                    } catch (Exception exx) {
+                                        ex.printStackTrace();
+                                    }
+                                }
+                            }
+                        }
+                    })
+                    .show();
+        }
+    }
+
+
+
+
+
+
+
+
+
+
 
     public void setDataOfActivity() {
         this.firebaseAdmin.onCreate();
