@@ -30,6 +30,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.ArrayTypeAdapter;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -172,10 +173,6 @@ public class FirebaseAdmin {
         }
 
 
-
-
-
-
     }
 
 
@@ -216,7 +213,7 @@ public class FirebaseAdmin {
 
     }
 
-    public void insertEventInFirebase(HashMap<String, Object> event) {
+    public void insertEventInFirebase(HashMap<String, Object> event, Uri uriQr) {
 
         try{
             String nameImage = UUID.randomUUID().toString() + ".jpg";
@@ -230,30 +227,48 @@ public class FirebaseAdmin {
         }).addOnSuccessListener(new OnSuccessListener() {
             @Override
             public void onSuccess(Object o) {
-
-                event.put("coverImg", (String) createFile("images/events/","getUrl",nameImage).get("urlComplete"));
-
-               db.collection("events").document(event.get("uuid").toString()).set(event).addOnSuccessListener(new OnSuccessListener<Void>() {
+                String urlQr="images/QR/" + event.get("uuid").toString()+".jpg";
+                StorageReference mountainImagesRefQr = storageRef.child(urlQr);
+                Task uploadTaskQr= mountainImagesRefQr.putFile(uriQr);
+                uploadTaskQr.addOnFailureListener(new OnFailureListener() {
                     @Override
-                    public void onSuccess(Void aVoid) {
+                    public void onFailure(@NonNull Exception e) {
+                        abstractFirebaseAdminListener.insertEventOk(false, "Firebase Exception");
+                    }
+                }).addOnSuccessListener(new OnSuccessListener() {
+                    @Override
+                    public void onSuccess(Object o) {
+                        event.put("coverImg", (String) createFile("images/events/","getUrl",nameImage).get("urlComplete"));
+                        event.put("qr",urlQr);
+                        db.collection("events").document(event.get("uuid").toString()).set(event).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
 
-                        System.out.println("insert ok");
-                        abstractFirebaseAdminListener.insertEventOk(true, "Document Insert");
-                        if(DataHolder.MyDataHolder.notificationUsers.size()>0){
-                            System.out.println("dentro del piush");
-                            abstractFirebaseAdminListener.pushNotification();
-                        }
+                                System.out.println("insert ok");
+                                abstractFirebaseAdminListener.insertEventOk(true, "Document Insert");
+                                if(DataHolder.MyDataHolder.notificationUsers.size()>0){
+                                    System.out.println("dentro del piush");
+                                    abstractFirebaseAdminListener.pushNotification();
+                                }
 
+
+                            }
+                        })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+
+                                        abstractFirebaseAdminListener.insertEventOk(false, "Firebase Exception");
+                                    }
+                                });
 
                     }
-                })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
+                });
 
-                                abstractFirebaseAdminListener.insertEventOk(false, "Firebase Exception");
-                            }
-                        });
+
+
+
+
 
 
             }

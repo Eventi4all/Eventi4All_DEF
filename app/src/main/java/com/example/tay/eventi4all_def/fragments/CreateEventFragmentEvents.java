@@ -3,8 +3,12 @@ package com.example.tay.eventi4all_def.fragments;
 
 import android.app.AlertDialog;
 
+import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.tay.eventi4all_def.DataHolder;
@@ -13,6 +17,9 @@ import com.example.tay.eventi4all_def.R;
 import com.example.tay.eventi4all_def.adapter.IMyViewHolderListener;
 import com.example.tay.eventi4all_def.entity.User;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
@@ -80,7 +87,8 @@ public class CreateEventFragmentEvents implements View.OnClickListener, IMyViewH
                 event.put("limit", this.createEventFragment.getSpPax().getSelectedItem().toString());
                assistants.put(DataHolder.MyDataHolder.currentUserNickName,true);
                 event.put("assistants", assistants);
-                this.createEventFragment.getiCreateEventFragmentListener().saveEventInFirebase(event, this.createEventFragment.getArrUsers());
+                Uri uriQr= createImageFile(this.createEventFragment.getiCreateEventFragmentListener().createQrFromEvent(event.get("uuid").toString()),event.get("uuid").toString());
+                this.createEventFragment.getiCreateEventFragmentListener().saveEventInFirebase(event, this.createEventFragment.getArrUsers(),uriQr);
             }
 
 
@@ -89,6 +97,35 @@ public class CreateEventFragmentEvents implements View.OnClickListener, IMyViewH
             this.createEventFragment.getiCreateEventFragmentListener().hideCreateEventDialogFragment();
         }
 
+    }
+
+    public Uri createImageFile(Bitmap bitmap, String uuid) {
+        Uri uri=null;
+        String imageFileName = uuid;
+        File mFileTemp = null;
+        String root = this.createEventFragment.getActivity().getDir("my_sub_dir", Context.MODE_PRIVATE).getAbsolutePath();
+        File myDir = new File(root + "/Img");
+        if (!myDir.exists()) {
+            myDir.mkdirs();
+        }
+        try {
+            mFileTemp = File.createTempFile(imageFileName, ".jpg", myDir.getAbsoluteFile());
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        if (mFileTemp != null) {
+            FileOutputStream fout;
+            try {
+                fout = new FileOutputStream(mFileTemp);
+                bitmap.compress(Bitmap.CompressFormat.PNG, 70, fout);
+                fout.flush();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+             uri = Uri.fromFile(mFileTemp);
+
+        }
+        return uri;
     }
 
 

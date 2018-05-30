@@ -7,6 +7,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -30,6 +31,11 @@ import com.example.tay.eventi4all_def.fragments.IGalleryAndCapturePhotoListener;
 import com.example.tay.eventi4all_def.fragments.IMainFragmentListener;
 import com.example.tay.eventi4all_def.fragments.IProfileFragmentListener;
 import com.example.tay.eventi4all_def.fragments.IListPublicEventsFragmentListener;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.journeyapps.barcodescanner.BarcodeEncoder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -374,18 +380,32 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
     }
 
     @Override
-    public void saveEventInFirebase(HashMap<String, Object> event, ArrayList<User> notificationUsers) {
+    public void saveEventInFirebase(HashMap<String, Object> event, ArrayList<User> notificationUsers, Uri uriQr) {
         DataHolder.MyDataHolder.notificationUsers = new ArrayList<>(notificationUsers);
 
         progress = new ProgressDialog(this.mainActivity);
         progress.setMessage("Estamos creando el evento, por favor espere...");
         progress.show();
-        this.mainActivity.getFirebaseAdmin().insertEventInFirebase(event);
+        this.mainActivity.getFirebaseAdmin().insertEventInFirebase(event,uriQr);
     }
 
     @Override
     public void hideCreateEventDialogFragment() {
         this.mainActivity.getCustomDialogFragment_createEvents().dismiss();
+    }
+
+    @Override
+    public Bitmap createQrFromEvent(String uuid) {
+        MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
+        Bitmap bitmap = null;
+        try {
+            BitMatrix bitMatrix = multiFormatWriter.encode(uuid, BarcodeFormat.QR_CODE,200,200);
+            BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
+            bitmap = barcodeEncoder.createBitmap(bitMatrix);
+        } catch (WriterException e) {
+            e.printStackTrace();
+        }
+        return bitmap;
     }
 
 

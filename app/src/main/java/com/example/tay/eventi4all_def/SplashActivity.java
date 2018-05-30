@@ -12,6 +12,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.felipecsl.gifimageview.library.GifImageView;
+import com.google.firebase.auth.FirebaseAuth;
 
 import org.apache.commons.io.IOUtils;
 
@@ -49,8 +50,15 @@ public class SplashActivity extends AppCompatActivity {
             @Override
             public void run() {
                 //Instancia de la clase SignIn
-                SplashActivity.this.startActivity(new Intent(SplashActivity.this,SignIn.class));
+                if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                    finish();
+                    SplashActivity.this.startActivity(new Intent(SplashActivity.this, MainActivity.class));
+
+                }else{
+                    SplashActivity.this.startActivity(new Intent(SplashActivity.this,SignIn.class));
+                }
                 SplashActivity.this.finish();
+
             }
         },4000);
 

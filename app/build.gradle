@@ -74,8 +74,11 @@ dependencies {
     implementation 'com.github.yalantis:ucrop:2.2.2-native'
     //Push notification
     implementation 'com.google.firebase:firebase-messaging:11.8.0'
-
+    //Material desing para dialogos
     implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
+    //Librerías ZXing para generar QR
+    implementation 'com.google.zxing:core:3.2.1'
+    implementation 'com.journeyapps:zxing-android-embedded:3.2.0@aar'
 
 
 
