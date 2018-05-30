@@ -17,5 +17,6 @@ public interface IFirebaseAdminListener {
     public void insertEventOk(boolean isInsertOk, String result);
     public void returnEventsFirebase(ArrayList<Event> events, String destination);
     public void returnInfoUserFirebase(User user);
+    public void pushNotification();
 
 }

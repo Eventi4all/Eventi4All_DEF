@@ -99,7 +99,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this,"Default")
                         .setSmallIcon(R.drawable.applogo)
                         .setContentTitle(objectData.get("title").toString())
-                        .setContentText(objectData.get("body").toString())
+                        .setContentText(objectData.get("message").toString())
                         .setPriority(NotificationCompat.PRIORITY_DEFAULT).setContentIntent(pendingIntent)
                         .setAutoCancel(true).addAction(R.drawable.common_full_open_on_phone, "Aceptar la invitación",
                                 pendingIntent).addAction(R.drawable.common_full_open_on_phone, "Declinar la invitación",
@@ -119,6 +119,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
 
         }else{
+
             /*
             Dado que para el manejo de código en nuestra app necesitamos erecibir el contenido de las notificaciones
              de tipo payload Data y no del tipo notification dado que sino, no podemos trabajar con ellas en segundo plano
@@ -155,7 +156,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
                 //Mediante  NotificationManagerCompat mostramos la notificación
                 NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-
                 notificationManager.notify(Integer.parseInt(objectData.get("badge").toString()), mBuilder.build());
             }catch (Exception e){
                 System.out.println("Error al recibir la notificacion: "  + e.getMessage());
@@ -164,7 +164,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
 
 
-
+System.out.println("todo bien y correcto");
 
 
 

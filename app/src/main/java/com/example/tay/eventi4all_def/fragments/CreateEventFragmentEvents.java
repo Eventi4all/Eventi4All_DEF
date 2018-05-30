@@ -15,6 +15,7 @@ import com.example.tay.eventi4all_def.entity.User;
 
 import java.text.SimpleDateFormat;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import java.util.HashMap;
@@ -53,7 +54,6 @@ public class CreateEventFragmentEvents implements View.OnClickListener, IMyViewH
 
             } else {
                 if (!(this.createEventFragment.getMyFriends().getText().toString().trim().equals("")) && users.containsKey(this.createEventFragment.getMyFriends().getText().toString().trim())) {
-                    System.out.println("haahha");
                     this.createEventFragment.getArrUsers().add(users.get(this.createEventFragment.getMyFriends().getText().toString().trim()));
                     this.createEventFragment.getListAdapter().notifyDataSetChanged();
                     this.createEventFragment.getMyFriends().setText("");
@@ -80,7 +80,7 @@ public class CreateEventFragmentEvents implements View.OnClickListener, IMyViewH
                 event.put("limit", this.createEventFragment.getSpPax().getSelectedItem().toString());
                assistants.put(DataHolder.MyDataHolder.currentUserNickName,true);
                 event.put("assistants", assistants);
-                this.createEventFragment.getiCreateEventFragmentListener().saveEventInFirebase(event);
+                this.createEventFragment.getiCreateEventFragmentListener().saveEventInFirebase(event, this.createEventFragment.getArrUsers());
             }
 
 

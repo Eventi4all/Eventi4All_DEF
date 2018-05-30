@@ -3,6 +3,7 @@ package com.example.tay.eventi4all_def.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -33,6 +34,7 @@ public class ListPublicEventsFragment extends Fragment {
     private ArrayList<Event> arrEvents;
     private RecyclerView myList;
     private EditText search;
+    private SwipeRefreshLayout refreshLayout;
 
 
     public ListPublicEventsFragment() {
@@ -73,9 +75,20 @@ public class ListPublicEventsFragment extends Fragment {
 
           }
       });
+
+        refreshLayout = v.findViewById(R.id.swipeRefresh);
+        refreshLayout.setOnRefreshListener(this.listPublicEventsFragmentEvents);
+        //Colores para el refresh
+        refreshLayout.setColorSchemeResources(
+                R.color.s1,
+                R.color.s2,
+                R.color.s3,
+                R.color.s4);
+
         return v;
     }
-    
+
+    //Filtro de eventos
     public void filter(String editable){
         ArrayList<Event> arrEventsFiltered = new ArrayList<>();
         for (Event aux: this.arrEvents) {
@@ -130,5 +143,11 @@ public class ListPublicEventsFragment extends Fragment {
         this.myList = myList;
     }
 
+    public SwipeRefreshLayout getRefreshLayout() {
+        return refreshLayout;
+    }
 
+    public void setRefreshLayout(SwipeRefreshLayout refreshLayout) {
+        this.refreshLayout = refreshLayout;
+    }
 }

@@ -7,7 +7,6 @@ import java.util.HashMap;
 
 public interface ICreateEventFragmentListener {
     public void getUsersFb(CharSequence sequence);
-    public void saveEventInFirebase(HashMap<String, Object> event);
-
+    public void saveEventInFirebase(HashMap<String, Object> event, ArrayList<User> notificationUsers);
    public void hideCreateEventDialogFragment();
 }

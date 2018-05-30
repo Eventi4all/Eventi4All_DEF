@@ -190,8 +190,9 @@ public class FirebaseAdmin {
                         storageRef.child(data.getData().get("imgProfile").toString()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                             @Override
                             public void onSuccess(Uri uri) {
-                                users.put(data.getData().get("nickname").toString(), new User(data.getData().get("nickname").toString(), uri.toString()));
-                                System.out.println("algo encuentra: " + users.get(data.getData().get("nickname").toString()).getNickName());
+                                User auxUser = new User(data.getData().get("nickname").toString(), uri.toString());
+                                auxUser.setToken(data.getData().get("token").toString());
+                                users.put(data.getData().get("nickname").toString(),auxUser);
                                 abstractFirebaseAdminListener.foundNickName(users);
                             }
                         }).addOnFailureListener(new OnFailureListener() {
@@ -220,6 +221,7 @@ public class FirebaseAdmin {
         try{
             String nameImage = UUID.randomUUID().toString() + ".jpg";
         Task uploadTask = (Task) createFile("images/events/","upload",nameImage).get("uploadTask");
+
         uploadTask.addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
@@ -228,17 +230,27 @@ public class FirebaseAdmin {
         }).addOnSuccessListener(new OnSuccessListener() {
             @Override
             public void onSuccess(Object o) {
+
                 event.put("coverImg", (String) createFile("images/events/","getUrl",nameImage).get("urlComplete"));
+
                db.collection("events").document(event.get("uuid").toString()).set(event).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
 
+                        System.out.println("insert ok");
                         abstractFirebaseAdminListener.insertEventOk(true, "Document Insert");
+                        if(DataHolder.MyDataHolder.notificationUsers.size()>0){
+                            System.out.println("dentro del piush");
+                            abstractFirebaseAdminListener.pushNotification();
+                        }
+
+
                     }
                 })
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
+
                                 abstractFirebaseAdminListener.insertEventOk(false, "Firebase Exception");
                             }
                         });

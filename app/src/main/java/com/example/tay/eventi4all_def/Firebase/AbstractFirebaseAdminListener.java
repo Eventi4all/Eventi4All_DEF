@@ -61,4 +61,9 @@ public abstract class AbstractFirebaseAdminListener implements IFirebaseAdminLis
     public void returnInfoUserFirebase(User user) {
 
     }
+
+    @Override
+    public void pushNotification() {
+
+    }
 }

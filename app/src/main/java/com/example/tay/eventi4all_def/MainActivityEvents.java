@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 
 import com.bumptech.glide.Glide;
+import com.example.tay.eventi4all_def.AsyncTask.HttpJsonAsyncTask;
 import com.example.tay.eventi4all_def.Firebase.AbstractFirebaseAdminListener;
 import com.example.tay.eventi4all_def.entity.Event;
 import com.example.tay.eventi4all_def.entity.User;
@@ -30,10 +31,15 @@ import com.example.tay.eventi4all_def.fragments.IMainFragmentListener;
 import com.example.tay.eventi4all_def.fragments.IProfileFragmentListener;
 import com.example.tay.eventi4all_def.fragments.IListPublicEventsFragmentListener;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import es.dmoral.toasty.Toasty;
 
@@ -45,7 +51,7 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
  * Created by tay on 17/4/18.
  */
 
-public class MainActivityEvents extends AbstractFirebaseAdminListener implements IMainFragmentListener, IProfileFragmentListener, ICreateEventFragmentListener, IGalleryAndCapturePhotoListener, IListPublicEventsFragmentListener {
+public class MainActivityEvents extends AbstractFirebaseAdminListener implements IMainFragmentListener, IProfileFragmentListener, ICreateEventFragmentListener, IGalleryAndCapturePhotoListener, IListPublicEventsFragmentListener{
     private MainActivity mainActivity;
     //Directorio principal donde se almacenan las imagenes
     private static String APP_DIRECTORY = "Eventy4All/";
@@ -368,7 +374,9 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
     }
 
     @Override
-    public void saveEventInFirebase(HashMap<String, Object> event) {
+    public void saveEventInFirebase(HashMap<String, Object> event, ArrayList<User> notificationUsers) {
+        DataHolder.MyDataHolder.notificationUsers = new ArrayList<>(notificationUsers);
+
         progress = new ProgressDialog(this.mainActivity);
         progress.setMessage("Estamos creando el evento, por favor espere...");
         progress.show();
@@ -383,7 +391,6 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
 
     @Override
     public void foundNickName(HashMap<String,User> users) {
-        System.out.println("Algo encuentra2: " +users.size());
       this.mainActivity.getCustomDialogFragment_createEvents().getCreateEventFragmentEvents().foundNickname(users);
 
 
@@ -409,6 +416,7 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
 
 
         }else{
+            DataHolder.MyDataHolder.notificationUsers=null;
             builder = new AlertDialog.Builder(this.mainActivity);
             builder.setTitle("¡Opps!");
             builder.setMessage("Hubo un problema, ¡Vuelve a intentarlo!");
@@ -442,6 +450,31 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
 
     }
 
+    @Override
+    public void pushNotification() {
+
+        JSONObject jsonObj;
+        JSONArray jsonArray = new JSONArray();
+        Random rand = new Random();
+        for(int i=0; i<DataHolder.MyDataHolder.notificationUsers.size(); i++){
+            try {
+                jsonObj = new JSONObject();
+                jsonObj.put("nickName",DataHolder.MyDataHolder.currentUserNickName);
+                jsonObj.put("addressee",DataHolder.MyDataHolder.notificationUsers.get(i).getNickName());
+                jsonObj.put("token",DataHolder.MyDataHolder.notificationUsers.get(i).getToken());
+                jsonObj.put("badge", String.valueOf(rand.nextInt(50) + 1));
+                jsonArray.put(jsonObj);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        HttpJsonAsyncTask httpJsonAsyncTask = new HttpJsonAsyncTask();
+        System.out.println("Antes del envio:\n" + jsonArray.toString());
+        httpJsonAsyncTask.execute(jsonArray);
+
+
+    }
 
     public void sendTokenReceived(String token) {
         this.mainActivity.getFirebaseAdmin().insertDeviceToken(token);
