@@ -24,7 +24,7 @@ public class ListPublicEventsFragmentEvents implements SwipeRefreshLayout.OnRefr
         this.listPublicEventsFragment.getArrEvents().clear();
         this.listPublicEventsFragment.getArrEvents().addAll(events);
         this.listPublicEventsFragment.getListAdapter().notifyDataSetChanged();
-        System.out.println("refreshing");
+        System.out.println("refreshing public events");
         listPublicEventsFragment.getRefreshLayout().setRefreshing(false);
 
     }

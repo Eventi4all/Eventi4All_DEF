@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragments.NotificationFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/swipeRefreshCards"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <com.tabassum.shimmerRecyclerView.ShimmerRecyclerView
+            android:id="@+id/listOfCards"
+            android:background="#ffffff"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout="@layout/item_image_shimmer_view" >
+
+        </com.tabassum.shimmerRecyclerView.ShimmerRecyclerView>
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+
+</FrameLayout>

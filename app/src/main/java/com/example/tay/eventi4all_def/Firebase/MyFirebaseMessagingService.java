@@ -5,6 +5,8 @@ import android.app.Notification;
 import android.app.PendingIntent;
 
 import android.content.Intent;
+import android.os.Binder;
+import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
@@ -37,6 +39,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
 
     private static final String TAG = "MyFirebaseMsgService";
+
+
+
 
 
 
@@ -206,6 +211,11 @@ System.out.println("todo bien y correcto");
     private void handleNow() {
         Log.d(TAG, "Short lived task is done.");
     }
+
+
+
+
+
 
     /**
      * Create and show a simple notification containing the received FCM message.

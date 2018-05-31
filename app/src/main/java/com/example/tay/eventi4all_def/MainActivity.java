@@ -46,10 +46,12 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
 import com.example.tay.eventi4all_def.Firebase.FirebaseAdmin;
 import com.example.tay.eventi4all_def.Firebase.MyFirebaseInstanceIDService;
+import com.example.tay.eventi4all_def.Firebase.MyFirebaseMessagingService;
 import com.example.tay.eventi4all_def.adapter.ViewPagerAdapter;
 import com.example.tay.eventi4all_def.fragments.CustomDialogFragment_CreateEvents;
 import com.example.tay.eventi4all_def.fragments.ListPublicEventsFragment;
 import com.example.tay.eventi4all_def.fragments.MainFragment;
+import com.example.tay.eventi4all_def.fragments.NotificationFragment;
 import com.example.tay.eventi4all_def.fragments.ProfileFragment;
 import com.yalantis.ucrop.UCrop;
 
@@ -86,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
     int request = 0;
     private CustomDialogFragment_CreateEvents customDialogFragment_createEvents;
     private MyFirebaseInstanceIDService myFirebaseInstanceIDService;
+    private NotificationFragment notificationFragment;
 
 
     @Override
@@ -188,26 +191,30 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
-
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(this.notificationFragment.getNotificationFragmentEvents()!=null){
+            this.notificationFragment.getNotificationFragmentEvents().getInvitations();
+        }
+
+    }
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
 
         mainFragment = new MainFragment();
-        listPublicEventsFragment = new ListPublicEventsFragment(); //createEventFragment = new CreateEventFragment();
-
-
-        profileFragment = new ProfileFragment();
-
-
+        listPublicEventsFragment = new ListPublicEventsFragment(); //createEventFragment = new CreateEventFragment()
+        notificationFragment = new NotificationFragment();
         this.mainFragment.setiMainFragmentListener(this.mainActivityEvents);
+        this.notificationFragment.setiNofiticationFragmentListener(this.mainActivityEvents);
 
+        //Profile sin uso de momento
+        profileFragment = new ProfileFragment();
         this.profileFragment.setiProfileFragmentListener(this.mainActivityEvents);
-
         this.profileFragment.setiGalleryAndCapturePhotoListener(this.mainActivityEvents);
 
 
@@ -221,7 +228,7 @@ public class MainActivity extends AppCompatActivity {
 
         adapter.addFragment(mainFragment);
         adapter.addFragment(listPublicEventsFragment);
-        adapter.addFragment(profileFragment);
+        adapter.addFragment(notificationFragment);
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(1);
         /*
@@ -724,5 +731,13 @@ public class MainActivity extends AppCompatActivity {
 
     public void setListPublicEventsFragment(ListPublicEventsFragment listPublicEventsFragment) {
         this.listPublicEventsFragment = listPublicEventsFragment;
+    }
+
+    public NotificationFragment getNotificationFragment() {
+        return notificationFragment;
+    }
+
+    public void setNotificationFragment(NotificationFragment notificationFragment) {
+        this.notificationFragment = notificationFragment;
     }
 }

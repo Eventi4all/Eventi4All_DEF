@@ -41,7 +41,11 @@ public class ListAdapterMyCreatedEvents extends RecyclerView.Adapter<MyViewHolde
 
     @Override
     public void onBindViewHolder(MyViewHolderCreatedEvents holder, int position) {
-        holder.getTxtTitleEvent().setText(this.contenidoLista.get(position).title);
+        if(this.contenidoLista.get(position).title.length()>20){
+            holder.getTxtTitleEvent().setText(this.contenidoLista.get(position).title.substring(0,15) + "...");
+        }else{
+            holder.getTxtTitleEvent().setText(this.contenidoLista.get(position).title);
+        }
         holder.getTxtCreateAt().setText(this.contenidoLista.get(position).createAt);
         Glide.with(context).load(this.getContenidoLista().get(position).urlCover).apply(new RequestOptions().transforms( new CropSquareTransformation(),new RoundedCornersTransformation(40,15))).apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE)).apply(RequestOptions.skipMemoryCacheOf(true)).thumbnail(0.3f).into(holder.getImageViewCover());
 

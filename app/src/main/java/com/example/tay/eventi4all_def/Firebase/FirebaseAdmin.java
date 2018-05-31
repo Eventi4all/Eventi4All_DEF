@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 
 
 import com.example.tay.eventi4all_def.DataHolder;
+import com.example.tay.eventi4all_def.entity.Card;
 import com.example.tay.eventi4all_def.entity.Event;
 import com.example.tay.eventi4all_def.entity.User;
 import com.firebase.ui.auth.AuthUI;
@@ -20,6 +21,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
@@ -123,7 +125,7 @@ public class FirebaseAdmin {
 
         try {
             String nameImage = UUID.randomUUID().toString() + ".jpg";
-            Task uploadTask = (Task) createFile("images/profile/","upload",nameImage).get("uploadTask");
+            Task uploadTask = (Task) createFile("images/profile/", "upload", nameImage).get("uploadTask");
             uploadTask.addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception exception) {
@@ -132,7 +134,7 @@ public class FirebaseAdmin {
             }).addOnSuccessListener(new OnSuccessListener() {
                 @Override
                 public void onSuccess(Object o) {
-                    document.put("imgProfile", (String) createFile("images/profile/","getUrl",nameImage).get("urlComplete"));
+                    document.put("imgProfile", (String) createFile("images/profile/", "getUrl", nameImage).get("urlComplete"));
                     db.collection("users").document(getUidUser()).set(document).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
@@ -162,12 +164,12 @@ public class FirebaseAdmin {
     public HashMap createFile(String url, String action, String nameImg) {
 
         HashMap<String, Object> result = new HashMap<>();
-        if(action.equals("upload")){
+        if (action.equals("upload")) {
             Uri file = DataHolder.MyDataHolder.imgUri;
             final StorageReference mountainImagesRef = storageRef.child(url + nameImg);
             result.put("uploadTask", mountainImagesRef.putFile(file));
             return result;
-        }else{
+        } else {
             result.put("urlComplete", url + nameImg);
             return result;
         }
@@ -183,13 +185,13 @@ public class FirebaseAdmin {
             @Override
             public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
                 for (final DocumentSnapshot data : documentSnapshots.getDocuments()) {
-                    if(!data.getData().get("nickname").toString().equals(DataHolder.MyDataHolder.currentUserNickName)){
+                    if (!data.getData().get("nickname").toString().equals(DataHolder.MyDataHolder.currentUserNickName)) {
                         storageRef.child(data.getData().get("imgProfile").toString()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                             @Override
                             public void onSuccess(Uri uri) {
                                 User auxUser = new User(data.getData().get("nickname").toString(), uri.toString());
                                 auxUser.setToken(data.getData().get("token").toString());
-                                users.put(data.getData().get("nickname").toString(),auxUser);
+                                users.put(data.getData().get("nickname").toString(), auxUser);
                                 abstractFirebaseAdminListener.foundNickName(users);
                             }
                         }).addOnFailureListener(new OnFailureListener() {
@@ -199,7 +201,6 @@ public class FirebaseAdmin {
                             }
                         });
                     }
-
 
 
                 }
@@ -215,95 +216,88 @@ public class FirebaseAdmin {
 
     public void insertEventInFirebase(HashMap<String, Object> event, Uri uriQr) {
 
-        try{
+        try {
             String nameImage = UUID.randomUUID().toString() + ".jpg";
-        Task uploadTask = (Task) createFile("images/events/","upload",nameImage).get("uploadTask");
+            Task uploadTask = (Task) createFile("images/events/", "upload", nameImage).get("uploadTask");
 
-        uploadTask.addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                abstractFirebaseAdminListener.insertEventOk(false, "Firebase Exception");
-            }
-        }).addOnSuccessListener(new OnSuccessListener() {
-            @Override
-            public void onSuccess(Object o) {
-                String urlQr="images/QR/" + event.get("uuid").toString()+".jpg";
-                StorageReference mountainImagesRefQr = storageRef.child(urlQr);
-                Task uploadTaskQr= mountainImagesRefQr.putFile(uriQr);
-                uploadTaskQr.addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        abstractFirebaseAdminListener.insertEventOk(false, "Firebase Exception");
-                    }
-                }).addOnSuccessListener(new OnSuccessListener() {
-                    @Override
-                    public void onSuccess(Object o) {
-                        event.put("coverImg", (String) createFile("images/events/","getUrl",nameImage).get("urlComplete"));
-                        event.put("qr",urlQr);
-                        db.collection("events").document(event.get("uuid").toString()).set(event).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
+            uploadTask.addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    abstractFirebaseAdminListener.insertEventOk(false, "Firebase Exception");
+                }
+            }).addOnSuccessListener(new OnSuccessListener() {
+                @Override
+                public void onSuccess(Object o) {
+                    String urlQr = "images/QR/" + event.get("uuid").toString() + ".jpg";
+                    StorageReference mountainImagesRefQr = storageRef.child(urlQr);
+                    Task uploadTaskQr = mountainImagesRefQr.putFile(uriQr);
+                    uploadTaskQr.addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            abstractFirebaseAdminListener.insertEventOk(false, "Firebase Exception");
+                        }
+                    }).addOnSuccessListener(new OnSuccessListener() {
+                        @Override
+                        public void onSuccess(Object o) {
+                            event.put("coverImg", (String) createFile("images/events/", "getUrl", nameImage).get("urlComplete"));
+                            event.put("qr", urlQr);
+                            db.collection("events").document(event.get("uuid").toString()).set(event).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
 
-                                System.out.println("insert ok");
-                                abstractFirebaseAdminListener.insertEventOk(true, "Document Insert");
-                                if(DataHolder.MyDataHolder.notificationUsers.size()>0){
-                                    System.out.println("dentro del piush");
-                                    abstractFirebaseAdminListener.pushNotification();
-                                }
-
-
-                            }
-                        })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-
-                                        abstractFirebaseAdminListener.insertEventOk(false, "Firebase Exception");
+                                    System.out.println("insert ok");
+                                    abstractFirebaseAdminListener.insertEventOk(true, "Document Insert");
+                                    if (DataHolder.MyDataHolder.notificationUsers.size() > 0) {
+                                        System.out.println("dentro del piush");
+                                        abstractFirebaseAdminListener.pushNotification();
                                     }
-                                });
-
-                    }
-                });
 
 
+                                }
+                            })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+
+                                            abstractFirebaseAdminListener.insertEventOk(false, "Firebase Exception");
+                                        }
+                                    });
+
+                        }
+                    });
 
 
+                }
 
 
+            });
+        } catch (Exception e)
 
-            }
+        {
+            abstractFirebaseAdminListener.insertDocumentIsOK(false, "Firebase Exception");
+        }
 
 
-        });
-    }catch(Exception e)
-
-    {
-        abstractFirebaseAdminListener.insertDocumentIsOK(false, "Firebase Exception");
     }
 
 
-}
-
-
-
-
     public void getEvents(String events) {
-        String destination="";
-        final HashMap<String,Event> hsEvents = new HashMap<>();
-        Query query=null;
+        String destination = "";
+        final HashMap<String, Event> hsEvents = new HashMap<>();
+        Query query = null;
 
-        if(events.equals("createEvents")){
-            query = db.collection("events").whereEqualTo("admin",DataHolder.MyDataHolder.currentUserNickName);
-            destination="mainFragment";
+        if (events.equals("createEvents")) {
+            query = db.collection("events").whereEqualTo("admin", DataHolder.MyDataHolder.currentUserNickName);
+            destination = "mainFragment";
 
-        }else if(events.equals("allAssistEvents")){
-            query = db.collection("events").whereEqualTo("assistants."+DataHolder.MyDataHolder.currentUserNickName,true);
-            destination="mainFragment";
-        }else if(events.equals("publicEvents")){
+        } else if (events.equals("allAssistEvents")) {
+            query = db.collection("events").whereEqualTo("assistants." + DataHolder.MyDataHolder.currentUserNickName, true);
+            destination = "mainFragment";
+        } else if (events.equals("publicEvents")) {
 
-            query = db.collection("events").whereEqualTo("private",false);
+            query = db.collection("events").whereEqualTo("private", false);
 
-            destination="listPublicEventsFragment";
+            destination = "listPublicEventsFragment";
         }
 
 
@@ -316,24 +310,23 @@ public class FirebaseAdmin {
                     storageRef.child(document.getData().get("coverImg").toString()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
-                            Event event = new Event(document.get("title").toString(),(boolean)document.get("private"),document.get("limit").toString());
+                            Event event = new Event(document.get("title").toString(), (boolean) document.get("private"), document.get("limit").toString());
                             event.setCreateAt(document.get("createAt").toString());
                             event.setUrlCover(uri.toString());
                             event.setUuid(document.get("uuid").toString());
 
-                            hsEvents.put(document.get("uuid").toString(),event);
-                            if(finalDestination.equals("listPublicEventsFragment")){
-                                Query queryAux= queryAux = db.collection("events").whereEqualTo("assistants."+DataHolder.MyDataHolder.currentUserNickName,true);
+                            hsEvents.put(document.get("uuid").toString(), event);
+                            if (finalDestination.equals("listPublicEventsFragment")) {
+                                Query queryAux = queryAux = db.collection("events").whereEqualTo("assistants." + DataHolder.MyDataHolder.currentUserNickName, true);
                                 queryAux.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                     @Override
                                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                         for (DocumentSnapshot document : task.getResult()) {
 
-                                            if(hsEvents.containsKey(document.get("uuid").toString())){
+                                            if (hsEvents.containsKey(document.get("uuid").toString())) {
                                                 hsEvents.remove(document.get("uuid").toString());
 
                                             }
-
 
 
                                         }
@@ -342,12 +335,9 @@ public class FirebaseAdmin {
 
                                 });
 
-                            }else{
+                            } else {
                                 abstractFirebaseAdminListener.returnEventsFirebase(new ArrayList<Event>(hsEvents.values()), finalDestination);
                             }
-
-
-
 
 
                         }
@@ -360,26 +350,19 @@ public class FirebaseAdmin {
                     });
 
 
-
-
-
-
                 }
-
 
 
             }
 
 
-
         });
-       query.get().addOnFailureListener(new OnFailureListener() {
-           @Override
-           public void onFailure(@NonNull Exception e) {
+        query.get().addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
                 System.out.println("Onfailure: " + e.getMessage());
-           }
-       });
-
+            }
+        });
 
 
     }
@@ -396,10 +379,10 @@ public class FirebaseAdmin {
                         storageRef.child(document.getData().get("imgProfile").toString()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                             @Override
                             public void onSuccess(Uri uri) {
-                                User user = new User(DataHolder.MyDataHolder.currentUserNickName,uri.toString());
-                               if(document.getData().get("token")!=null){
-                                   user.setToken(document.getData().get("token").toString());
-                               }
+                                User user = new User(DataHolder.MyDataHolder.currentUserNickName, uri.toString());
+                                if (document.getData().get("token") != null) {
+                                    user.setToken(document.getData().get("token").toString());
+                                }
                                 abstractFirebaseAdminListener.returnInfoUserFirebase(user);
                             }
                         }).addOnFailureListener(new OnFailureListener() {
@@ -420,9 +403,9 @@ public class FirebaseAdmin {
     }
 
 
-    public void insertDeviceToken(String token){
+    public void insertDeviceToken(String token) {
         HashMap<String, String> hsToken = new HashMap<String, String>();
-        hsToken.put("token",token);
+        hsToken.put("token", token);
         //Hacemos un merge apra que no borre el contenido de este usuario y solamente añada el token cada vez que cambie
         Task<Void> docRef = db.collection("users").document(this.getUidUser()).set(hsToken, SetOptions.merge()).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
@@ -430,6 +413,41 @@ public class FirebaseAdmin {
 
             }
         });
+
+    }
+
+    public void getInvitationsFirebase() {
+        Query query = db.collection("events").whereEqualTo("invitations." + DataHolder.MyDataHolder.currentUserNickName, false);
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                ArrayList<Card> arrCards = new ArrayList<>();
+                System.out.println("size task cards: " + task.getResult().size());
+                for (DocumentSnapshot document : task.getResult()) {
+                    storageRef.child(document.getData().get("coverImg").toString()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            Card card = new Card(document.getData().get("admin").toString(), DataHolder.MyDataHolder.currentUserNickName, document.getData().get("title").toString(), uri.toString(), document.getData().get("uuid").toString());
+                            arrCards.add(card);
+                            abstractFirebaseAdminListener.giveBackCards(arrCards);
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+
+                        }
+                    });
+
+                }
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+            }
+        });
+
 
     }
 
@@ -485,5 +503,45 @@ public class FirebaseAdmin {
     }
 
 
+    public void deleteInvitation(String uuid, int position) {
+        DocumentReference docRef = db.collection("events").document(uuid);
+
+// Remove the 'capital' field from the document
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("invitations." + DataHolder.MyDataHolder.currentUserNickName, FieldValue.delete());
+
+        docRef.update(updates).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                abstractFirebaseAdminListener.successDeleteInvitation(true, position);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                abstractFirebaseAdminListener.successDeleteInvitation(false, position);
+            }
+        });
+
+    }
+
+    public void addAssistant(String uuid, int position) {
+        HashMap<String,Object> addAssisantIntoEvent = new HashMap<String, Object>();
+        HashMap<String,Boolean> newAssistant = new HashMap<String,Boolean>();
+        newAssistant.put(DataHolder.MyDataHolder.currentUserNickName,true);
+        addAssisantIntoEvent.put("assistants",newAssistant);
+        //Hacemos un merge apra que no borre el contenido de este usuario y solamente añada el token cada vez que cambie
+        Task<Void> docRef = db.collection("events").document(uuid).set(addAssisantIntoEvent, SetOptions.merge()).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                abstractFirebaseAdminListener.addOkNewAssistant(true,position, uuid);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                abstractFirebaseAdminListener.addOkNewAssistant(false,position, uuid);
+            }
+        });
+
+    }
 }
 

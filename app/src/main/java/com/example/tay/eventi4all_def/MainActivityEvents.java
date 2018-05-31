@@ -24,11 +24,14 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.tay.eventi4all_def.AsyncTask.HttpJsonAsyncTask;
 import com.example.tay.eventi4all_def.Firebase.AbstractFirebaseAdminListener;
+import com.example.tay.eventi4all_def.Firebase.IMyFirebaseMessagingServiceListener;
+import com.example.tay.eventi4all_def.entity.Card;
 import com.example.tay.eventi4all_def.entity.Event;
 import com.example.tay.eventi4all_def.entity.User;
 import com.example.tay.eventi4all_def.fragments.ICreateEventFragmentListener;
 import com.example.tay.eventi4all_def.fragments.IGalleryAndCapturePhotoListener;
 import com.example.tay.eventi4all_def.fragments.IMainFragmentListener;
+import com.example.tay.eventi4all_def.fragments.INofiticationFragmentListener;
 import com.example.tay.eventi4all_def.fragments.IProfileFragmentListener;
 import com.example.tay.eventi4all_def.fragments.IListPublicEventsFragmentListener;
 import com.google.zxing.BarcodeFormat;
@@ -57,7 +60,7 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
  * Created by tay on 17/4/18.
  */
 
-public class MainActivityEvents extends AbstractFirebaseAdminListener implements IMainFragmentListener, IProfileFragmentListener, ICreateEventFragmentListener, IGalleryAndCapturePhotoListener, IListPublicEventsFragmentListener{
+public class MainActivityEvents extends AbstractFirebaseAdminListener implements IMainFragmentListener, IProfileFragmentListener, ICreateEventFragmentListener, IGalleryAndCapturePhotoListener, IListPublicEventsFragmentListener, INofiticationFragmentListener, IMyFirebaseMessagingServiceListener {
     private MainActivity mainActivity;
     //Directorio principal donde se almacenan las imagenes
     private static String APP_DIRECTORY = "Eventy4All/";
@@ -108,6 +111,7 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
             transition.show(this.mainActivity.getMainFragment());
             this.mainActivity.getMainFragment().getiMainFragmentListener().getEvents("createEvents");
             this.mainActivity.getListPublicEventsFragment().getIListPublicEventsFragmentListener().callGetPublicEvents();
+            this.mainActivity.getNotificationFragment().getiNofiticationFragmentListener().getInvitations();
             transition.hide(this.mainActivity.getProfileFragment());
         }else{
             //redirigimos al fragment de creación de perfil
@@ -494,6 +498,99 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
         httpJsonAsyncTask.execute(jsonArray);
 
 
+    }
+
+
+    @Override
+    public void acceptInvitation() {
+
+    }
+
+    @Override
+    public void declineInvitation() {
+
+    }
+
+    @Override
+    public void getInvitations() {
+        this.mainActivity.getFirebaseAdmin().getInvitationsFirebase();
+    }
+
+    @Override
+    public void deleteInvitation(String uuid, int position) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.mainActivity);
+        builder.setTitle("¿Estás seguro de que deseas eliminar la invitación?");
+        builder.setMessage("Si lo hace, no podrás volver a verla.");
+        builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                progress = new ProgressDialog(mainActivity);
+                progress.setMessage("Espere...");
+                progress.show();
+                mainActivity.getFirebaseAdmin().deleteInvitation(uuid,position);
+            }
+        }).setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+        builder.show();
+
+    }
+
+    @Override
+    public void acceptInvitationAndDeleteCard(String uuid, int position) {
+        progress = new ProgressDialog(this.mainActivity);
+        progress.setMessage("Espere...");
+        progress.show();
+        this.mainActivity.getFirebaseAdmin().addAssistant(uuid,position);
+    }
+
+    @Override
+    public void addOkNewAssistant(boolean isOk, int position, String uuid) {
+        if(isOk==true){
+            Toasty.success(this.mainActivity, "¡Enhorabuena! Ahora eres participante de: "+ this.mainActivity.getNotificationFragment().getArrCards().get(position).getEventTitle().toString(), Toast.LENGTH_SHORT, true).show();
+            this.mainActivity.getFirebaseAdmin().deleteInvitation(uuid,position);
+        }else{
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(this.mainActivity);
+            alertDialog.setTitle("Error");
+            alertDialog.setMessage("Ha ocurrido un error, vuelve a intentarlo");
+            alertDialog.show();
+        }
+    }
+
+    @Override
+    public void giveBackCards(ArrayList<Card> arrCards) {
+       this.mainActivity.getNotificationFragment().getNotificationFragmentEvents().createCard(arrCards);
+    }
+
+    @Override
+    public void notifMessageReceiveAndAcreateCard() {
+        this.mainActivity.getNotificationFragment().getNotificationFragmentEvents().getInvitations();
+    }
+
+
+    @Override
+    public void successDeleteInvitation(boolean isDelete, int position) {
+        if(isDelete==true){
+            this.mainActivity.getNotificationFragment().getNotificationFragmentEvents().removeCard(position);
+            if(progress!=null){
+                progress.dismiss();
+                progress=null;
+            }
+
+        }else{
+            if(progress!=null){
+                progress.dismiss();
+                progress=null;
+
+            }
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(this.mainActivity);
+            alertDialog.setTitle("Error");
+            alertDialog.setMessage("Ha ocurrido un error, vuelve a intentarlo");
+            alertDialog.show();
+
+        }
     }
 
     public void sendTokenReceived(String token) {

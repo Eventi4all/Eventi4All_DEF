@@ -55,7 +55,7 @@ public class ListPublicEventsFragment extends Fragment {
         myList.setAdapter(listAdapter);
         int spanCount = 2; //num de columnas
         int spacing = 30; //espaciado entre columnas
-        boolean includeEdge = true;
+        boolean includeEdge = true; //incluir borde
         myList.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, includeEdge));
         this.search = v.findViewById(R.id.searchEvent);
         this.search.addTextChangedListener(new TextWatcher() {

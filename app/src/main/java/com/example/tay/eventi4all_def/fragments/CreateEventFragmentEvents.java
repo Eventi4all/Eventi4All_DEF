@@ -77,17 +77,29 @@ public class CreateEventFragmentEvents implements View.OnClickListener, IMyViewH
             if (this.createEventFragment.getTxtEventName().getText().toString().trim().equals("")) {
                 Toasty.info(this.createEventFragment.getActivity(), "¡Opps! Debes de añadir un título a tu evento.", Toast.LENGTH_SHORT, true).show();
             } else {
+                //Data of Event
                 HashMap<String, Object> event = new HashMap<String, Object>();
                 HashMap<String,Object> assistants = new HashMap<>();
+                HashMap<String,Object> invitations = new HashMap<>();
                 event.put("uuid", UUID.randomUUID().toString());
                 event.put("title", this.createEventFragment.getTxtEventName().getText().toString().trim());
                 event.put("admin", DataHolder.MyDataHolder.currentUserNickName);
                 event.put("createAt", new SimpleDateFormat("dd-MMM-yyyy").format(Calendar.getInstance().getTime()));
                 event.put("private", this.createEventFragment.getCheckboxPrivate().isChecked());
                 event.put("limit", this.createEventFragment.getSpPax().getSelectedItem().toString());
-               assistants.put(DataHolder.MyDataHolder.currentUserNickName,true);
+                assistants.put(DataHolder.MyDataHolder.currentUserNickName,true);
                 event.put("assistants", assistants);
+                if(this.createEventFragment.getArrUsers().size()>0){
+                    for(int i=0; i< createEventFragment.getArrUsers().size(); i++){
+                        invitations.put(createEventFragment.getArrUsers().get(i).nickName.toString(),false);
+                    }
+                    event.put("invitations",invitations);
+
+                }
+
+                //Event QR
                 Uri uriQr= createImageFile(this.createEventFragment.getiCreateEventFragmentListener().createQrFromEvent(event.get("uuid").toString()),event.get("uuid").toString());
+
                 this.createEventFragment.getiCreateEventFragmentListener().saveEventInFirebase(event, this.createEventFragment.getArrUsers(),uriQr);
             }
 
