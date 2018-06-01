@@ -7,6 +7,7 @@ import android.os.Bundle;
 
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -42,6 +43,7 @@ public class MainFragment extends Fragment {
     private ImageView userImgProfile;
     private TextView userTxtNickname;
     private FloatingActionButton fab;
+    private SwipeRefreshLayout swipeRefreshLayout;
     /*
     Array de iconos para el circle button que será equivalente a
     la opción seleccionada del circleMenu
@@ -96,6 +98,14 @@ public class MainFragment extends Fragment {
         this.circleMenu.setMainMenu(Color.parseColor("#CDCDCD"),R.drawable.ic_options,R.drawable.cancel).
                 addSubMenu(Color.parseColor("#FF8000"),R.drawable.user).addSubMenu(Color.parseColor("#DF0101"),R.drawable.exit).setOnMenuSelectedListener(this.mainFragmentEvents);
 
+      this.swipeRefreshLayout = v.findViewById(R.id.swipeRefreshMyEvents);
+      this.swipeRefreshLayout.setOnRefreshListener(this.mainFragmentEvents);
+        //Colores para el refresh
+        swipeRefreshLayout.setColorSchemeResources(
+                R.color.s1,
+                R.color.s2,
+                R.color.s3,
+                R.color.s4);
 
 
         return v;
@@ -189,5 +199,13 @@ public class MainFragment extends Fragment {
 
     public void setCircleMenu(CircleMenu circleMenu) {
         this.circleMenu = circleMenu;
+    }
+
+    public SwipeRefreshLayout getSwipeRefreshLayout() {
+        return swipeRefreshLayout;
+    }
+
+    public void setSwipeRefreshLayout(SwipeRefreshLayout swipeRefreshLayout) {
+        this.swipeRefreshLayout = swipeRefreshLayout;
     }
 }

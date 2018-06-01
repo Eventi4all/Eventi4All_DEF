@@ -20,14 +20,13 @@ public class ListPublicEventsFragmentEvents implements SwipeRefreshLayout.OnRefr
     }
 
     public void setEventsInListAdapter(ArrayList<Event> events){
-        System.out.println("LLegan los siguientes eventos: " + events.size());
         this.listPublicEventsFragment.getArrEvents().clear();
         this.listPublicEventsFragment.getArrEvents().addAll(events);
         this.listPublicEventsFragment.getListAdapter().notifyDataSetChanged();
-        System.out.println("refreshing public events");
         listPublicEventsFragment.getRefreshLayout().setRefreshing(false);
 
     }
+
 
     public ListPublicEventsFragment getListPublicEventsFragment() {
         return listPublicEventsFragment;
@@ -43,5 +42,6 @@ public class ListPublicEventsFragmentEvents implements SwipeRefreshLayout.OnRefr
 
 
     }
+
 
 }

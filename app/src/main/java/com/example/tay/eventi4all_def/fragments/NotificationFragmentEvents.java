@@ -54,6 +54,11 @@ public class NotificationFragmentEvents implements IMyViewHolderCardListener, Sw
 
     @Override
     public void onRefresh() {
-        this.getInvitations();
+
+        if(this.notificationFragment.getArrCards().size()>0){
+            this.getInvitations();
+        }else{
+            notificationFragment.getRefreshLayout().setRefreshing(false);
+        }
     }
 }

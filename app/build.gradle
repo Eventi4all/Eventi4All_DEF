@@ -82,6 +82,11 @@ dependencies {
     //Librerías ShimmerRecyclerView para que brillen las celdas
     implementation 'com.github.tabassumLatif:ShimmerRecyclerView:0.1.2'
 
+    /*DEPENDENCIAS PARA HACER UN COUNT BADGE EN EL ICONO ES DECIR UN COUNT DE NOTIFICACIONES*/
+    implementation "me.leolin:ShortcutBadger:1.1.21@aar"
+
+
+
 
 }
 

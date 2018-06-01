@@ -3,6 +3,7 @@ package com.example.tay.eventi4all_def.fragments;
 import android.os.Handler;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
@@ -19,7 +20,7 @@ import com.hitomi.cmlibrary.OnMenuSelectedListener;
 
 import java.util.ArrayList;
 
-public class MainFragmentEvents implements View.OnClickListener,AdapterView.OnItemSelectedListener, OnMenuSelectedListener {
+public class MainFragmentEvents implements View.OnClickListener,AdapterView.OnItemSelectedListener, OnMenuSelectedListener, SwipeRefreshLayout.OnRefreshListener {
 
     private MainFragment mainFragment;
 
@@ -63,6 +64,7 @@ public class MainFragmentEvents implements View.OnClickListener,AdapterView.OnIt
         this.mainFragment.getArrEvents().clear();
         this.mainFragment.getArrEvents().addAll(events);
         this.mainFragment.getListAdapter().notifyDataSetChanged();
+        this.mainFragment.getSwipeRefreshLayout().setRefreshing(false);
 
     }
 
@@ -97,5 +99,14 @@ public class MainFragmentEvents implements View.OnClickListener,AdapterView.OnIt
         }, 1000);
 
 
+    }
+
+    @Override
+    public void onRefresh() {
+        if(this.mainFragment.getArrEvents().size()>0){
+            this.getEvents(this.mainFragment.getSpEvents().getSelectedItemPosition());
+        }else{
+            this.mainFragment.getSwipeRefreshLayout().setRefreshing(false);
+        }
     }
 }

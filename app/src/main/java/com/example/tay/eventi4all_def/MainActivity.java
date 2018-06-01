@@ -28,6 +28,7 @@ import android.support.design.widget.BottomNavigationView;
 
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.AndroidException;
@@ -57,6 +58,8 @@ import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
 import java.util.UUID;
+
+import me.leolin.shortcutbadger.ShortcutBadger;
 
 import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
@@ -89,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
     private CustomDialogFragment_CreateEvents customDialogFragment_createEvents;
     private MyFirebaseInstanceIDService myFirebaseInstanceIDService;
     private NotificationFragment notificationFragment;
+
 
 
     @Override
@@ -192,7 +196,10 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-
+/*
+Cuando se vuelva a abrir la aplicación sehace una llamada ver si hay invitaciones en la bbdd.
+De esta forma da la sensación de quw al llegar una push notification se genera el card
+ */
     @Override
     protected void onResume() {
         super.onResume();
@@ -200,6 +207,17 @@ public class MainActivity extends AppCompatActivity {
             this.notificationFragment.getNotificationFragmentEvents().getInvitations();
         }
 
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(this.notificationFragment.getArrCards()!=null && this.notificationFragment.getArrCards().size()>0){
+            int badgeCount = this.notificationFragment.getArrCards().size();
+            ShortcutBadger.applyCount(this, badgeCount); //for 1.1.4+
+        }else{
+            ShortcutBadger.removeCount(this);
+        }
     }
 
     private void setupViewPager(ViewPager viewPager) {

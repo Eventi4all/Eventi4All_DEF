@@ -21,7 +21,10 @@ import com.example.tay.eventi4all_def.adapter.GridSpacingItemDecoration;
 import com.example.tay.eventi4all_def.adapter.ListAdapterListOfPublicEvents;
 import com.example.tay.eventi4all_def.entity.Event;
 
+
 import java.util.ArrayList;
+
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -35,6 +38,8 @@ public class ListPublicEventsFragment extends Fragment {
     private RecyclerView myList;
     private EditText search;
     private SwipeRefreshLayout refreshLayout;
+
+
 
 
     public ListPublicEventsFragment() {
@@ -84,6 +89,9 @@ public class ListPublicEventsFragment extends Fragment {
                 R.color.s2,
                 R.color.s3,
                 R.color.s4);
+
+
+
 
         return v;
     }
@@ -150,4 +158,6 @@ public class ListPublicEventsFragment extends Fragment {
     public void setRefreshLayout(SwipeRefreshLayout refreshLayout) {
         this.refreshLayout = refreshLayout;
     }
+
+
 }
