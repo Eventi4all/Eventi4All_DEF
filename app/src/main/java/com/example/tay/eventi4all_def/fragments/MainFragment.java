@@ -73,6 +73,7 @@ public class MainFragment extends Fragment {
         this.userTxtNickname = v.findViewById(R.id.txtNickNameProfile);
 
         this.listAdapter = new ListAdapterMyCreatedEvents(arrEvents,getActivity());
+        this.listAdapter.setListAdapterCreatedEventsListener(this.mainFragmentEvents);
         myList = v.findViewById(R.id.myListOfEvents);
         myList.setLayoutManager(new GridLayoutManager(getContext(),1));
 

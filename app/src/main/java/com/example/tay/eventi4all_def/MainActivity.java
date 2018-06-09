@@ -26,6 +26,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.BottomNavigationView;
 
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -50,6 +51,8 @@ import com.example.tay.eventi4all_def.Firebase.MyFirebaseInstanceIDService;
 import com.example.tay.eventi4all_def.Firebase.MyFirebaseMessagingService;
 import com.example.tay.eventi4all_def.adapter.ViewPagerAdapter;
 import com.example.tay.eventi4all_def.fragments.CustomDialogFragment_CreateEvents;
+import com.example.tay.eventi4all_def.fragments.CustomDialogFragment_QR;
+import com.example.tay.eventi4all_def.fragments.EventContentFragment;
 import com.example.tay.eventi4all_def.fragments.ListPublicEventsFragment;
 import com.example.tay.eventi4all_def.fragments.MainFragment;
 import com.example.tay.eventi4all_def.fragments.NotificationFragment;
@@ -90,19 +93,27 @@ public class MainActivity extends AppCompatActivity {
     private UCrop uCrop;
     int request = 0;
     private CustomDialogFragment_CreateEvents customDialogFragment_createEvents;
+    private CustomDialogFragment_QR customDialogFragment_qr;
     private MyFirebaseInstanceIDService myFirebaseInstanceIDService;
     private NotificationFragment notificationFragment;
-
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private EventContentFragment eventContentFragment;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        this.eventContentFragment = (EventContentFragment)this.getSupportFragmentManager().findFragmentById(R.id.frgEventContent);
+        FragmentTransaction fragmentTransaction = this.getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.hide(this.eventContentFragment);
+        fragmentTransaction.commit();
+
         bottomNavigationView = findViewById(R.id.navigation);
         //bottomNavigationView.setItemTextColor(getColorStateList(R.color.colorGreen));
 
         mainActivityEvents = new MainActivityEvents(this);
+        this.eventContentFragment.setiEventContentFragmentListener(this.mainActivityEvents);
 
         //Instancia de la clase SignIn
         //Instancia de FirebaseAdmin
@@ -114,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
         //this.createEventFragment = (CreateEventFragment)this.getSupportFragmentManager().findFragmentById(R.id.createEventFragment);
 
         customDialogFragment_createEvents= new CustomDialogFragment_CreateEvents();
+        customDialogFragment_qr = new CustomDialogFragment_QR();
 
         viewPager = findViewById(R.id.viewpager);
         bottomNavigationView = findViewById(R.id.navigation);
@@ -240,8 +252,10 @@ De esta forma da la sensación de quw al llegar una push notification se genera 
 
         this.customDialogFragment_createEvents.setiCreateEventFragmentListener(this.mainActivityEvents);
 
+
         this.customDialogFragment_createEvents.setiGalleryAndCapturePhotoListener(this.mainActivityEvents);
 
+        this.customDialogFragment_qr.setiCustomDialogFragment_qrListener(this.mainActivityEvents);
 
 
         adapter.addFragment(mainFragment);
@@ -757,5 +771,37 @@ De esta forma da la sensación de quw al llegar una push notification se genera 
 
     public void setNotificationFragment(NotificationFragment notificationFragment) {
         this.notificationFragment = notificationFragment;
+    }
+
+    public EventContentFragment getEventContentFragment() {
+        return eventContentFragment;
+    }
+
+    public void setEventContentFragment(EventContentFragment eventContentFragment) {
+        this.eventContentFragment = eventContentFragment;
+    }
+
+    public BottomNavigationView getBottomNavigationView() {
+        return bottomNavigationView;
+    }
+
+    public void setBottomNavigationView(BottomNavigationView bottomNavigationView) {
+        this.bottomNavigationView = bottomNavigationView;
+    }
+
+    public ViewPager getViewPager() {
+        return viewPager;
+    }
+
+    public void setViewPager(ViewPager viewPager) {
+        this.viewPager = viewPager;
+    }
+
+    public CustomDialogFragment_QR getCustomDialogFragment_qr() {
+        return customDialogFragment_qr;
+    }
+
+    public void setCustomDialogFragment_qr(CustomDialogFragment_QR customDialogFragment_qr) {
+        this.customDialogFragment_qr = customDialogFragment_qr;
     }
 }

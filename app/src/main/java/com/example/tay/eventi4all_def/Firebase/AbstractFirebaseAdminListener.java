@@ -2,6 +2,7 @@ package com.example.tay.eventi4all_def.Firebase;
 
 import com.example.tay.eventi4all_def.entity.Card;
 import com.example.tay.eventi4all_def.entity.Event;
+import com.example.tay.eventi4all_def.entity.Photo;
 import com.example.tay.eventi4all_def.entity.User;
 
 import java.util.ArrayList;
@@ -80,6 +81,11 @@ public abstract class AbstractFirebaseAdminListener implements IFirebaseAdminLis
 
     @Override
     public void addOkNewAssistant(boolean isOk, int position, String uuid) {
+
+    }
+
+    @Override
+    public void returnPhotosOfEvent(ArrayList<Photo> arrPhotos) {
 
     }
 }

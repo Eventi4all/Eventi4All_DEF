@@ -71,6 +71,7 @@ dependencies {
     implementation 'jp.wasabeef:glide-transformations:3.3.0'
     //Librería filtros Glide
     implementation 'jp.co.cyberagent.android.gpuimage:gpuimage-library:1.4.1'
+    //Librería para Crop
     implementation 'com.github.yalantis:ucrop:2.2.2-native'
     //Push notification
     implementation 'com.google.firebase:firebase-messaging:11.8.0'
@@ -84,7 +85,6 @@ dependencies {
 
     /*DEPENDENCIAS PARA HACER UN COUNT BADGE EN EL ICONO ES DECIR UN COUNT DE NOTIFICACIONES*/
     implementation "me.leolin:ShortcutBadger:1.1.21@aar"
-
 
 
 

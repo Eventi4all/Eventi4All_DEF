@@ -4,10 +4,12 @@ package com.example.tay.eventi4all_def;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -17,23 +19,30 @@ import android.provider.Settings;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.tay.eventi4all_def.AsyncTask.HttpJsonAsyncTask;
 import com.example.tay.eventi4all_def.Firebase.AbstractFirebaseAdminListener;
 import com.example.tay.eventi4all_def.Firebase.IMyFirebaseMessagingServiceListener;
 import com.example.tay.eventi4all_def.entity.Card;
 import com.example.tay.eventi4all_def.entity.Event;
+import com.example.tay.eventi4all_def.entity.Photo;
 import com.example.tay.eventi4all_def.entity.User;
 import com.example.tay.eventi4all_def.fragments.ICreateEventFragmentListener;
+import com.example.tay.eventi4all_def.fragments.ICustomDialogFragment_QRListener;
+import com.example.tay.eventi4all_def.fragments.IEventContentFragmentListener;
 import com.example.tay.eventi4all_def.fragments.IGalleryAndCapturePhotoListener;
 import com.example.tay.eventi4all_def.fragments.IMainFragmentListener;
 import com.example.tay.eventi4all_def.fragments.INofiticationFragmentListener;
 import com.example.tay.eventi4all_def.fragments.IProfileFragmentListener;
 import com.example.tay.eventi4all_def.fragments.IListPublicEventsFragmentListener;
+import com.example.tay.eventi4all_def.fragments.ProfileFragment;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
@@ -45,12 +54,20 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
 import es.dmoral.toasty.Toasty;
+import jp.wasabeef.glide.transformations.CropSquareTransformation;
+import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
 import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
@@ -60,7 +77,7 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
  * Created by tay on 17/4/18.
  */
 
-public class MainActivityEvents extends AbstractFirebaseAdminListener implements IMainFragmentListener, IProfileFragmentListener, ICreateEventFragmentListener, IGalleryAndCapturePhotoListener, IListPublicEventsFragmentListener, INofiticationFragmentListener, IMyFirebaseMessagingServiceListener {
+public class MainActivityEvents extends AbstractFirebaseAdminListener implements IMainFragmentListener, IProfileFragmentListener, ICreateEventFragmentListener, IGalleryAndCapturePhotoListener, IListPublicEventsFragmentListener, INofiticationFragmentListener, IMyFirebaseMessagingServiceListener, IEventContentFragmentListener, ICustomDialogFragment_QRListener{
     private MainActivity mainActivity;
     //Directorio principal donde se almacenan las imagenes
     private static String APP_DIRECTORY = "Eventy4All/";
@@ -69,26 +86,25 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
 
 
     //Para propocionar un código de permiso para tomar una foto
-    private final int MY_PERMISSIONS =100;
+    private final int MY_PERMISSIONS = 100;
     //Para proporcionar permisos para abrir la cámara
-    private final int PHOTO_CODE_PROFILE =200;
-    private final int PHOTO_CODE_MAINEVENT=201;
+    private final int PHOTO_CODE_PROFILE = 200;
+    private final int PHOTO_CODE_MAINEVENT = 201;
     //Para proporcionar permisos para abrir la galería
-    private final int SELECT_PICTURE_PROFILE =300;
-    private final int SELECT_PICTURE_MAINEVENT =301;
+    private final int SELECT_PICTURE_PROFILE = 300;
+    private final int SELECT_PICTURE_MAINEVENT = 301;
     //Almacenamos la ruta donde se guarda la img
     private String mPath;
 
     private ProgressDialog progress;
-    private  AlertDialog.Builder builder;
-    private  FragmentTransaction transition;
+    private AlertDialog.Builder builder;
+    private FragmentTransaction transition;
 
     public MainActivityEvents(MainActivity mainActivity) {
 
         this.mainActivity = mainActivity;
 
     }
-
 
 
     public MainActivity getMainActivity() {
@@ -102,21 +118,24 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
     }
 
 
-
     @Override
     public void checkUserExist(boolean isUserExist) {
         transition = this.mainActivity.getSupportFragmentManager().beginTransaction();
-        if(isUserExist){
+        if (isUserExist) {
             //redirigimos al fragment principal
             transition.show(this.mainActivity.getMainFragment());
+            transition.show(this.mainActivity.getListPublicEventsFragment());
+            transition.show(this.mainActivity.getNotificationFragment());
             this.mainActivity.getMainFragment().getiMainFragmentListener().getEvents("createEvents");
             this.mainActivity.getListPublicEventsFragment().getIListPublicEventsFragmentListener().callGetPublicEvents();
             this.mainActivity.getNotificationFragment().getiNofiticationFragmentListener().getInvitations();
             transition.hide(this.mainActivity.getProfileFragment());
-        }else{
+        } else {
             //redirigimos al fragment de creación de perfil
             transition.show(this.mainActivity.getProfileFragment());
             transition.hide(this.mainActivity.getMainFragment());
+            transition.hide(this.mainActivity.getListPublicEventsFragment());
+            transition.hide(this.mainActivity.getNotificationFragment());
 
         }
         transition.commit();
@@ -126,18 +145,16 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
 
     @Override
     public void logout(boolean isLogout) {
-        if(isLogout){
-            DataHolder.MyDataHolder.token=null;
+        if (isLogout) {
+            DataHolder.MyDataHolder.token = null;
             System.out.println("----------> SESIÓN CERRADA SATISFACTORIAMENTE <----------");
             Intent intent = new Intent(mainActivity, SignIn.class);
             mainActivity.startActivity(intent);
             mainActivity.finish();
-           // this.mainActivity.getSignIn().signInAllProviders();
+            // this.mainActivity.getSignIn().signInAllProviders();
 
 
-
-
-        }else{
+        } else {
             //Se muestra mensaje de error al usuario
         }
     }
@@ -160,18 +177,17 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
 
     @Override
     public void openCreateEventsFragment() {
-        this.mainActivity.getCustomDialogFragment_createEvents().show(this.mainActivity.getFragmentManager(),"MyCustomDialog");
-
+        this.mainActivity.getCustomDialogFragment_createEvents().show(this.mainActivity.getFragmentManager(), "MyCustomDialog");
 
 
     }
 
 
     @Override
-    public void executeOptions(int option,String call) {
-        if(option == 0){
-           this.openCamera(call);
-        }else if(option == 1){
+    public void executeOptions(int option, String call) {
+        if (option == 0) {
+            this.openCamera(call);
+        } else if (option == 1) {
             /*
             Hacemos un intent abrir la galería(ACTION_PICK es una listas de cosas de las que se puede seleccionar,
             y EXTERNAL_CONTENT_URI es para abrir el elemento seleccionado de la lista.
@@ -183,9 +199,9 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
             Iniciamos el intent(createChooser es para que me salgan todas las imagenes de cualqueir aplicación
             para poder seleccinarlas
              */
-            if(call.equals("profile")){
+            if (call.equals("profile")) {
                 this.mainActivity.startActivityForResult(Intent.createChooser(intent, "Elige una imagen de la galería"), SELECT_PICTURE_PROFILE);
-            }else if(call.equals("coverEvent")){
+            } else if (call.equals("coverEvent")) {
                 this.mainActivity.startActivityForResult(Intent.createChooser(intent, "Elige una imagen de la galería"), SELECT_PICTURE_MAINEVENT);
             }
 
@@ -194,12 +210,11 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
     }
 
 
-
     private void openCamera(String call) {
-        File file = new File(Environment.getExternalStorageDirectory(),MEDIA_DIRECTORY);
+        File file = new File(Environment.getExternalStorageDirectory(), MEDIA_DIRECTORY);
         //Nos devuelve true/false si el directorio APP_DIRECTORY está creado
         boolean isDirectoryCreated = file.exists();
-        if(!isDirectoryCreated){
+        if (!isDirectoryCreated) {
             System.out.println("------------------------------>>>>>>>>>>>El directorio no existe");
             //Si no está creado, lo creamos y la variable la establecemos a true
             System.out.println("------------------------------>>>>>>>>>>>CREAMOS EL DIRECTORIO");
@@ -208,7 +223,7 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
 
         }
 
-        if(isDirectoryCreated){
+        if (isDirectoryCreated) {
             System.out.println("------------------------------>>>>>>>>>>>El directorio YA EXISTE");
 
             /*
@@ -216,7 +231,7 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
             de esta manera no se repiten los nombres de las imagenes, podriamos usar un uid aleatorio.
              */
 
-            Long timestamp = System.currentTimeMillis()/1000;
+            Long timestamp = System.currentTimeMillis() / 1000;
             //Obtenemos el nombre de la imagen cy le damos una extensión
             String imageName = timestamp.toString() + ".jpg";
 
@@ -240,9 +255,9 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
             intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(newFile));
 
             DataHolder.MyDataHolder.imgUri = Uri.fromFile(newFile);
-            if(call.equals("profile")){
+            if (call.equals("profile")) {
                 this.mainActivity.startActivityForResult(intent, PHOTO_CODE_PROFILE);
-            }else if(call.equals("coverEvent")){
+            } else if (call.equals("coverEvent")) {
                 this.mainActivity.startActivityForResult(intent, PHOTO_CODE_MAINEVENT);
             }
             System.out.println("------------------------------>>>>>>>>>>>START ACTIVITY CAMARA");
@@ -254,7 +269,7 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
     @TargetApi(Build.VERSION_CODES.M)
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
-    public boolean mayRequestStoragePermission(){
+    public boolean mayRequestStoragePermission() {
 
         /*
         si la versión del S.0 es inferior a la 6.0, entonces no tenemos que proporcionar permisos porque
@@ -262,7 +277,7 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
           los permisos que hemos agregado.
          */
 
-        if(Build.VERSION.SDK_INT< Build.VERSION_CODES.M){
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             System.out.println("return true 1--------------------------------->>>>>>>>>>>>>");
             return true;
         }
@@ -272,7 +287,7 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
         // el de la cámara y el de escritura.
         //Al dar permisos para un tipo de permiso se aceptan automaticamente toos los permisos que estén en el mismo grupo de permisos.
 
-        if((this.mainActivity.checkSelfPermission(WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) && (this.mainActivity.checkSelfPermission(CAMERA) == PackageManager.PERMISSION_GRANTED)){
+        if ((this.mainActivity.checkSelfPermission(WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) && (this.mainActivity.checkSelfPermission(CAMERA) == PackageManager.PERMISSION_GRANTED)) {
             System.out.println("return true 2--------------------------------->>>>>>>>>>>>>");
             return true;
         }
@@ -284,21 +299,21 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
         un tiempo indefinido hasta que el usuario permisione el botoón ok.
         ESTE MENSAJE APARECE SI DENEGÓ LOS PERMISOS Y ENTONCES SE MUESTRA EL SNACKBAR EXPLICANDO POR QUÉ SON NECESARIOS
          */
-        if(this.mainActivity.shouldShowRequestPermissionRationale(WRITE_EXTERNAL_STORAGE) || this.mainActivity.shouldShowRequestPermissionRationale(CAMERA)){
-            Snackbar.make(this.mainActivity.getProfileFragment().getmRlView(),"Los permisos son necesarios para el uso de esta aplicación.", Snackbar.LENGTH_INDEFINITE).setAction(android.R.string.ok, new View.OnClickListener() {
-               //Añadimos la anotación @TargeApi porque el método requestPermissions solo se puede usar a partir de la api 23(android 6.0)
+        if (this.mainActivity.shouldShowRequestPermissionRationale(WRITE_EXTERNAL_STORAGE) || this.mainActivity.shouldShowRequestPermissionRationale(CAMERA)) {
+            Snackbar.make(this.mainActivity.getProfileFragment().getmRlView(), "Los permisos son necesarios para el uso de esta aplicación.", Snackbar.LENGTH_INDEFINITE).setAction(android.R.string.ok, new View.OnClickListener() {
+                //Añadimos la anotación @TargeApi porque el método requestPermissions solo se puede usar a partir de la api 23(android 6.0)
                 @TargetApi(Build.VERSION_CODES.M)
                 @Override
                 public void onClick(View v) {
                     //Si le da al "Ok" entonces proporcionamos los permisos
-                    mainActivity.requestPermissions(new String[] {WRITE_EXTERNAL_STORAGE,CAMERA}, MY_PERMISSIONS);
+                    mainActivity.requestPermissions(new String[]{WRITE_EXTERNAL_STORAGE, CAMERA}, MY_PERMISSIONS);
                 }
             }).show();
             System.out.println("return snackbar--------------------------------->>>>>>>>>>>>>");
 
-        //AGREGA LOS PERMISOS POR PRIMERA VEZ (IGUAL QUE EL ANTERIOR PERO EN EL ANTERIOR HAY UN MENSAJE DE INSISTENCIA SI DENIEGA LOS PERMISOS)
-        }else {
-            mainActivity.requestPermissions(new String[] {WRITE_EXTERNAL_STORAGE,CAMERA}, MY_PERMISSIONS);
+            //AGREGA LOS PERMISOS POR PRIMERA VEZ (IGUAL QUE EL ANTERIOR PERO EN EL ANTERIOR HAY UN MENSAJE DE INSISTENCIA SI DENIEGA LOS PERMISOS)
+        } else {
+            mainActivity.requestPermissions(new String[]{WRITE_EXTERNAL_STORAGE, CAMERA}, MY_PERMISSIONS);
             System.out.println("return ultimo else--------------------------------->>>>>>>>>>>>>");
         }
 
@@ -347,7 +362,6 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
                 dialog.dismiss();
 
 
-
             }
         });
 
@@ -355,8 +369,8 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
 
     }
 
-    public void insertDocumentIsOK(boolean isInsertOk, String result){
-        if(isInsertOk){
+    public void insertDocumentIsOK(boolean isInsertOk, String result) {
+        if (isInsertOk) {
             progress.dismiss();
             FragmentTransaction transition = mainActivity.getSupportFragmentManager().beginTransaction();
             transition.hide(this.mainActivity.getProfileFragment());
@@ -364,7 +378,7 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
             transition.commit();
 
 
-        }else if(!isInsertOk && result.equals("NickName exist")){
+        } else if (!isInsertOk && result.equals("NickName exist")) {
             progress.dismiss();
             builder = new AlertDialog.Builder(this.mainActivity);
             builder.setTitle("¡Opps!");
@@ -373,7 +387,6 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
         }
 
     }
-
 
 
     @Override
@@ -390,7 +403,7 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
         progress = new ProgressDialog(this.mainActivity);
         progress.setMessage("Estamos creando el evento, por favor espere...");
         progress.show();
-        this.mainActivity.getFirebaseAdmin().insertEventInFirebase(event,uriQr);
+        this.mainActivity.getFirebaseAdmin().insertEventInFirebase(event, uriQr);
     }
 
     @Override
@@ -403,7 +416,7 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
         MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
         Bitmap bitmap = null;
         try {
-            BitMatrix bitMatrix = multiFormatWriter.encode(uuid, BarcodeFormat.QR_CODE,200,200);
+            BitMatrix bitMatrix = multiFormatWriter.encode(uuid, BarcodeFormat.QR_CODE, 200, 200);
             BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
             bitmap = barcodeEncoder.createBitmap(bitMatrix);
         } catch (WriterException e) {
@@ -414,8 +427,8 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
 
 
     @Override
-    public void foundNickName(HashMap<String,User> users) {
-      this.mainActivity.getCustomDialogFragment_createEvents().getCreateEventFragmentEvents().foundNickname(users);
+    public void foundNickName(HashMap<String, User> users) {
+        this.mainActivity.getCustomDialogFragment_createEvents().getCreateEventFragmentEvents().foundNickname(users);
 
 
     }
@@ -423,10 +436,10 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
     @Override
     public void insertEventOk(boolean isInsertOk, String result) {
         progress.dismiss();
-        if(isInsertOk && result.equals("Document Insert")){
+        if (isInsertOk && result.equals("Document Insert")) {
             this.mainActivity.getCustomDialogFragment_createEvents().getCheckboxPrivate().setChecked(false);
-            DataHolder.MyDataHolder.imgUri= Uri.parse("android.resource://com.example.tay.eventi4all_def/" + R.drawable.com_facebook_profile_picture_blank_square);
-            Drawable myDrawable = this.mainActivity.getResources().getDrawable(R.drawable.com_facebook_profile_picture_blank_square,null);
+            DataHolder.MyDataHolder.imgUri = Uri.parse("android.resource://com.example.tay.eventi4all_def/" + R.drawable.com_facebook_profile_picture_blank_square);
+            Drawable myDrawable = this.mainActivity.getResources().getDrawable(R.drawable.com_facebook_profile_picture_blank_square, null);
             this.mainActivity.getCustomDialogFragment_createEvents().getEventImgMain().setImageDrawable(myDrawable);
             this.mainActivity.getCustomDialogFragment_createEvents().getSpPax().setSelection(0);
             this.mainActivity.getCustomDialogFragment_createEvents().getMyFriends().setText("");
@@ -435,12 +448,12 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
             this.mainActivity.getCustomDialogFragment_createEvents().dismiss();
             Long aux = this.mainActivity.getMainFragment().getSpEvents().getSelectedItemId();
             this.mainActivity.getMainFragment().getMainFragmentEvents().getEvents(aux.intValue());
-            Toasty.success(this.mainActivity, "¡Enhorabuena! Has creado el evento: "+ this.mainActivity.getCustomDialogFragment_createEvents().getTxtEventName().getText().toString(), Toast.LENGTH_SHORT, true).show();
+            Toasty.success(this.mainActivity, "¡Enhorabuena! Has creado el evento: " + this.mainActivity.getCustomDialogFragment_createEvents().getTxtEventName().getText().toString(), Toast.LENGTH_SHORT, true).show();
             this.mainActivity.getCustomDialogFragment_createEvents().getTxtEventName().setText("");
 
 
-        }else{
-            DataHolder.MyDataHolder.notificationUsers=null;
+        } else {
+            DataHolder.MyDataHolder.notificationUsers = null;
             builder = new AlertDialog.Builder(this.mainActivity);
             builder.setTitle("¡Opps!");
             builder.setMessage("Hubo un problema, ¡Vuelve a intentarlo!");
@@ -452,17 +465,17 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
 
     @Override
     public void returnInfoUserFirebase(User user) {
-       this.mainActivity.getMainFragment().getUserTxtNickname().setText("Eventos de " + user.nickName);
-       Glide.with(this.mainActivity.getApplicationContext()).load(user.urlImgProfile).into(this.mainActivity.getMainFragment().getUserImgProfile());
+        this.mainActivity.getMainFragment().getUserTxtNickname().setText("Eventos de " + user.nickName);
+        Glide.with(this.mainActivity.getApplicationContext()).load(user.urlImgProfile).into(this.mainActivity.getMainFragment().getUserImgProfile());
     }
 
     @Override
     public void returnEventsFirebase(ArrayList<Event> events, String destination) {
         System.out.println("size de events" + events.size());
-        if(destination.equals("mainFragment")){
+        if (destination.equals("mainFragment")) {
             this.mainActivity.getMainFragment().getMainFragmentEvents().setEventsInListAdapter(events);
 
-        }else if(destination.equals("listPublicEventsFragment")){
+        } else if (destination.equals("listPublicEventsFragment")) {
             this.mainActivity.getListPublicEventsFragment().getListPublicEventsFragmentEvents().setEventsInListAdapter(events);
         }
 
@@ -480,12 +493,12 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
         JSONObject jsonObj;
         JSONArray jsonArray = new JSONArray();
         Random rand = new Random();
-        for(int i=0; i<DataHolder.MyDataHolder.notificationUsers.size(); i++){
+        for (int i = 0; i < DataHolder.MyDataHolder.notificationUsers.size(); i++) {
             try {
                 jsonObj = new JSONObject();
-                jsonObj.put("nickName",DataHolder.MyDataHolder.currentUserNickName);
-                jsonObj.put("addressee",DataHolder.MyDataHolder.notificationUsers.get(i).getNickName());
-                jsonObj.put("token",DataHolder.MyDataHolder.notificationUsers.get(i).getToken());
+                jsonObj.put("nickName", DataHolder.MyDataHolder.currentUserNickName);
+                jsonObj.put("addressee", DataHolder.MyDataHolder.notificationUsers.get(i).getNickName());
+                jsonObj.put("token", DataHolder.MyDataHolder.notificationUsers.get(i).getToken());
                 jsonObj.put("badge", String.valueOf(rand.nextInt(50) + 1));
                 jsonArray.put(jsonObj);
             } catch (JSONException e) {
@@ -526,7 +539,7 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
                 progress = new ProgressDialog(mainActivity);
                 progress.setMessage("Espere...");
                 progress.show();
-                mainActivity.getFirebaseAdmin().deleteInvitation(uuid,position);
+                mainActivity.getFirebaseAdmin().deleteInvitation(uuid, position);
             }
         }).setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
             @Override
@@ -543,15 +556,15 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
         progress = new ProgressDialog(this.mainActivity);
         progress.setMessage("Espere...");
         progress.show();
-        this.mainActivity.getFirebaseAdmin().addAssistant(uuid,position);
+        this.mainActivity.getFirebaseAdmin().addAssistant(uuid, position);
     }
 
     @Override
     public void addOkNewAssistant(boolean isOk, int position, String uuid) {
-        if(isOk==true){
-            Toasty.success(this.mainActivity, "¡Enhorabuena! Ahora eres participante de: "+ this.mainActivity.getNotificationFragment().getArrCards().get(position).getEventTitle().toString(), Toast.LENGTH_SHORT, true).show();
-            this.mainActivity.getFirebaseAdmin().deleteInvitation(uuid,position);
-        }else{
+        if (isOk == true) {
+            Toasty.success(this.mainActivity, "¡Enhorabuena! Ahora eres participante de: " + this.mainActivity.getNotificationFragment().getArrCards().get(position).getEventTitle().toString(), Toast.LENGTH_SHORT, true).show();
+            this.mainActivity.getFirebaseAdmin().deleteInvitation(uuid, position);
+        } else {
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(this.mainActivity);
             alertDialog.setTitle("Error");
             alertDialog.setMessage("Ha ocurrido un error, vuelve a intentarlo");
@@ -561,7 +574,7 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
 
     @Override
     public void giveBackCards(ArrayList<Card> arrCards) {
-       this.mainActivity.getNotificationFragment().getNotificationFragmentEvents().createCard(arrCards);
+        this.mainActivity.getNotificationFragment().getNotificationFragmentEvents().createCard(arrCards);
     }
 
     @Override
@@ -572,17 +585,17 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
 
     @Override
     public void successDeleteInvitation(boolean isDelete, int position) {
-        if(isDelete==true){
+        if (isDelete == true) {
             this.mainActivity.getNotificationFragment().getNotificationFragmentEvents().removeCard(position);
-            if(progress!=null){
+            if (progress != null) {
                 progress.dismiss();
-                progress=null;
+                progress = null;
             }
 
-        }else{
-            if(progress!=null){
+        } else {
+            if (progress != null) {
                 progress.dismiss();
-                progress=null;
+                progress = null;
 
             }
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(this.mainActivity);
@@ -595,6 +608,110 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
 
     public void sendTokenReceived(String token) {
         this.mainActivity.getFirebaseAdmin().insertDeviceToken(token);
+    }
+
+
+    @Override
+    public void openEvent(int position) {
+        System.out.println("celda presionada en posición: " + position);
+        Event event = this.mainActivity.getMainFragment().getArrEvents().get(position);
+        Glide.with(this.mainActivity).load(event.getUrlCover()).apply(new RequestOptions().transforms( new CropSquareTransformation(),new RoundedCornersTransformation(40,15))).apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE)).apply(RequestOptions.skipMemoryCacheOf(true)).thumbnail(0.3f).into(this.mainActivity.getEventContentFragment().getImgEvent());
+        this.mainActivity.getEventContentFragment().getEventContentFragmentEvents().setQr(event.getQr());
+        this.mainActivity.getEventContentFragment().getTxtTitleOfEvent().setText(event.getTitle());
+        this.mainActivity.getEventContentFragment().getEventContentFragmentEvents().setUuidEvent(event.getUuid());
+        FragmentTransaction transaction = this.mainActivity.getSupportFragmentManager().beginTransaction();
+        transaction.hide(this.mainActivity.getMainFragment());
+        transaction.hide(this.mainActivity.getListPublicEventsFragment());
+        transaction.hide(this.mainActivity.getNotificationFragment());
+        transaction.show(this.mainActivity.getEventContentFragment());
+        this.mainActivity.getBottomNavigationView().setVisibility(View.INVISIBLE);
+        this.mainActivity.getViewPager().setVisibility(View.INVISIBLE);
+        progress = new ProgressDialog(this.mainActivity);
+        progress.setMessage("Cargando imágenes, espere...");
+        progress.show();
+        this.mainActivity.getFirebaseAdmin().getPhotosOfEvent(event.getUuid());
+        transaction.commit();
+
+
+    }
+
+    @Override
+    public void closeEventContent() {
+        FragmentTransaction transaction = this.mainActivity.getSupportFragmentManager().beginTransaction();
+        transaction.hide(this.mainActivity.getEventContentFragment());
+        transaction.show(this.mainActivity.getMainFragment());
+        transaction.show(this.mainActivity.getListPublicEventsFragment());
+        transaction.show(this.mainActivity.getNotificationFragment());
+        this.mainActivity.getBottomNavigationView().setVisibility(View.VISIBLE);
+        this.mainActivity.getViewPager().setVisibility(View.VISIBLE);
+        transaction.commit();
+    }
+
+    @Override
+    public void shareEventWithQRWhatsApp(Uri qr) {
+        System.out.println("getpath: " +qr.toString());
+
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        //Target whatsapp:
+        shareIntent.setPackage("com.whatsapp");
+        //Add text and then Image URI
+
+
+        //shareIntent.putExtra(Intent.EXTRA_STREAM, qr.getPath());
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, "'Quiero que te unas a mi evento!\n"  + qr.toString());
+        //shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        try {
+            this.mainActivity.startActivity(shareIntent);
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(mainActivity, "Whatsapp no está instalado.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void shareEventWithQRGmail(Uri uriQr) {
+        Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+        //emailIntent.setPackage("com.gmail");
+        emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, "");
+        emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, "   ¡Quiero que te unas a mi evento!\n" +  uriQr.toString());
+        emailIntent.setType("image/png");
+
+
+
+        //emailIntent.putExtra(Intent.EXTRA_STREAM, uriQr);
+
+
+        try {
+            this.mainActivity.startActivity(emailIntent);
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(mainActivity, "Gmail no está instalado.", Toast.LENGTH_SHORT).show();
+        }
+
+        this.mainActivity.startActivity(emailIntent);
+    }
+
+    @Override
+    public void closeQRDialogFragment() {
+        this.mainActivity.getCustomDialogFragment_qr().dismiss();
+    }
+
+
+    @Override
+    public void openQR(Uri uriQR) {
+
+
+        this.mainActivity.getCustomDialogFragment_qr().setUriQr(uriQR);
+        this.mainActivity.getCustomDialogFragment_qr().show(this.mainActivity.getFragmentManager(), "MyCustomDialogQR");
+
+    }
+
+
+    @Override
+    public void returnPhotosOfEvent(ArrayList<Photo> arrPhotos) {
+        this.mainActivity.getEventContentFragment().getEventContentFragmentEvents().setPhotosOfEvent(arrPhotos);
+        progress.dismiss();
     }
 
     public static String getAppDirectory() {

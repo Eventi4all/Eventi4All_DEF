@@ -15,12 +15,14 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import com.example.tay.eventi4all_def.R;
+import com.example.tay.eventi4all_def.adapter.ListAdapterCreatedEventsListener;
+import com.example.tay.eventi4all_def.adapter.MyViewHolderCreatedEvents;
 import com.example.tay.eventi4all_def.entity.Event;
 import com.hitomi.cmlibrary.OnMenuSelectedListener;
 
 import java.util.ArrayList;
 
-public class MainFragmentEvents implements View.OnClickListener,AdapterView.OnItemSelectedListener, OnMenuSelectedListener, SwipeRefreshLayout.OnRefreshListener {
+public class MainFragmentEvents implements View.OnClickListener,AdapterView.OnItemSelectedListener, OnMenuSelectedListener, SwipeRefreshLayout.OnRefreshListener, ListAdapterCreatedEventsListener{
 
     private MainFragment mainFragment;
 
@@ -108,5 +110,12 @@ public class MainFragmentEvents implements View.OnClickListener,AdapterView.OnIt
         }else{
             this.mainFragment.getSwipeRefreshLayout().setRefreshing(false);
         }
+    }
+
+    @Override
+    public void openEvent(MyViewHolderCreatedEvents cell) {
+        //posición de la celda seleccionada
+        this.mainFragment.getiMainFragmentListener().openEvent(cell.getAdapterPosition());
+
     }
 }

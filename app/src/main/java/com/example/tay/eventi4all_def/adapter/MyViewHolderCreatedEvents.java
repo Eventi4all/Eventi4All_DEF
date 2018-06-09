@@ -15,6 +15,8 @@ public class MyViewHolderCreatedEvents extends RecyclerView.ViewHolder {
     private TextView txtTitleEvent;
     private TextView txtCreateAt;
     private ImageView imageViewCover;
+    private MyViewHolderCreatedEvents_Events myViewHolderCreatedEvents_events;
+    private ListAdapterCreatedEventsListener listAdapterCreatedEventsListener;
 
 
 
@@ -24,10 +26,13 @@ public class MyViewHolderCreatedEvents extends RecyclerView.ViewHolder {
 
     public MyViewHolderCreatedEvents(View itemView) {
         super(itemView);
+
         this.itemView=itemView;
         this.txtTitleEvent = (TextView) itemView.findViewById(R.id.txtTitleMyEvent);
         this.txtCreateAt = (TextView) itemView.findViewById(R.id.txtCreatedAt);
         this.imageViewCover=(ImageView)itemView.findViewById(R.id.imgCoverEvent);
+        this.myViewHolderCreatedEvents_events = new MyViewHolderCreatedEvents_Events(this);
+        itemView.setOnClickListener(myViewHolderCreatedEvents_events);
 
 
     }
@@ -63,5 +68,21 @@ public class MyViewHolderCreatedEvents extends RecyclerView.ViewHolder {
 
     public void setItemView(View itemView) {
         this.itemView = itemView;
+    }
+
+    public MyViewHolderCreatedEvents_Events getMyViewHolderCreatedEvents_events() {
+        return myViewHolderCreatedEvents_events;
+    }
+
+    public void setMyViewHolderCreatedEvents_events(MyViewHolderCreatedEvents_Events myViewHolderCreatedEvents_events) {
+        this.myViewHolderCreatedEvents_events = myViewHolderCreatedEvents_events;
+    }
+
+    public ListAdapterCreatedEventsListener getListAdapterCreatedEventsListener() {
+        return listAdapterCreatedEventsListener;
+    }
+
+    public void setListAdapterCreatedEventsListener(ListAdapterCreatedEventsListener listAdapterCreatedEventsListener) {
+        this.listAdapterCreatedEventsListener = listAdapterCreatedEventsListener;
     }
 }

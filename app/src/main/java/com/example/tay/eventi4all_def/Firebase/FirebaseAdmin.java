@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import com.example.tay.eventi4all_def.DataHolder;
 import com.example.tay.eventi4all_def.entity.Card;
 import com.example.tay.eventi4all_def.entity.Event;
+import com.example.tay.eventi4all_def.entity.Photo;
 import com.example.tay.eventi4all_def.entity.User;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -34,6 +35,7 @@ import com.google.gson.internal.bind.ArrayTypeAdapter;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -179,6 +181,7 @@ public class FirebaseAdmin {
 
 
     public void getAllUsers(CharSequence sequence) {
+        System.out.println("secuencia: " + sequence.toString());
         final HashMap<String, User> users = new HashMap<String, User>();
         String search = sequence.toString().toLowerCase();
         db.collection("users").orderBy("nickname").startAt(search).endAt(search + '\uf8ff').addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -186,13 +189,16 @@ public class FirebaseAdmin {
             public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
                 for (final DocumentSnapshot data : documentSnapshots.getDocuments()) {
                     if (!data.getData().get("nickname").toString().equals(DataHolder.MyDataHolder.currentUserNickName)) {
+
                         storageRef.child(data.getData().get("imgProfile").toString()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                             @Override
                             public void onSuccess(Uri uri) {
+
                                 User auxUser = new User(data.getData().get("nickname").toString(), uri.toString());
                                 auxUser.setToken(data.getData().get("token").toString());
                                 users.put(data.getData().get("nickname").toString(), auxUser);
                                 abstractFirebaseAdminListener.foundNickName(users);
+                                System.out.println("qeu pasao");
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
@@ -309,35 +315,42 @@ public class FirebaseAdmin {
                 for (DocumentSnapshot document : task.getResult()) {
                     storageRef.child(document.getData().get("coverImg").toString()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
-                        public void onSuccess(Uri uri) {
-                            Event event = new Event(document.get("title").toString(), (boolean) document.get("private"), document.get("limit").toString());
-                            event.setCreateAt(document.get("createAt").toString());
-                            event.setUrlCover(uri.toString());
-                            event.setUuid(document.get("uuid").toString());
+                        public void onSuccess(Uri uriCover) {
+                            storageRef.child(document.getData().get("qr").toString()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uriQr) {
 
-                            hsEvents.put(document.get("uuid").toString(), event);
-                            if (finalDestination.equals("listPublicEventsFragment")) {
-                                Query queryAux = queryAux = db.collection("events").whereEqualTo("assistants." + DataHolder.MyDataHolder.currentUserNickName, true);
-                                queryAux.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                        for (DocumentSnapshot document : task.getResult()) {
+                                    Event event = new Event(document.get("title").toString(), (boolean) document.get("private"), document.get("limit").toString());
+                                    event.setCreateAt(document.get("createAt").toString());
+                                    event.setUrlCover(uriCover.toString());
+                                    event.setUuid(document.get("uuid").toString());
+                                    event.setQr(uriQr);
+                                    hsEvents.put(document.get("uuid").toString(), event);
+                                    if (finalDestination.equals("listPublicEventsFragment")) {
+                                        Query queryAux = queryAux = db.collection("events").whereEqualTo("assistants." + DataHolder.MyDataHolder.currentUserNickName, true);
+                                        queryAux.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                for (DocumentSnapshot document : task.getResult()) {
 
-                                            if (hsEvents.containsKey(document.get("uuid").toString())) {
-                                                hsEvents.remove(document.get("uuid").toString());
+                                                    if (hsEvents.containsKey(document.get("uuid").toString())) {
+                                                        hsEvents.remove(document.get("uuid").toString());
 
+                                                    }
+
+
+                                                }
+                                                abstractFirebaseAdminListener.returnEventsFirebase(new ArrayList<Event>(hsEvents.values()), finalDestination);
                                             }
 
+                                        });
 
-                                        }
+                                    } else {
                                         abstractFirebaseAdminListener.returnEventsFirebase(new ArrayList<Event>(hsEvents.values()), finalDestination);
                                     }
+                                }
+                            });
 
-                                });
-
-                            } else {
-                                abstractFirebaseAdminListener.returnEventsFirebase(new ArrayList<Event>(hsEvents.values()), finalDestination);
-                            }
 
 
                         }
@@ -543,5 +556,50 @@ public class FirebaseAdmin {
         });
 
     }
-}
 
+    public void getPhotosOfEvent(String uuid) {
+        ArrayList<Photo> arrPhotos = new ArrayList<Photo>();
+
+        Query query = db.collection("photos").whereEqualTo("uuidEvent", uuid);
+
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.getResult().size()==0){
+                    abstractFirebaseAdminListener.returnPhotosOfEvent(arrPhotos);
+                }
+
+
+                for (DocumentSnapshot document : task.getResult()) {
+
+
+                    storageRef.child(document.getData().get("urlPhoto").toString()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uriPhoto) {
+
+                            Photo photo = new Photo(uriPhoto.toString(), document.get("photoTitle").toString(), document.get("photoCreatedBy").toString(), document.get("uuidEvent").toString());
+                            arrPhotos.add(photo);
+                            abstractFirebaseAdminListener.returnPhotosOfEvent(arrPhotos);
+
+
+
+
+                        }
+                    })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    System.out.println("Exception: " + e.getMessage());
+
+                                }
+                            });
+
+                }
+
+
+
+               }
+        });
+    }
+}

@@ -1,5 +1,7 @@
 package com.example.tay.eventi4all_def.entity;
 
+import android.net.Uri;
+
 import java.util.HashMap;
 
 public class Event {
@@ -9,6 +11,7 @@ public class Event {
     public String until;
     public String createAt;
     public String urlCover;
+    public Uri qr;
     public String uuid;
 
 
@@ -80,5 +83,13 @@ public class Event {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
+    }
+
+    public Uri getQr() {
+        return qr;
+    }
+
+    public void setQr(Uri qr) {
+        this.qr = qr;
     }
 }

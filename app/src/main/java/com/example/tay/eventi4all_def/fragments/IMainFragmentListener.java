@@ -11,5 +11,6 @@ public interface IMainFragmentListener {
     public void getEvents(String events);
     public void getUserInfo();
     public void openCreateEventsFragment();
+    public void openEvent(int position);
 
 }

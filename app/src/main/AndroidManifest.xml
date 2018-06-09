@@ -12,6 +12,9 @@
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
 
 
+    <!--permisos de internet-->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <!-- Para que actualice la galería con la foto tomada -->
     <protected-broadcast android:name="android.intent.action.MEDIA_MOUNTED" />
 
@@ -22,6 +25,7 @@
         android:roundIcon="@mipmap/ic_logocamera_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
+        android:largeHeap="true"
        >
         <!-- android:hardwareAccelerated="false"
             android:largeHeap="true"-->

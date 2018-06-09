@@ -20,11 +20,15 @@ import com.example.tay.eventi4all_def.entity.User;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -85,6 +89,9 @@ public class CreateEventFragmentEvents implements View.OnClickListener, IMyViewH
                 event.put("title", this.createEventFragment.getTxtEventName().getText().toString().trim());
                 event.put("admin", DataHolder.MyDataHolder.currentUserNickName);
                 event.put("createAt", new SimpleDateFormat("dd-MMM-yyyy").format(Calendar.getInstance().getTime()));
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+                Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+                event.put("timeStamp",  Float.parseFloat(simpleDateFormat.format(timestamp)));
                 event.put("private", this.createEventFragment.getCheckboxPrivate().isChecked());
                 event.put("limit", this.createEventFragment.getSpPax().getSelectedItem().toString());
                 assistants.put(DataHolder.MyDataHolder.currentUserNickName,true);

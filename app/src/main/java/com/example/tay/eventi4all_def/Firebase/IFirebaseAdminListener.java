@@ -3,6 +3,7 @@ package com.example.tay.eventi4all_def.Firebase;
 
 import com.example.tay.eventi4all_def.entity.Card;
 import com.example.tay.eventi4all_def.entity.Event;
+import com.example.tay.eventi4all_def.entity.Photo;
 import com.example.tay.eventi4all_def.entity.User;
 
 import java.util.ArrayList;
@@ -22,5 +23,6 @@ public interface IFirebaseAdminListener {
     public void giveBackCards(ArrayList<Card> arrCards);
     public void successDeleteInvitation(boolean isDelete, int position);
     public void addOkNewAssistant(boolean isOk, int position, String uuid);
+    public void returnPhotosOfEvent(ArrayList<Photo> arrPhotos);
 
 }
