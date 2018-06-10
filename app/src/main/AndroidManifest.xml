@@ -2,6 +2,21 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.tay.eventi4all_def">
 
+        <!--
+    Para el uso de la cámara sin que la maneje el sistema operativo es decir
+    para que podamos manejarla nosotros necesitamos permisos
+    -->
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+
+
+
+
+
+
+
+    <!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-->
+
     <!-- Agregamos permisos de cámara -->
     <uses-permission android:name="android.permission.CAMERA" />
     <!-- Permisos para escribir en memoria las imagenes -->
@@ -27,6 +42,15 @@
         android:theme="@style/AppTheme"
         android:largeHeap="true"
        >
+
+        <!--
+        Agregamos las dependencias de la APÌ Google Vision en el Manifiest
+        también para proporcionar permisos
+        -->
+        <meta-data
+            android:name="com.google.android.gms.vision.DEPENDENCIES"
+            android:value="face" />
+
         <!-- android:hardwareAccelerated="false"
             android:largeHeap="true"-->
         <activity
@@ -52,6 +76,24 @@
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+
+        <activity android:name="com.example.tay.eventi4all_def.GoogleVisionAPI.FaceDetectionActivity" />
+        <activity android:name="com.example.tay.eventi4all_def.GoogleVisionAPI.MainActivity_GoogleVision" />
+        <!--
+         Necesitamos establecer los permisos para FileProvider que se encarga del
+         manejo de los archivos así como de su lectura y escritura. Lo usaremos
+         para obtener la URI de la imagen
+         -->
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+        <activity android:name="com.example.tay.eventi4all_def.GoogleVisionAPI.VideoFaceDetectionActivity"></activity>
 
 <!--Service para autogenerar el token de dispositivo para las notificaciones-->
         <service

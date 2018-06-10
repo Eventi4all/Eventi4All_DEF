@@ -85,6 +85,8 @@ dependencies {
 
     /*DEPENDENCIAS PARA HACER UN COUNT BADGE EN EL ICONO ES DECIR UN COUNT DE NOTIFICACIONES*/
     implementation "me.leolin:ShortcutBadger:1.1.21@aar"
+    //Añadimos las dependencias para usar la API Google Vision para detectar rostros
+    implementation 'com.google.android.gms:play-services-vision:11.8.0'
 
 
 

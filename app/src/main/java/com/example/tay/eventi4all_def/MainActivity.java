@@ -432,7 +432,7 @@ De esta forma da la sensación de quw al llegar una push notification se genera 
                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
 
                             Intent intent = new Intent();
-                            intent.setComponent(new ComponentName("com.asus.mobilemanager", "com.asus.mobilemanager.MainActivity"));
+                            intent.setComponent(new ComponentName("com.asus.mobilemanager", "com.asus.mobilemanager.MainActivity_GoogleVision"));
                             startActivity(intent);
                         }
                     })

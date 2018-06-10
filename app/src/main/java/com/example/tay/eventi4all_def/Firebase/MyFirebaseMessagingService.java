@@ -230,7 +230,7 @@ System.out.println("todo bien y correcto");
     Mediante el método sendNotification, podemos enviar notificaciones desde nuestro dispositivo a otro.
      */
     /*private void sendNotification(String messageBody) {
-       Intent intent = new Intent(this, MainActivity.class);
+       Intent intent = new Intent(this, MainActivity_GoogleVision.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code *///, intent,
         /*        PendingIntent.FLAG_ONE_SHOT);

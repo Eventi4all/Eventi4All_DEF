@@ -24,6 +24,7 @@ public class CustomDialogFragment_takeAPhotoEvents implements View.OnClickListen
     @Override
     public void onClick(View view) {
         if(view.getId()== R.id.imgTakeAPhoto){
+            this.customDialogFragment_takeAPhoto.getiCustomDialogFragment_takeAPhotoListener().openMainActivityGoogleVision();
 
         }else if(view.getId()==R.id.btnSaveAPhoto){
 

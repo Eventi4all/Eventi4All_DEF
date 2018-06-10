@@ -44,7 +44,7 @@ public class SplashActivity extends AppCompatActivity {
         }
 
 
-        //Delay while MainActivity is loading
+        //Delay while MainActivity_GoogleVision is loading
         new Handler().postDelayed(new Runnable() {
             //packageContext es el nombre del activity.this, this es el propio activity y .class la clase del activity
             @Override

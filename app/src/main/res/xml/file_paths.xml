@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<path xmlns:android="http://schemas.android.com/apk/res/android">
+    <external-path name="my_images" path="." />
+</path>
+
+    <!--
+Creamos dentro de res una carpeta xml y guardamos este path que es donde queremos que se
+guarden la imagenes que tomamos.
+-->

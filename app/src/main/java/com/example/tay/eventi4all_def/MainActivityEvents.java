@@ -30,6 +30,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.tay.eventi4all_def.AsyncTask.HttpJsonAsyncTask;
 import com.example.tay.eventi4all_def.Firebase.AbstractFirebaseAdminListener;
 import com.example.tay.eventi4all_def.Firebase.IMyFirebaseMessagingServiceListener;
+import com.example.tay.eventi4all_def.GoogleVisionAPI.MainActivity_GoogleVision;
 import com.example.tay.eventi4all_def.entity.Card;
 import com.example.tay.eventi4all_def.entity.Event;
 import com.example.tay.eventi4all_def.entity.Photo;
@@ -729,6 +730,14 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
     public void closeTakeAPhoto() {
         System.out.println("take a photo");
         this.mainActivity.getCustomDialogFragment_takeAPhoto().dismiss();
+    }
+
+    @Override
+    public void openMainActivityGoogleVision() {
+        Intent intent = new Intent(mainActivity, MainActivity_GoogleVision.class);
+        mainActivity.startActivity(intent);
+        //mainActivity.finish();
+
     }
 
     public static String getAppDirectory() {
