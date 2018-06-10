@@ -36,6 +36,7 @@ import com.example.tay.eventi4all_def.entity.Photo;
 import com.example.tay.eventi4all_def.entity.User;
 import com.example.tay.eventi4all_def.fragments.ICreateEventFragmentListener;
 import com.example.tay.eventi4all_def.fragments.ICustomDialogFragment_QRListener;
+import com.example.tay.eventi4all_def.fragments.ICustomDialogFragment_takeAPhotoListener;
 import com.example.tay.eventi4all_def.fragments.IEventContentFragmentListener;
 import com.example.tay.eventi4all_def.fragments.IGalleryAndCapturePhotoListener;
 import com.example.tay.eventi4all_def.fragments.IMainFragmentListener;
@@ -77,7 +78,7 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
  * Created by tay on 17/4/18.
  */
 
-public class MainActivityEvents extends AbstractFirebaseAdminListener implements IMainFragmentListener, IProfileFragmentListener, ICreateEventFragmentListener, IGalleryAndCapturePhotoListener, IListPublicEventsFragmentListener, INofiticationFragmentListener, IMyFirebaseMessagingServiceListener, IEventContentFragmentListener, ICustomDialogFragment_QRListener{
+public class MainActivityEvents extends AbstractFirebaseAdminListener implements IMainFragmentListener, IProfileFragmentListener, ICreateEventFragmentListener, IGalleryAndCapturePhotoListener, IListPublicEventsFragmentListener, INofiticationFragmentListener, IMyFirebaseMessagingServiceListener, IEventContentFragmentListener, ICustomDialogFragment_QRListener, ICustomDialogFragment_takeAPhotoListener{
     private MainActivity mainActivity;
     //Directorio principal donde se almacenan las imagenes
     private static String APP_DIRECTORY = "Eventy4All/";
@@ -648,6 +649,15 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
     }
 
     @Override
+    public void openTakeAPhoto(String uuidEvent) {
+        System.out.println("el uuidEvent:"+uuidEvent);
+        this.mainActivity.getCustomDialogFragment_takeAPhoto().show(this.mainActivity.getFragmentManager(),"MyCustomDialogTakeAPhoto");
+        this.mainActivity.getCustomDialogFragment_takeAPhoto().setUuidEvent(uuidEvent);
+
+
+    }
+
+    @Override
     public void shareEventWithQRWhatsApp(Uri qr) {
         System.out.println("getpath: " +qr.toString());
 
@@ -712,6 +722,13 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
     public void returnPhotosOfEvent(ArrayList<Photo> arrPhotos) {
         this.mainActivity.getEventContentFragment().getEventContentFragmentEvents().setPhotosOfEvent(arrPhotos);
         progress.dismiss();
+    }
+
+
+    @Override
+    public void closeTakeAPhoto() {
+        System.out.println("take a photo");
+        this.mainActivity.getCustomDialogFragment_takeAPhoto().dismiss();
     }
 
     public static String getAppDirectory() {

@@ -26,6 +26,8 @@ public class EventContentFragmentEvents implements View.OnClickListener {
             this.eventContentFragment.getiEventContentFragmentListener().closeEventContent();
         } else if (view.getId() == R.id.btnShareEvent) {
             this.eventContentFragment.getiEventContentFragmentListener().openQR(qr);
+        }else if(view.getId()==R.id.btnTakeNewPhoto){
+            this.eventContentFragment.getiEventContentFragmentListener().openTakeAPhoto(uuidEvent);
         }
 
 

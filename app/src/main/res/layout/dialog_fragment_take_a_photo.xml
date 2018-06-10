@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/transparent"
+    android:orientation="vertical">
+    <!--Tu contenido-->
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center"
+            android:layout_marginBottom="45dp"
+            android:layout_marginTop="45dp"
+            android:background="@drawable/dialog_bg">
+
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/closeTakeAPhoto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:adjustViewBounds="true"
+                app:civ_border_color="@color/rojoApagado"
+                app:civ_border_width="2dp"
+                app:srcCompat="@drawable/back" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="22dp"
+                android:orientation="vertical">
+
+
+                <android.support.v7.widget.AppCompatImageView
+                    android:id="@+id/imgTakeAPhoto"
+                    android:layout_width="match_parent"
+                    android:layout_height="299dp"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_weight="1"
+                    android:adjustViewBounds="true"
+                    android:background="@color/greyColor"
+                    app:civ_border_color="@color/rojoApagado"
+                    app:civ_border_width="2dp"
+                    app:srcCompat="@drawable/photo_tcamera" />
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/setTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/txtAddTitleOfPhoto"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ems="10"
+                        android:hint="Agrega un título..."
+                        android:inputType="textPersonName"
+                        android:textAlignment="center" />
+
+                    <Button
+                        android:id="@+id/btnSaveAPhoto"
+                        style="@style/AppTheme.RoundedCornerMaterialButton"
+                        android:layout_width="126dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|center"
+                        android:layout_marginEnd="100dp"
+                        android:layout_marginStart="100dp"
+                        android:layout_marginTop="3dp"
+                        android:layout_weight="1"
+                        android:text="Subir Imagen"
+                        android:textAlignment="center"
+                        android:textColor="@color/tw__solid_white" />
+                </android.support.design.widget.TextInputLayout>
+            </LinearLayout>
+
+        </RelativeLayout>
+    </LinearLayout>
+
+    <!--Tu contenido-->
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/picture_circle"
+        android:padding="4dp">
+
+
+        <ImageView
+            android:id="@+id/dialog_iconQr"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_gravity="center|top"
+            android:src="@drawable/landscape" />
+
+    </FrameLayout>
+
+</FrameLayout>
+

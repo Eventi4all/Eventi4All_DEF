@@ -52,6 +52,7 @@ import com.example.tay.eventi4all_def.Firebase.MyFirebaseMessagingService;
 import com.example.tay.eventi4all_def.adapter.ViewPagerAdapter;
 import com.example.tay.eventi4all_def.fragments.CustomDialogFragment_CreateEvents;
 import com.example.tay.eventi4all_def.fragments.CustomDialogFragment_QR;
+import com.example.tay.eventi4all_def.fragments.CustomDialogFragment_takeAPhoto;
 import com.example.tay.eventi4all_def.fragments.EventContentFragment;
 import com.example.tay.eventi4all_def.fragments.ListPublicEventsFragment;
 import com.example.tay.eventi4all_def.fragments.MainFragment;
@@ -94,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
     int request = 0;
     private CustomDialogFragment_CreateEvents customDialogFragment_createEvents;
     private CustomDialogFragment_QR customDialogFragment_qr;
+    private CustomDialogFragment_takeAPhoto customDialogFragment_takeAPhoto;
     private MyFirebaseInstanceIDService myFirebaseInstanceIDService;
     private NotificationFragment notificationFragment;
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -126,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
 
         customDialogFragment_createEvents= new CustomDialogFragment_CreateEvents();
         customDialogFragment_qr = new CustomDialogFragment_QR();
+        customDialogFragment_takeAPhoto = new CustomDialogFragment_takeAPhoto();
 
         viewPager = findViewById(R.id.viewpager);
         bottomNavigationView = findViewById(R.id.navigation);
@@ -257,6 +260,7 @@ De esta forma da la sensación de quw al llegar una push notification se genera 
 
         this.customDialogFragment_qr.setiCustomDialogFragment_qrListener(this.mainActivityEvents);
 
+        this.customDialogFragment_takeAPhoto.setiCustomDialogFragment_takeAPhotoListener(this.mainActivityEvents);
 
         adapter.addFragment(mainFragment);
         adapter.addFragment(listPublicEventsFragment);
@@ -803,5 +807,13 @@ De esta forma da la sensación de quw al llegar una push notification se genera 
 
     public void setCustomDialogFragment_qr(CustomDialogFragment_QR customDialogFragment_qr) {
         this.customDialogFragment_qr = customDialogFragment_qr;
+    }
+
+    public CustomDialogFragment_takeAPhoto getCustomDialogFragment_takeAPhoto() {
+        return customDialogFragment_takeAPhoto;
+    }
+
+    public void setCustomDialogFragment_takeAPhoto(CustomDialogFragment_takeAPhoto customDialogFragment_takeAPhoto) {
+        this.customDialogFragment_takeAPhoto = customDialogFragment_takeAPhoto;
     }
 }

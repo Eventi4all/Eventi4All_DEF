@@ -7,5 +7,5 @@
 
     <stroke
         android:width="45dp"
-        android:color="@android:color/transparent" />
+        android:color="@android:color/white" />
 </shape>
