@@ -88,4 +88,9 @@ public abstract class AbstractFirebaseAdminListener implements IFirebaseAdminLis
     public void returnPhotosOfEvent(ArrayList<Photo> arrPhotos) {
 
     }
+
+    @Override
+    public void insertPhotoOfEventOk(boolean isOk, String response) {
+
+    }
 }

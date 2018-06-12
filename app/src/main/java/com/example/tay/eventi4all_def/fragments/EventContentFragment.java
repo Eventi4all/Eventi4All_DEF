@@ -4,6 +4,7 @@ package com.example.tay.eventi4all_def.fragments;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -37,7 +38,7 @@ public class EventContentFragment extends Fragment {
     private ListAdapterPhotosOfEvent listAdapter;
     private ArrayList<Photo> arrPhotos;
     private RecyclerView myList;
-
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     public EventContentFragment() {
         this.arrPhotos = new ArrayList<>();
@@ -60,15 +61,25 @@ public class EventContentFragment extends Fragment {
         this.btnBack.setOnClickListener(this.eventContentFragmentEvents);
 
 
-        this.listAdapter = new ListAdapterPhotosOfEvent(arrPhotos,getActivity());
+        this.listAdapter = new ListAdapterPhotosOfEvent(arrPhotos, getActivity());
         myList = view.findViewById(R.id.listPhotosOfEvent);
         int spanCount = 1; //num de columnas
         int spacing = 30; //espaciado entre columnas
         boolean includeEdge = true; //incluir borde
         myList.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, includeEdge));
-        myList.setLayoutManager(new StaggeredGridLayoutManager(1,StaggeredGridLayoutManager.VERTICAL));
+        myList.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
         myList.setItemAnimator(new DefaultItemAnimator());
         myList.setAdapter(listAdapter);
+
+        this.swipeRefreshLayout = view.findViewById(R.id.swipeRefreshMyPhotosOfEvent);
+        this.swipeRefreshLayout.setOnRefreshListener(this.eventContentFragmentEvents);
+        //Colores para el refresh
+        swipeRefreshLayout.setColorSchemeResources(
+                R.color.s1,
+                R.color.s2,
+                R.color.s3,
+                R.color.s4);
+
 
 
         return view;
@@ -152,5 +163,15 @@ public class EventContentFragment extends Fragment {
 
     public void setMyList(RecyclerView myList) {
         this.myList = myList;
+
     }
+
+    public SwipeRefreshLayout getSwipeRefreshLayout() {
+        return swipeRefreshLayout;
+    }
+
+    public void setSwipeRefreshLayout(SwipeRefreshLayout swipeRefreshLayout) {
+        this.swipeRefreshLayout = swipeRefreshLayout;
+    }
+
 }

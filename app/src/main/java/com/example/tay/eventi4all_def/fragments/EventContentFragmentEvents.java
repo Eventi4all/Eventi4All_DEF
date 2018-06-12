@@ -1,6 +1,7 @@
 package com.example.tay.eventi4all_def.fragments;
 
 import android.net.Uri;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.View;
 
 import com.example.tay.eventi4all_def.R;
@@ -8,7 +9,7 @@ import com.example.tay.eventi4all_def.entity.Photo;
 
 import java.util.ArrayList;
 
-public class EventContentFragmentEvents implements View.OnClickListener {
+public class EventContentFragmentEvents implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
 
     private EventContentFragment eventContentFragment;
@@ -46,7 +47,7 @@ public class EventContentFragmentEvents implements View.OnClickListener {
             this.eventContentFragment.getArrPhotos().addAll( this.eventContentFragment.getListAdapter().getContenidoLista());
         }
         this.eventContentFragment.getListAdapter().notifyDataSetChanged();
-        //this.mainFragment.getSwipeRefreshLayout().setRefreshing(false);
+        this.eventContentFragment.getSwipeRefreshLayout().setRefreshing(false);
 
     }
 
@@ -72,5 +73,19 @@ public class EventContentFragmentEvents implements View.OnClickListener {
 
     public void setUuidEvent(String uuidEvent) {
         this.uuidEvent = uuidEvent;
+    }
+
+    @Override
+    public void onRefresh() {
+        if(this.eventContentFragment.getArrPhotos().size()>0){
+            reloadArrOfPhotos();
+        }else{
+            this.eventContentFragment.getSwipeRefreshLayout().setRefreshing(false);
+        }
+
+    }
+
+    public void reloadArrOfPhotos() {
+        this.eventContentFragment.getiEventContentFragmentListener().reloadPhotosFromFirebase(uuidEvent);
     }
 }

@@ -34,6 +34,7 @@ public class CustomDialogFragment_takeAPhoto extends DialogFragment{
     private Button btnSaveAPhoto;
     private ImageView btnBackAndCloseTakeAPhoto;
     private String uuidEvent;
+    private IGalleryAndCapturePhotoListener iGalleryAndCapturePhotoListener;
 
     public CustomDialogFragment_takeAPhoto() {
         this.context = getActivity();
@@ -129,5 +130,13 @@ public class CustomDialogFragment_takeAPhoto extends DialogFragment{
 
     public void setUuidEvent(String uuidEvent) {
         this.uuidEvent = uuidEvent;
+    }
+
+    public IGalleryAndCapturePhotoListener getiGalleryAndCapturePhotoListener() {
+        return iGalleryAndCapturePhotoListener;
+    }
+
+    public void setiGalleryAndCapturePhotoListener(IGalleryAndCapturePhotoListener iGalleryAndCapturePhotoListener) {
+        this.iGalleryAndCapturePhotoListener = iGalleryAndCapturePhotoListener;
     }
 }

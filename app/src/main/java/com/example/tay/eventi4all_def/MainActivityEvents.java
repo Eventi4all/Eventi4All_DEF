@@ -92,9 +92,11 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
     //Para proporcionar permisos para abrir la cámara
     private final int PHOTO_CODE_PROFILE = 200;
     private final int PHOTO_CODE_MAINEVENT = 201;
+    private final int PHOTO_CODE_PHOTOS_OF_EVENT = 202;
     //Para proporcionar permisos para abrir la galería
     private final int SELECT_PICTURE_PROFILE = 300;
     private final int SELECT_PICTURE_MAINEVENT = 301;
+    private final int SELECT_PICTURE_PHOTOS_OK_EVENTS = 302;
     //Almacenamos la ruta donde se guarda la img
     private String mPath;
 
@@ -205,6 +207,8 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
                 this.mainActivity.startActivityForResult(Intent.createChooser(intent, "Elige una imagen de la galería"), SELECT_PICTURE_PROFILE);
             } else if (call.equals("coverEvent")) {
                 this.mainActivity.startActivityForResult(Intent.createChooser(intent, "Elige una imagen de la galería"), SELECT_PICTURE_MAINEVENT);
+            } else if(call.equals("photosOfEvent")){
+                this.mainActivity.startActivityForResult(Intent.createChooser(intent, "Elige una imagen de la galería"), SELECT_PICTURE_PHOTOS_OK_EVENTS);
             }
 
 
@@ -261,6 +265,8 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
                 this.mainActivity.startActivityForResult(intent, PHOTO_CODE_PROFILE);
             } else if (call.equals("coverEvent")) {
                 this.mainActivity.startActivityForResult(intent, PHOTO_CODE_MAINEVENT);
+            }else if (call.equals("photosOfEvent")) {
+                this.mainActivity.startActivityForResult(intent, PHOTO_CODE_PHOTOS_OF_EVENT);
             }
             System.out.println("------------------------------>>>>>>>>>>>START ACTIVITY CAMARA");
         }
@@ -659,6 +665,11 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
     }
 
     @Override
+    public void reloadPhotosFromFirebase(String uuidEvent) {
+        this.mainActivity.getFirebaseAdmin().getPhotosOfEvent(uuidEvent);
+    }
+
+    @Override
     public void shareEventWithQRWhatsApp(Uri qr) {
         System.out.println("getpath: " +qr.toString());
 
@@ -733,11 +744,61 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
     }
 
     @Override
-    public void openMainActivityGoogleVision() {
-        Intent intent = new Intent(mainActivity, MainActivity_GoogleVision.class);
-        mainActivity.startActivity(intent);
-        //mainActivity.finish();
+    public void openCameraTakeAphoto() {
 
+        CharSequence options[] = new CharSequence[] {"Tomar una foto", "Demostración filtros (BETA)"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.mainActivity);
+        builder.setCancelable(false);
+        builder.setTitle("Selecciona una opción");
+        builder.setItems(options, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                        if(which==0){
+                            mainActivity.getCustomDialogFragment_takeAPhoto().getCustomDialogFragment_takeAPhotoEvents().isPermissionAccepted();
+                            mainActivity.getCustomDialogFragment_takeAPhoto().getCustomDialogFragment_takeAPhotoEvents().showOptions();
+                        }else if(which==1){
+                            Intent intent = new Intent(mainActivity, MainActivity_GoogleVision.class);
+                            mainActivity.startActivity(intent);
+                            //mainActivity.finish();
+                        }
+            }
+        });
+        builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder.show();
+
+
+
+    }
+
+    @Override
+    public void uploadPhotoOfEvent(String uuidEvent, HashMap<String,Object> dataofPhoto) {
+        progress = new ProgressDialog(this.mainActivity);
+        progress.setMessage("Subiendo la imagen. Por favor, espere...");
+        progress.show();
+        this.mainActivity.getFirebaseAdmin().uploadTakePhotoOfEvent(uuidEvent,dataofPhoto);
+    }
+
+    @Override
+    public void insertPhotoOfEventOk(boolean isOk, String response) {
+        if(isOk){
+            progress.dismiss();
+            Toasty.success(this.mainActivity, "¡Enhorabuena! Has subido : " + this.mainActivity.getCustomDialogFragment_takeAPhoto().getTxtTitleoFPhoto().getText().toString() + " a tu evento.", Toast.LENGTH_SHORT, true).show();
+            this.mainActivity.getCustomDialogFragment_takeAPhoto().dismiss();
+            this.mainActivity.getEventContentFragment().getEventContentFragmentEvents().reloadArrOfPhotos();
+            DataHolder.MyDataHolder.imgUri=null;
+
+        }else{
+            progress.dismiss();
+            DataHolder.MyDataHolder.imgUri=null;
+            this.mainActivity.getCustomDialogFragment_takeAPhoto().dismiss();
+            Toasty.error(this.mainActivity,"Ha ocurrido un problema, vuelve a intentarlo más tarde.", Toast.LENGTH_SHORT, true).show();
+        }
     }
 
     public static String getAppDirectory() {
@@ -792,6 +853,7 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
         return SELECT_PICTURE_MAINEVENT;
     }
 
-
-
+    public int getSELECT_PICTURE_PHOTOS_OK_EVENTS() {
+        return SELECT_PICTURE_PHOTOS_OK_EVENTS;
+    }
 }

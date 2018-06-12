@@ -4,6 +4,7 @@ package com.example.tay.eventi4all_def;
 import android.annotation.TargetApi;
 
 
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -261,7 +262,7 @@ De esta forma da la sensación de quw al llegar una push notification se genera 
         this.customDialogFragment_qr.setiCustomDialogFragment_qrListener(this.mainActivityEvents);
 
         this.customDialogFragment_takeAPhoto.setiCustomDialogFragment_takeAPhotoListener(this.mainActivityEvents);
-
+        this.customDialogFragment_takeAPhoto.setiGalleryAndCapturePhotoListener(this.mainActivityEvents);
         adapter.addFragment(mainFragment);
         adapter.addFragment(listPublicEventsFragment);
         adapter.addFragment(notificationFragment);
@@ -589,6 +590,7 @@ De esta forma da la sensación de quw al llegar una push notification se genera 
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Activity activity = this;
         super.onActivityResult(requestCode, resultCode, data);
         //System.out.println("resultCode" + resultCode + "equestcode: " + requestCode + "y request" + request);
 
@@ -597,7 +599,7 @@ De esta forma da la sensación de quw al llegar una push notification se genera 
         if (resultCode == RESULT_OK || resultCode == 96) {
 
             //Si el requestCode es igual al PHOTO_CODE
-            if (requestCode == 200 || requestCode == 201) {
+            if (requestCode == 200 || requestCode == 201 || requestCode==202) {
                 request = requestCode;
 
                 //Escaneamos la nueva imagen que hemos tomado porque si no, no la encuentra
@@ -606,18 +608,25 @@ De esta forma da la sensación de quw al llegar una push notification se genera 
                     public void onScanCompleted(String path, Uri uri) {
                         System.out.println("Externa Storage scanned " + path + ":");
                         System.out.println("ExternalStorage Uri:v " + uri);
+                        int width=250;
+                        int height=250;
+
+                        if(request==202){
+                            width=500;
+                            height=500;
+                        }
 
                         DataHolder.MyDataHolder.imgUri = Uri.parse(Environment.getExternalStorageDirectory() + File.separator + "Eventy4All/" + "ProfilePicture" + File.separator + UUID.randomUUID().toString() + ".jpg");
                         UCrop.of(uri, DataHolder.MyDataHolder.imgUri)
                                 .withAspectRatio(10, 10)
-                                .withMaxResultSize(250, 250)
-                                .start(customDialogFragment_createEvents.getActivity());
+                                .withMaxResultSize(width, height)
+                                .start(activity);
 
                     }
                 });
 
                 //Si el requestCode es el de SELECT_PICTURE
-            } else if (requestCode == 300 || requestCode == 301) {
+            } else if (requestCode == 300 || requestCode == 301 || requestCode==302) {
                 request = requestCode;
                 Long timestamp = System.currentTimeMillis()/1000;
                 String mPath = Environment.getExternalStorageDirectory() + File.separator + "Eventy4All/Profilepicture" + File.separator + timestamp.toString() + ".jpg";
@@ -628,12 +637,19 @@ De esta forma da la sensación de quw al llegar una push notification se genera 
 
                 //Recibimos la URI de la imagen
                 Uri path = data.getData();
+                int width=250;
+                int height=250;
+
+                if(request==302){
+                    width=500;
+                    height=500;
+                }
 
                 DataHolder.MyDataHolder.imgUri = Uri.parse(Environment.getExternalStorageDirectory() + File.separator + "Eventy4All/" + "ProfilePicture" + File.separator + UUID.randomUUID().toString() + ".jpg");
                 UCrop.of(path, DataHolder.MyDataHolder.imgUri)
                         .withAspectRatio(10, 10)
-                        .withMaxResultSize(250, 250)
-                        .start(customDialogFragment_createEvents.getActivity());
+                        .withMaxResultSize(width, height)
+                        .start(activity);
 
 
 
@@ -657,10 +673,16 @@ De esta forma da la sensación de quw al llegar una push notification se genera 
                 } else if (request == 201) {
 
                     this.customDialogFragment_createEvents.getEventImgMain().setImageBitmap(bitmap);
-                } else if (request == 300) {
+                } else if (request == 202) {
+
+                    this.customDialogFragment_takeAPhoto.getImgTakeAPhoto().setImageBitmap(bitmap);
+                }else if (request == 300) {
                     this.profileFragment.getImgProfile().setImageURI(DataHolder.MyDataHolder.imgUri);
                 } else if (request == 301) {
                     this.customDialogFragment_createEvents.getEventImgMain().setImageURI(DataHolder.MyDataHolder.imgUri);
+                }else if (request == 302) {
+
+                    this.customDialogFragment_takeAPhoto.getImgTakeAPhoto().setImageURI(DataHolder.MyDataHolder.imgUri);
                 }
                 request = 0;
             } else if (resultCode == UCrop.RESULT_ERROR) {

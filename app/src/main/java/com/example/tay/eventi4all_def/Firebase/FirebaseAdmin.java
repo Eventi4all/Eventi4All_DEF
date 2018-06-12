@@ -168,6 +168,7 @@ public class FirebaseAdmin {
         HashMap<String, Object> result = new HashMap<>();
         if (action.equals("upload")) {
             Uri file = DataHolder.MyDataHolder.imgUri;
+            DataHolder.MyDataHolder.imgUri=null;
             final StorageReference mountainImagesRef = storageRef.child(url + nameImg);
             result.put("uploadTask", mountainImagesRef.putFile(file));
             return result;
@@ -175,6 +176,8 @@ public class FirebaseAdmin {
             result.put("urlComplete", url + nameImg);
             return result;
         }
+
+
 
 
     }
@@ -601,5 +604,56 @@ public class FirebaseAdmin {
 
                }
         });
+    }
+
+    public void uploadTakePhotoOfEvent(String uuidEvent, HashMap<String,Object> dataOfPhoto) {
+        Map<String, Object> data = dataOfPhoto;
+
+        try {
+            String nameImage = UUID.randomUUID().toString() + ".jpg";
+            Task uploadTask = (Task) createFile("images/photos_events/" + uuidEvent + "/", "upload", nameImage).get("uploadTask");
+
+            uploadTask.addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    abstractFirebaseAdminListener.insertPhotoOfEventOk(false, "Firebase Exception");
+                }
+            }).addOnSuccessListener(new OnSuccessListener() {
+                @Override
+                public void onSuccess(Object o) {
+                    dataOfPhoto.put("urlPhoto", (String) createFile("images/photos_events/" + uuidEvent + "/", "getUrl", nameImage).get("urlComplete"));
+                            db.collection("photos").document().set(dataOfPhoto).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+
+                                    System.out.println("insert ok");
+                                    abstractFirebaseAdminListener.insertPhotoOfEventOk(true, "Document Insert");
+
+
+
+                                }
+                            })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+
+                                            abstractFirebaseAdminListener.insertPhotoOfEventOk(false, "Firebase Exception");
+                                        }
+                                    });
+
+                        }
+                    });
+
+
+                }
+
+
+
+         catch (Exception e)
+
+        {
+            abstractFirebaseAdminListener.insertDocumentIsOK(false, "Firebase Exception");
+        }
+
     }
 }

@@ -47,10 +47,16 @@
                 android:layout_height="151dp"
                 android:background="@color/rojoApagado" />
 
+            <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/swipeRefreshMyPhotosOfEvent"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/listPhotosOfEvent"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
+            </android.support.v4.widget.SwipeRefreshLayout>
 
         </LinearLayout>
 

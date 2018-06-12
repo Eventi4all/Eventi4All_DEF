@@ -6,4 +6,5 @@ public interface IEventContentFragmentListener {
     public void openQR(Uri uriQR);
     public void closeEventContent();
     public void openTakeAPhoto(String uuidEvent);
+    public void reloadPhotosFromFirebase(String uuidEvent);
 }

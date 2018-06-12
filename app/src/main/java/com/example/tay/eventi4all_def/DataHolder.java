@@ -16,7 +16,7 @@ public class DataHolder {
 
 
     public static class MyDataHolder {
-        public static Uri imgUri;
+        public static Uri imgUri = null;
         public static String currentUserNickName;
         public static String userImgProfile;
         public static String token;
