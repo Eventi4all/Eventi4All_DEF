@@ -48,7 +48,7 @@ public class MainFragment extends Fragment {
     Array de iconos para el circle button que será equivalente a
     la opción seleccionada del circleMenu
      */
-    private String[] arrIcons={"EditProfile","Logout"};
+    private String[] arrIcons={"EditProfile","Logout", "BarcodeReader"};
     private CircleMenu circleMenu;
 
 
@@ -97,7 +97,7 @@ public class MainFragment extends Fragment {
         this.circleMenu = v.findViewById(R.id.btnOptions);
         this.circleMenu.setOnClickListener(this.mainFragmentEvents);
         this.circleMenu.setMainMenu(Color.parseColor("#CDCDCD"),R.drawable.ic_options,R.drawable.cancel).
-                addSubMenu(Color.parseColor("#FF8000"),R.drawable.user).addSubMenu(Color.parseColor("#DF0101"),R.drawable.exit).setOnMenuSelectedListener(this.mainFragmentEvents);
+                addSubMenu(Color.parseColor("#FF8000"),R.drawable.user).addSubMenu(Color.parseColor("#DF0101"),R.drawable.exit).addSubMenu(Color.parseColor("#FFFF00"),R.drawable.barcode_reader2).setOnMenuSelectedListener(this.mainFragmentEvents);
 
       this.swipeRefreshLayout = v.findViewById(R.id.swipeRefreshMyEvents);
       this.swipeRefreshLayout.setOnRefreshListener(this.mainFragmentEvents);

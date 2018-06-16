@@ -3,9 +3,11 @@ package com.example.tay.eventi4all_def.Firebase;
 import android.app.Activity;
 import android.net.Uri;
 
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 
 
+import com.example.tay.eventi4all_def.BarcodeActivity;
 import com.example.tay.eventi4all_def.DataHolder;
 import com.example.tay.eventi4all_def.entity.Card;
 import com.example.tay.eventi4all_def.entity.Event;
@@ -19,6 +21,7 @@ import com.google.android.gms.tasks.Task;
 
 import com.google.firebase.auth.FirebaseAuth;
 
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -30,6 +33,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.bind.ArrayTypeAdapter;
 
@@ -168,7 +172,7 @@ public class FirebaseAdmin {
         HashMap<String, Object> result = new HashMap<>();
         if (action.equals("upload")) {
             Uri file = DataHolder.MyDataHolder.imgUri;
-            DataHolder.MyDataHolder.imgUri=null;
+            DataHolder.MyDataHolder.imgUri = null;
             final StorageReference mountainImagesRef = storageRef.child(url + nameImg);
             result.put("uploadTask", mountainImagesRef.putFile(file));
             return result;
@@ -176,8 +180,6 @@ public class FirebaseAdmin {
             result.put("urlComplete", url + nameImg);
             return result;
         }
-
-
 
 
     }
@@ -355,7 +357,6 @@ public class FirebaseAdmin {
                             });
 
 
-
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
@@ -522,8 +523,9 @@ public class FirebaseAdmin {
     public void deleteInvitation(String uuid, int position) {
         DocumentReference docRef = db.collection("events").document(uuid);
 
-// Remove the 'capital' field from the document
+
         Map<String, Object> updates = new HashMap<>();
+        //Con fiedlvalue delete elminamos al invitacion
         updates.put("invitations." + DataHolder.MyDataHolder.currentUserNickName, FieldValue.delete());
 
         docRef.update(updates).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -541,20 +543,20 @@ public class FirebaseAdmin {
     }
 
     public void addAssistant(String uuid, int position) {
-        HashMap<String,Object> addAssisantIntoEvent = new HashMap<String, Object>();
-        HashMap<String,Boolean> newAssistant = new HashMap<String,Boolean>();
-        newAssistant.put(DataHolder.MyDataHolder.currentUserNickName,true);
-        addAssisantIntoEvent.put("assistants",newAssistant);
+        HashMap<String, Object> addAssisantIntoEvent = new HashMap<String, Object>();
+        HashMap<String, Boolean> newAssistant = new HashMap<String, Boolean>();
+        newAssistant.put(DataHolder.MyDataHolder.currentUserNickName, true);
+        addAssisantIntoEvent.put("assistants", newAssistant);
         //Hacemos un merge apra que no borre el contenido de este usuario y solamente añada el token cada vez que cambie
         Task<Void> docRef = db.collection("events").document(uuid).set(addAssisantIntoEvent, SetOptions.merge()).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                abstractFirebaseAdminListener.addOkNewAssistant(true,position, uuid);
+                abstractFirebaseAdminListener.addOkNewAssistant(true, position, uuid);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                abstractFirebaseAdminListener.addOkNewAssistant(false,position, uuid);
+                abstractFirebaseAdminListener.addOkNewAssistant(false, position, uuid);
             }
         });
 
@@ -569,7 +571,7 @@ public class FirebaseAdmin {
 
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if(task.getResult().size()==0){
+                if (task.getResult().size() == 0) {
                     abstractFirebaseAdminListener.returnPhotosOfEvent(arrPhotos);
                 }
 
@@ -586,8 +588,6 @@ public class FirebaseAdmin {
                             abstractFirebaseAdminListener.returnPhotosOfEvent(arrPhotos);
 
 
-
-
                         }
                     })
                             .addOnFailureListener(new OnFailureListener() {
@@ -601,12 +601,11 @@ public class FirebaseAdmin {
                 }
 
 
-
-               }
+            }
         });
     }
 
-    public void uploadTakePhotoOfEvent(String uuidEvent, HashMap<String,Object> dataOfPhoto) {
+    public void uploadTakePhotoOfEvent(String uuidEvent, HashMap<String, Object> dataOfPhoto) {
         Map<String, Object> data = dataOfPhoto;
 
         try {
@@ -622,38 +621,84 @@ public class FirebaseAdmin {
                 @Override
                 public void onSuccess(Object o) {
                     dataOfPhoto.put("urlPhoto", (String) createFile("images/photos_events/" + uuidEvent + "/", "getUrl", nameImage).get("urlComplete"));
-                            db.collection("photos").document().set(dataOfPhoto).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
+                    db.collection("photos").document().set(dataOfPhoto).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
 
-                                    System.out.println("insert ok");
-                                    abstractFirebaseAdminListener.insertPhotoOfEventOk(true, "Document Insert");
+                            System.out.println("insert ok");
+                            abstractFirebaseAdminListener.insertPhotoOfEventOk(true, "Document Insert");
 
-
-
-                                }
-                            })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-
-                                            abstractFirebaseAdminListener.insertPhotoOfEventOk(false, "Firebase Exception");
-                                        }
-                                    });
 
                         }
-                    });
+                    })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
 
+                                    abstractFirebaseAdminListener.insertPhotoOfEventOk(false, "Firebase Exception");
+                                }
+                            });
 
                 }
+            });
 
 
-
-         catch (Exception e)
+        } catch (Exception e)
 
         {
             abstractFirebaseAdminListener.insertDocumentIsOK(false, "Firebase Exception");
         }
+
+    }
+
+    public void checkIfUserisAssistant(String barcode, BarcodeActivity barcodeActivity) {
+        DocumentReference docRef = db.collection("events").document(barcode);
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+
+                    if (document.exists()) {
+                        System.out.println( document.getData());
+
+                       if(document.get("assistants").toString().contains(DataHolder.MyDataHolder.currentUserNickName + "=true")){
+
+                           System.out.println("pertenece al evento");
+                           DataHolder.MyDataHolder.belong = true;
+
+
+
+                           //abstractFirebaseAdminListener.isUserBelongsToTheEvent(true,null,null,null);
+                           //abstractFirebaseAdminListener.closeBarcode();
+                       }else{
+
+                           System.out.println("no Pertenece al evento");
+                           Event event = new Event();
+                           event.setTitle(document.get("title").toString());
+                           event.setCreateAt(document.get("admin").toString());
+                           event.setUuid(document.get("uuid").toString());
+                           DataHolder.MyDataHolder.belong = false;
+                           DataHolder.MyDataHolder.event = event;
+
+
+                           //abstractFirebaseAdminListener.isUserBelongsToTheEvent(false,document.get("title").toString(), document.get("admin").toString(), document.get("uui").toString());
+                           //abstractFirebaseAdminListener.closeBarcode();
+                       }
+                        DataHolder.MyDataHolder.requesCode=1313;
+                        barcodeActivity.finish();
+
+
+
+
+                    } else {
+
+                    }
+                } else {
+
+                }
+            }
+        });
 
     }
 }

@@ -78,8 +78,10 @@ dependencies {
     //Material desing para dialogos
     implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
     //Librerías ZXing para generar QR
-    implementation 'com.google.zxing:core:3.2.1'
-    implementation 'com.journeyapps:zxing-android-embedded:3.2.0@aar'
+    implementation('com.journeyapps:zxing-android-embedded:3.4.0') {
+        exclude(group: 'com.google.zxing.client.android.camera.CameraConfigurationUtils')
+    }
+
     //Librerías ShimmerRecyclerView para que brillen las celdas
     implementation 'com.github.tabassumLatif:ShimmerRecyclerView:0.1.2'
 
@@ -87,7 +89,8 @@ dependencies {
     implementation "me.leolin:ShortcutBadger:1.1.21@aar"
     //Añadimos las dependencias para usar la API Google Vision para detectar rostros
     implementation 'com.google.android.gms:play-services-vision:11.8.0'
-
+    //Implementación API apra lector de codigo de barras
+    implementation 'info.androidhive:barcode-reader:1.1.5'
 
 
 }

@@ -12,5 +12,5 @@ public interface IMainFragmentListener {
     public void getUserInfo();
     public void openCreateEventsFragment();
     public void openEvent(int position);
-
+    public void openBarcodeReader();
 }

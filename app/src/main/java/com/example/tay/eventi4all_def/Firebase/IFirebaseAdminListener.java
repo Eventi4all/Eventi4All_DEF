@@ -25,5 +25,7 @@ public interface IFirebaseAdminListener {
     public void addOkNewAssistant(boolean isOk, int position, String uuid);
     public void returnPhotosOfEvent(ArrayList<Photo> arrPhotos);
     public void insertPhotoOfEventOk(boolean isOk, String response);
+    public void isUserBelongsToTheEvent(boolean belong, String titleEvent, String adminEvent, String uuidEvent);
+    public void closeBarcode();
 
 }

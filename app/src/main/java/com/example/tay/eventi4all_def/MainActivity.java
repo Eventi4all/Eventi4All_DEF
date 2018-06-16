@@ -13,15 +13,12 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
 import android.os.Environment;
-import android.os.PowerManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
@@ -33,7 +30,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.AndroidException;
 import android.util.Log;
 
 import android.view.MenuItem;
@@ -49,7 +45,6 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
 import com.example.tay.eventi4all_def.Firebase.FirebaseAdmin;
 import com.example.tay.eventi4all_def.Firebase.MyFirebaseInstanceIDService;
-import com.example.tay.eventi4all_def.Firebase.MyFirebaseMessagingService;
 import com.example.tay.eventi4all_def.adapter.ViewPagerAdapter;
 import com.example.tay.eventi4all_def.fragments.CustomDialogFragment_CreateEvents;
 import com.example.tay.eventi4all_def.fragments.CustomDialogFragment_QR;
@@ -64,10 +59,8 @@ import com.yalantis.ucrop.UCrop;
 import java.io.File;
 import java.util.UUID;
 
+import info.androidhive.barcode.BarcodeReader;
 import me.leolin.shortcutbadger.ShortcutBadger;
-
-import static android.Manifest.permission.CAMERA;
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -97,10 +90,12 @@ public class MainActivity extends AppCompatActivity {
     private CustomDialogFragment_CreateEvents customDialogFragment_createEvents;
     private CustomDialogFragment_QR customDialogFragment_qr;
     private CustomDialogFragment_takeAPhoto customDialogFragment_takeAPhoto;
+    private BarcodeReader barcodeReader;
     private MyFirebaseInstanceIDService myFirebaseInstanceIDService;
     private NotificationFragment notificationFragment;
     private SwipeRefreshLayout swipeRefreshLayout;
     private EventContentFragment eventContentFragment;
+
 
 
     @Override
@@ -130,6 +125,9 @@ public class MainActivity extends AppCompatActivity {
         customDialogFragment_createEvents= new CustomDialogFragment_CreateEvents();
         customDialogFragment_qr = new CustomDialogFragment_QR();
         customDialogFragment_takeAPhoto = new CustomDialogFragment_takeAPhoto();
+        barcodeReader = (BarcodeReader) this.getSupportFragmentManager().findFragmentById(R.id.barcode_scanner);
+
+
 
         viewPager = findViewById(R.id.viewpager);
         bottomNavigationView = findViewById(R.id.navigation);
@@ -221,6 +219,16 @@ De esta forma da la sensación de quw al llegar una push notification se genera 
         super.onResume();
         if(this.notificationFragment.getNotificationFragmentEvents()!=null){
             this.notificationFragment.getNotificationFragmentEvents().getInvitations();
+        }
+        if(DataHolder.MyDataHolder.requesCode==1313){
+            System.out.println("el request code que llega es: " + DataHolder.MyDataHolder.requesCode);
+            DataHolder.MyDataHolder.requesCode=-1;
+            if(DataHolder.MyDataHolder.belong==true){
+                this.firebaseAdmin.getAbstractFirebaseAdminListener().isUserBelongsToTheEvent(true,null,null,null);
+            }else{
+                this.firebaseAdmin.getAbstractFirebaseAdminListener().isUserBelongsToTheEvent(false,DataHolder.MyDataHolder.event.getTitle(),DataHolder.MyDataHolder.event.getCreateAt(), DataHolder.MyDataHolder.event.getUuid());
+            }
+
         }
 
     }
@@ -576,6 +584,8 @@ De esta forma da la sensación de quw al llegar una push notification se genera 
 
 
 
+
+
         setupViewPager(viewPager);
         if(DataHolder.MyDataHolder.token!=null){
             this.firebaseAdmin.insertDeviceToken(DataHolder.MyDataHolder.token);
@@ -694,6 +704,13 @@ De esta forma da la sensación de quw al llegar una push notification se genera 
 
 
         }
+
+
+
+
+
+
+
 
     }
 
@@ -837,5 +854,15 @@ De esta forma da la sensación de quw al llegar una push notification se genera 
 
     public void setCustomDialogFragment_takeAPhoto(CustomDialogFragment_takeAPhoto customDialogFragment_takeAPhoto) {
         this.customDialogFragment_takeAPhoto = customDialogFragment_takeAPhoto;
+    }
+
+
+
+    public BarcodeReader getBarcodeReader() {
+        return barcodeReader;
+    }
+
+    public void setBarcodeReader(BarcodeReader barcodeReader) {
+        this.barcodeReader = barcodeReader;
     }
 }

@@ -95,6 +95,8 @@ public class MainFragmentEvents implements View.OnClickListener,AdapterView.OnIt
 
                 }else if(mainFragment.getArrIcons()[index].equals("EditProfile")){
 
+                }else if(mainFragment.getArrIcons()[index].equals("BarcodeReader")){
+                    mainFragment.getiMainFragmentListener().openBarcodeReader();
                 }
 
             }

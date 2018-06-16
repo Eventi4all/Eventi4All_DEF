@@ -4,12 +4,10 @@ package com.example.tay.eventi4all_def;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -19,9 +17,10 @@ import android.provider.Settings;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
+import android.util.SparseArray;
 import android.view.View;
 import android.widget.Toast;
+
 
 
 import com.bumptech.glide.Glide;
@@ -44,7 +43,7 @@ import com.example.tay.eventi4all_def.fragments.IMainFragmentListener;
 import com.example.tay.eventi4all_def.fragments.INofiticationFragmentListener;
 import com.example.tay.eventi4all_def.fragments.IProfileFragmentListener;
 import com.example.tay.eventi4all_def.fragments.IListPublicEventsFragmentListener;
-import com.example.tay.eventi4all_def.fragments.ProfileFragment;
+import com.google.android.gms.vision.barcode.Barcode;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
@@ -56,18 +55,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
 import es.dmoral.toasty.Toasty;
+import info.androidhive.barcode.BarcodeReader;
 import jp.wasabeef.glide.transformations.CropSquareTransformation;
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
@@ -539,23 +534,28 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
 
     @Override
     public void deleteInvitation(String uuid, int position) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this.mainActivity);
-        builder.setTitle("¿Estás seguro de que deseas eliminar la invitación?");
-        builder.setMessage("Si lo hace, no podrás volver a verla.");
-        builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                progress = new ProgressDialog(mainActivity);
-                progress.setMessage("Espere...");
-                progress.show();
-                mainActivity.getFirebaseAdmin().deleteInvitation(uuid, position);
-            }
-        }).setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
+        if(position!=-1){
+            AlertDialog.Builder builder = new AlertDialog.Builder(this.mainActivity);
+            builder.setTitle("¿Estás seguro de que deseas eliminar la invitación?");
+            builder.setMessage("Si lo hace, no podrás volver a verla.");
+            builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    progress = new ProgressDialog(mainActivity);
+                    progress.setMessage("Espere...");
+                    progress.show();
+                    mainActivity.getFirebaseAdmin().deleteInvitation(uuid, position);
+                }
+            }).setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
 
-            }
-        });
-        builder.show();
+                }
+            });
+            builder.show();
+
+        }else{
+            mainActivity.getFirebaseAdmin().deleteInvitation(uuid, position);
+        }
 
     }
 
@@ -570,8 +570,18 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
     @Override
     public void addOkNewAssistant(boolean isOk, int position, String uuid) {
         if (isOk == true) {
-            Toasty.success(this.mainActivity, "¡Enhorabuena! Ahora eres participante de: " + this.mainActivity.getNotificationFragment().getArrCards().get(position).getEventTitle().toString(), Toast.LENGTH_SHORT, true).show();
-            this.mainActivity.getFirebaseAdmin().deleteInvitation(uuid, position);
+            if(position==-1){
+                //Recargamos als listas para que se actualicen si hemos aceptado el evento.
+                this.mainActivity.getMainFragment().getiMainFragmentListener().getEvents("allAssistEvents");
+                this.mainActivity.getListPublicEventsFragment().getIListPublicEventsFragmentListener().callGetPublicEvents();
+                this.deleteInvitation(DataHolder.MyDataHolder.event.getUuid(),-1);
+                Toasty.success(this.mainActivity,"¡Enhorabuena, has sido añadido al evento!", Toast.LENGTH_SHORT, true).show();
+                progress.dismiss();
+            }else{
+                Toasty.success(this.mainActivity, "¡Enhorabuena! Ahora eres participante de: " + this.mainActivity.getNotificationFragment().getArrCards().get(position).getEventTitle().toString(), Toast.LENGTH_SHORT, true).show();
+                this.mainActivity.getFirebaseAdmin().deleteInvitation(uuid, position);
+            }
+
         } else {
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(this.mainActivity);
             alertDialog.setTitle("Error");
@@ -593,25 +603,34 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
 
     @Override
     public void successDeleteInvitation(boolean isDelete, int position) {
-        if (isDelete == true) {
-            this.mainActivity.getNotificationFragment().getNotificationFragmentEvents().removeCard(position);
-            if (progress != null) {
-                progress.dismiss();
-                progress = null;
-            }
+        if(position==-1){
+            if(isDelete==true){
+                this.mainActivity.getNotificationFragment().getNotificationFragmentEvents().getInvitations();
 
-        } else {
-            if (progress != null) {
-                progress.dismiss();
-                progress = null;
 
             }
-            AlertDialog.Builder alertDialog = new AlertDialog.Builder(this.mainActivity);
-            alertDialog.setTitle("Error");
-            alertDialog.setMessage("Ha ocurrido un error, vuelve a intentarlo");
-            alertDialog.show();
+        }else{
+            if (isDelete == true) {
+                this.mainActivity.getNotificationFragment().getNotificationFragmentEvents().removeCard(position);
+                if (progress != null) {
+                    progress.dismiss();
+                    progress = null;
+                }
 
+            } else {
+                if (progress != null) {
+                    progress.dismiss();
+                    progress = null;
+
+                }
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(this.mainActivity);
+                alertDialog.setTitle("Error");
+                alertDialog.setMessage("Ha ocurrido un error, vuelve a intentarlo");
+                alertDialog.show();
+
+            }
         }
+
     }
 
     public void sendTokenReceived(String token) {
@@ -642,6 +661,8 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
 
 
     }
+
+
 
     @Override
     public void closeEventContent() {
@@ -801,6 +822,64 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
         }
     }
 
+
+
+    @Override
+    public void openBarcodeReader() {
+        DataHolder.MyDataHolder.firebaseAdmin=this.mainActivity.getFirebaseAdmin();
+        Intent intent = new Intent(this.mainActivity, BarcodeActivity.class);
+       this.mainActivity.startActivity(intent);
+
+
+
+    }
+
+
+
+    @Override
+    public void isUserBelongsToTheEvent(boolean belong, String titleEvent, String adminEvent, String uuidEvent) {
+        builder = new AlertDialog.Builder(this.mainActivity);
+        if(belong==false){
+
+            builder.setTitle("¡Hemos encontrado un evento para ti!");
+            builder.setMessage(adminEvent + ", quiere que te unas a su evento " + "'"+ titleEvent + "'.");
+            builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    progress = new ProgressDialog(mainActivity);
+                    progress.setMessage("Espere...");
+                    progress.show();
+                    mainActivity.getFirebaseAdmin().addAssistant(uuidEvent, -1);
+                }
+            });
+            builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+
+
+                }
+            });
+
+
+
+        }else{
+
+            builder.setTitle("¡Vaya, ya eres miembro de este evento!");
+            builder.setMessage("¡Búscalo en la lista de tus eventos!");
+            builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            });
+
+
+        }
+
+        builder.show();
+    }
+
     public static String getAppDirectory() {
         return APP_DIRECTORY;
     }
@@ -856,4 +935,9 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
     public int getSELECT_PICTURE_PHOTOS_OK_EVENTS() {
         return SELECT_PICTURE_PHOTOS_OK_EVENTS;
     }
+
+
+
+
+
 }

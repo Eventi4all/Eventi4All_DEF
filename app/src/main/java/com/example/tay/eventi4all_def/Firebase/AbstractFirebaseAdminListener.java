@@ -93,4 +93,14 @@ public abstract class AbstractFirebaseAdminListener implements IFirebaseAdminLis
     public void insertPhotoOfEventOk(boolean isOk, String response) {
 
     }
+
+    @Override
+    public void isUserBelongsToTheEvent(boolean belong, String titleEvent, String adminEvent, String uuidEvent) {
+
+    }
+
+    @Override
+    public void closeBarcode() {
+
+    }
 }
