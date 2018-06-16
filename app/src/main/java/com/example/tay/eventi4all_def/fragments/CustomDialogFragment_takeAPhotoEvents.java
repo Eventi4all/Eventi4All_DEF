@@ -54,6 +54,7 @@ public class CustomDialogFragment_takeAPhotoEvents implements View.OnClickListen
 
         }else if(view.getId()==R.id.closeTakeAPhoto){
             this.customDialogFragment_takeAPhoto.getiCustomDialogFragment_takeAPhotoListener().closeTakeAPhoto();
+            this.destroyCustomDialogTakeAPhoto();
         }
     }
 
@@ -101,4 +102,7 @@ public class CustomDialogFragment_takeAPhotoEvents implements View.OnClickListen
     }
 
 
+    public void destroyCustomDialogTakeAPhoto() {
+        this.customDialogFragment_takeAPhoto.getiCustomDialogFragment_takeAPhotoListener().destroyCustomDialogTakeAPhoto();
+    }
 }

@@ -13,4 +13,5 @@ public interface ICreateEventFragmentListener {
     public void saveEventInFirebase(HashMap<String, Object> event, ArrayList<User> notificationUsers, Uri uriQr);
     public void hideCreateEventDialogFragment();
     public Bitmap createQrFromEvent(String uuid);
+    public void destroyCreateEventDialogFragment();
 }

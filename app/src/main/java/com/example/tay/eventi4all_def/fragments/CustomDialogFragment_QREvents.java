@@ -15,6 +15,7 @@ public class CustomDialogFragment_QREvents implements View.OnClickListener{
             this.customDialogFragment_qr.getiCustomDialogFragment_qrListener().shareEventWithQRGmail(this.customDialogFragment_qr.getUriQr());
         }else if(view.getId()== R.id.btnbackAndCloseQr){
             this.customDialogFragment_qr.getiCustomDialogFragment_qrListener().closeQRDialogFragment();
+            this.destroyCustomDialogFragmentQr();
         }
     }
 
@@ -31,4 +32,7 @@ public class CustomDialogFragment_QREvents implements View.OnClickListener{
     }
 
 
+    public void destroyCustomDialogFragmentQr() {
+        this.customDialogFragment_qr.getiCustomDialogFragment_qrListener().destroyCustomDialogFragmentQr();
+    }
 }

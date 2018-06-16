@@ -114,6 +114,7 @@ public class CreateEventFragmentEvents implements View.OnClickListener, IMyViewH
         }
         else if(v.getId()==R.id.btnback){
             this.createEventFragment.getiCreateEventFragmentListener().hideCreateEventDialogFragment();
+            this.destroyCreateEventDialogFragment();
         }
 
     }
@@ -213,5 +214,10 @@ public class CreateEventFragmentEvents implements View.OnClickListener, IMyViewH
             return false;
         }
 
+    }
+
+
+    public void destroyCreateEventDialogFragment() {
+        this.createEventFragment.getiCreateEventFragmentListener().destroyCreateEventDialogFragment();
     }
 }

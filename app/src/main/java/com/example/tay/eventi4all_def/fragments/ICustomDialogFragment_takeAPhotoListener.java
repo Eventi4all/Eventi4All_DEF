@@ -6,4 +6,5 @@ public interface ICustomDialogFragment_takeAPhotoListener {
     public void closeTakeAPhoto();
     public void openCameraTakeAphoto();
     public void uploadPhotoOfEvent(String uuidEvent, HashMap<String,Object> dataOgPhoto);
+    public void destroyCustomDialogTakeAPhoto();
 }

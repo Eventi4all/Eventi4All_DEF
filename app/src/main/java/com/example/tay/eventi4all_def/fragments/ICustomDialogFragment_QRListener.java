@@ -6,4 +6,5 @@ public interface ICustomDialogFragment_QRListener {
     public void shareEventWithQRWhatsApp(Uri qr);
     public void shareEventWithQRGmail(Uri uriQr);
     public void closeQRDialogFragment();
+    public void destroyCustomDialogFragmentQr();
 }

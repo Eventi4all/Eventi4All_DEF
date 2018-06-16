@@ -19,6 +19,9 @@ public class BarcodeActivityEvents extends AbstractFirebaseAdminListener impleme
 
     @Override
     public void onClick(View view) {
+        if(view.getId()==R.id.btnCloseBarcodeActivity){
+            this.barcodeActivity.finish();
+        }
 
     }
 

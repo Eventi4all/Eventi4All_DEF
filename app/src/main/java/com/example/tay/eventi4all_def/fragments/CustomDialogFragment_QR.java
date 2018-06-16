@@ -21,12 +21,13 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.tay.eventi4all_def.R;
+import com.labo.kaji.swipeawaydialog.SwipeAwayDialogFragment;
 
 import jp.wasabeef.glide.transformations.CropSquareTransformation;
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
 
-public class CustomDialogFragment_QR extends DialogFragment{
+public class CustomDialogFragment_QR extends SwipeAwayDialogFragment{
     private static final String TAG = "MyCustomDialogQR";
     private Context context;
     private ImageView imgQr;
@@ -64,6 +65,12 @@ public class CustomDialogFragment_QR extends DialogFragment{
         return v;
 
 
+    }
+
+    @Override
+    public boolean onSwipedAway(boolean toRight) {
+        this.customDialogFragment_qrEvents.destroyCustomDialogFragmentQr();
+        return false;
     }
 
     public static String getTAG() {

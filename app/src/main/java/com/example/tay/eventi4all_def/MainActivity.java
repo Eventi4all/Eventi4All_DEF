@@ -32,6 +32,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import android.view.Gravity;
 import android.view.MenuItem;
 
 import android.view.Window;
@@ -205,6 +206,7 @@ public class MainActivity extends AppCompatActivity {
             openPowerSettings(this);
             enableAutoStart();
         }
+
 
 
 

@@ -18,13 +18,14 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.tay.eventi4all_def.R;
+import com.labo.kaji.swipeawaydialog.SwipeAwayDialogFragment;
 import com.twitter.sdk.android.core.models.ImageValue;
 
 import jp.wasabeef.glide.transformations.CropSquareTransformation;
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
 
-public class CustomDialogFragment_takeAPhoto extends DialogFragment{
+public class CustomDialogFragment_takeAPhoto extends SwipeAwayDialogFragment{
     private static final String TAG = "MyCustomDialogTakeAPhoto";
     private Context context;
     private CustomDialogFragment_takeAPhotoEvents customDialogFragment_takeAPhotoEvents;
@@ -61,6 +62,12 @@ public class CustomDialogFragment_takeAPhoto extends DialogFragment{
         return v;
 
 
+    }
+
+    @Override
+    public boolean onSwipedAway(boolean toRight) {
+        this.customDialogFragment_takeAPhotoEvents.destroyCustomDialogTakeAPhoto();
+        return false;
     }
 
     public static String getTAG() {

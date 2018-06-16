@@ -29,6 +29,8 @@ import com.example.tay.eventi4all_def.MainActivity;
 import com.example.tay.eventi4all_def.R;
 import com.example.tay.eventi4all_def.adapter.ListAdapter;
 import com.example.tay.eventi4all_def.entity.User;
+import com.labo.kaji.swipeawaydialog.SwipeAwayDialogFragment;
+
 
 import java.util.ArrayList;
 
@@ -37,7 +39,7 @@ import es.dmoral.toasty.Toasty;
 
 import static android.R.layout.simple_list_item_1;
 
-public class CustomDialogFragment_CreateEvents extends DialogFragment{
+public class CustomDialogFragment_CreateEvents extends SwipeAwayDialogFragment{
     private static final String TAG = "MyCustomDialog";
     private ICreateEventFragmentListener iCreateEventFragmentListener;
     private IGalleryAndCapturePhotoListener iGalleryAndCapturePhotoListener;
@@ -248,4 +250,13 @@ public class CustomDialogFragment_CreateEvents extends DialogFragment{
     public void setiCreateEventFragmentListener(ICreateEventFragmentListener iCreateEventFragmentListener) {
         this.iCreateEventFragmentListener = iCreateEventFragmentListener;
     }
+
+    @Override
+    public boolean onSwipedAway(boolean toRight) {
+        this.createEventFragmentEvents.destroyCreateEventDialogFragment();
+        return false;
+    }
+
+
+
 }

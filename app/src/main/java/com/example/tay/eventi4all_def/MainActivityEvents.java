@@ -17,7 +17,6 @@ import android.provider.Settings;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
-import android.util.SparseArray;
 import android.view.View;
 import android.widget.Toast;
 
@@ -34,6 +33,9 @@ import com.example.tay.eventi4all_def.entity.Card;
 import com.example.tay.eventi4all_def.entity.Event;
 import com.example.tay.eventi4all_def.entity.Photo;
 import com.example.tay.eventi4all_def.entity.User;
+import com.example.tay.eventi4all_def.fragments.CustomDialogFragment_CreateEvents;
+import com.example.tay.eventi4all_def.fragments.CustomDialogFragment_QR;
+import com.example.tay.eventi4all_def.fragments.CustomDialogFragment_takeAPhoto;
 import com.example.tay.eventi4all_def.fragments.ICreateEventFragmentListener;
 import com.example.tay.eventi4all_def.fragments.ICustomDialogFragment_QRListener;
 import com.example.tay.eventi4all_def.fragments.ICustomDialogFragment_takeAPhotoListener;
@@ -43,7 +45,8 @@ import com.example.tay.eventi4all_def.fragments.IMainFragmentListener;
 import com.example.tay.eventi4all_def.fragments.INofiticationFragmentListener;
 import com.example.tay.eventi4all_def.fragments.IProfileFragmentListener;
 import com.example.tay.eventi4all_def.fragments.IListPublicEventsFragmentListener;
-import com.google.android.gms.vision.barcode.Barcode;
+
+
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
@@ -57,12 +60,10 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
 import es.dmoral.toasty.Toasty;
-import info.androidhive.barcode.BarcodeReader;
 import jp.wasabeef.glide.transformations.CropSquareTransformation;
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
@@ -176,6 +177,7 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
 
     @Override
     public void openCreateEventsFragment() {
+
         this.mainActivity.getCustomDialogFragment_createEvents().show(this.mainActivity.getFragmentManager(), "MyCustomDialog");
 
 
@@ -426,6 +428,13 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
             e.printStackTrace();
         }
         return bitmap;
+    }
+
+    @Override
+    public void destroyCreateEventDialogFragment() {
+        this.mainActivity.setCustomDialogFragment_createEvents(new CustomDialogFragment_CreateEvents());
+        this.mainActivity.getCustomDialogFragment_createEvents().setiCreateEventFragmentListener(this.mainActivity.getMainActivityEvents());
+        this.mainActivity.getCustomDialogFragment_createEvents().setiGalleryAndCapturePhotoListener(this.mainActivity.getMainActivityEvents());
     }
 
 
@@ -740,6 +749,12 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
         this.mainActivity.getCustomDialogFragment_qr().dismiss();
     }
 
+    @Override
+    public void destroyCustomDialogFragmentQr() {
+        this.mainActivity.setCustomDialogFragment_qr(new CustomDialogFragment_QR());
+        this.mainActivity.getCustomDialogFragment_qr().setiCustomDialogFragment_qrListener(this.mainActivity.getMainActivityEvents());
+    }
+
 
     @Override
     public void openQR(Uri uriQR) {
@@ -803,6 +818,13 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
         progress.setMessage("Subiendo la imagen. Por favor, espere...");
         progress.show();
         this.mainActivity.getFirebaseAdmin().uploadTakePhotoOfEvent(uuidEvent,dataofPhoto);
+    }
+
+    @Override
+    public void destroyCustomDialogTakeAPhoto() {
+        this.mainActivity.setCustomDialogFragment_takeAPhoto(new CustomDialogFragment_takeAPhoto());
+        this.mainActivity.getCustomDialogFragment_takeAPhoto().setiCustomDialogFragment_takeAPhotoListener(this.mainActivity.getMainActivityEvents());
+        this.mainActivity.getCustomDialogFragment_takeAPhoto().setiGalleryAndCapturePhotoListener(this.mainActivity.getMainActivityEvents());
     }
 
     @Override

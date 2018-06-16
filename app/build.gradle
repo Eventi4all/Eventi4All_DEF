@@ -91,6 +91,8 @@ dependencies {
     implementation 'com.google.android.gms:play-services-vision:11.8.0'
     //Implementación API apra lector de codigo de barras
     implementation 'info.androidhive:barcode-reader:1.1.5'
+    //Pending Dialog para cerrarlos con un swipe
+    implementation 'com.labo.kaji:swipeawaydialog:0.1.1'
 
 
 }
