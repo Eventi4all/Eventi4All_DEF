@@ -500,6 +500,30 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
     }
 
     @Override
+    public void accessToPublicEvent(int adapterPosition) {
+        Event event = this.mainActivity.getListPublicEventsFragment().getArrEvents().get(adapterPosition);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.mainActivity);
+        builder.setTitle("¿Quieres acceder al evento: '" + event.getTitle() + "'?");
+        builder.setMessage("¡Accede para compartir tus momentos en este evento!");
+        builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                progress = new ProgressDialog(mainActivity);
+                progress.setMessage("Espere...");
+                progress.show();
+                mainActivity.getFirebaseAdmin().addAssistant(event.getUuid(), adapterPosition, "publicEvents");
+
+            }
+        }).setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+        builder.show();
+
+    }
+
+    @Override
     public void pushNotification() {
 
         JSONObject jsonObj;
@@ -573,11 +597,11 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
         progress = new ProgressDialog(this.mainActivity);
         progress.setMessage("Espere...");
         progress.show();
-        this.mainActivity.getFirebaseAdmin().addAssistant(uuid, position);
+        this.mainActivity.getFirebaseAdmin().addAssistant(uuid, position, "invitations");
     }
 
     @Override
-    public void addOkNewAssistant(boolean isOk, int position, String uuid) {
+    public void addOkNewAssistant(boolean isOk, int position, String uuid, String from) {
         if (isOk == true) {
             if(position==-1){
                 //Recargamos als listas para que se actualicen si hemos aceptado el evento.
@@ -585,10 +609,19 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
                 this.mainActivity.getListPublicEventsFragment().getIListPublicEventsFragmentListener().callGetPublicEvents();
                 this.deleteInvitation(DataHolder.MyDataHolder.event.getUuid(),-1);
                 Toasty.success(this.mainActivity,"¡Enhorabuena, has sido añadido al evento!", Toast.LENGTH_SHORT, true).show();
-                progress.dismiss();
+
             }else{
-                Toasty.success(this.mainActivity, "¡Enhorabuena! Ahora eres participante de: " + this.mainActivity.getNotificationFragment().getArrCards().get(position).getEventTitle().toString(), Toast.LENGTH_SHORT, true).show();
-                this.mainActivity.getFirebaseAdmin().deleteInvitation(uuid, position);
+                if(from.equals("invitations")){
+                    Toasty.success(this.mainActivity, "¡Enhorabuena! Ahora eres participante de: " + this.mainActivity.getNotificationFragment().getArrCards().get(position).getEventTitle().toString(), Toast.LENGTH_SHORT, true).show();
+                    this.mainActivity.getFirebaseAdmin().deleteInvitation(uuid, position);
+                }else if(from.equals("publicEvents")){
+                    Toasty.success(this.mainActivity, "¡Enhorabuena! Ahora eres participante de: " + this.mainActivity.getListPublicEventsFragment().getArrEvents().get(position).getTitle().toString(), Toast.LENGTH_SHORT, true).show();
+                    this.mainActivity.getListPublicEventsFragment().getIListPublicEventsFragmentListener().callGetPublicEvents();
+                    this.mainActivity.getMainFragment().getiMainFragmentListener().getEvents("allAssistEvents");
+                    this.mainActivity.getMainFragment().getSpEvents().setSelection(1);
+
+                }
+
             }
 
         } else {
@@ -597,6 +630,8 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
             alertDialog.setMessage("Ha ocurrido un error, vuelve a intentarlo");
             alertDialog.show();
         }
+
+        progress.dismiss();
     }
 
     @Override
@@ -615,7 +650,7 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
         if(position==-1){
             if(isDelete==true){
                 this.mainActivity.getNotificationFragment().getNotificationFragmentEvents().getInvitations();
-
+                this.mainActivity.getMainFragment().getSpEvents().setSelection(1);
 
             }
         }else{
@@ -625,6 +660,8 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
                     progress.dismiss();
                     progress = null;
                 }
+
+                this.mainActivity.getMainFragment().getSpEvents().setSelection(1);
 
             } else {
                 if (progress != null) {
@@ -871,7 +908,7 @@ public class MainActivityEvents extends AbstractFirebaseAdminListener implements
                     progress = new ProgressDialog(mainActivity);
                     progress.setMessage("Espere...");
                     progress.show();
-                    mainActivity.getFirebaseAdmin().addAssistant(uuidEvent, -1);
+                    mainActivity.getFirebaseAdmin().addAssistant(uuidEvent, -1, "fromQR");
                 }
             });
             builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {

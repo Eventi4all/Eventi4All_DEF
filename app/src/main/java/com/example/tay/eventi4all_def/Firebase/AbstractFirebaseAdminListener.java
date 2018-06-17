@@ -80,7 +80,7 @@ public abstract class AbstractFirebaseAdminListener implements IFirebaseAdminLis
     }
 
     @Override
-    public void addOkNewAssistant(boolean isOk, int position, String uuid) {
+    public void addOkNewAssistant(boolean isOk, int position, String uuid, String from) {
 
     }
 

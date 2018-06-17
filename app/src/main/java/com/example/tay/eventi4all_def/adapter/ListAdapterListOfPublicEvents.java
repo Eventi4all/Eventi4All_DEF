@@ -29,6 +29,7 @@ import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 public class ListAdapterListOfPublicEvents extends RecyclerView.Adapter<MyViewHolderListOfPublicEvents> {
     private ArrayList<Event> contenidoLista; //declaramos un array que contiene contenido que queremos que s epinte en las celdas de la lista
     private Context context; // esta variable la creamos dado que la librería Glide para cargar imagenes desde firebase necesita una variable de tipo contexto
+    private ListAdapterListOfPublicEventsListener listAdapterListOfPublicEventsListener;
     public ListAdapterListOfPublicEvents(ArrayList<Event> contenidoLista, Context context) { // ListAdapter recibe como parámetro el context de Glide, en nuestro caso el contexto es el padre donde se encuentra que al fin de cuentas el list se encuentra en el second Activity
         this.contenidoLista = contenidoLista;
         this.context = context;
@@ -46,6 +47,7 @@ public class ListAdapterListOfPublicEvents extends RecyclerView.Adapter<MyViewHo
     public void onBindViewHolder(MyViewHolderListOfPublicEvents holder, int position) {
         holder.getTxtTitleEvent().setText(this.contenidoLista.get(position).title);
         holder.getTxtCreateAt().setText(this.contenidoLista.get(position).createAt);
+        holder.setListAdapterListOfPublicEventsListener(this.listAdapterListOfPublicEventsListener);
         Glide.with(context).load(this.getContenidoLista().get(position).urlCover).apply(new RequestOptions().transforms( new CropSquareTransformation(),new RoundedCornersTransformation(40,15))).apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE)).apply(RequestOptions.skipMemoryCacheOf(true)).thumbnail(0.3f).into(holder.getImageViewCover());
 
 
@@ -70,4 +72,11 @@ public class ListAdapterListOfPublicEvents extends RecyclerView.Adapter<MyViewHo
         return context;
     }
 
+    public ListAdapterListOfPublicEventsListener getListAdapterListOfPublicEventsListener() {
+        return listAdapterListOfPublicEventsListener;
+    }
+
+    public void setListAdapterListOfPublicEventsListener(ListAdapterListOfPublicEventsListener listAdapterListOfPublicEventsListener) {
+        this.listAdapterListOfPublicEventsListener = listAdapterListOfPublicEventsListener;
+    }
 }

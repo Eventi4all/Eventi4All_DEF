@@ -11,7 +11,6 @@ import info.androidhive.barcode.BarcodeReader;
 
 public class BarcodeActivity extends AppCompatActivity {
     private BarcodeActivityEvents barcodeActivityEvents;
-    private BarcodeActivityListener barcodeActivityListener;
     private BarcodeReader barcodeReader;
     private ImageView btnCloseBarcodeActivity;
 
@@ -49,13 +48,7 @@ public class BarcodeActivity extends AppCompatActivity {
         this.barcodeActivityEvents = barcodeActivityEvents;
     }
 
-    public BarcodeActivityListener getBarcodeActivityListener() {
-        return barcodeActivityListener;
-    }
 
-    public void setBarcodeActivityListener(BarcodeActivityListener barcodeActivityListener) {
-        this.barcodeActivityListener = barcodeActivityListener;
-    }
 
     public BarcodeReader getBarcodeReader() {
         return barcodeReader;

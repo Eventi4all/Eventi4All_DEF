@@ -2,11 +2,13 @@ package com.example.tay.eventi4all_def.fragments;
 
 import android.support.v4.widget.SwipeRefreshLayout;
 
+import com.example.tay.eventi4all_def.adapter.ListAdapterListOfPublicEventsListener;
+import com.example.tay.eventi4all_def.adapter.MyViewHolderListOfPublicEvents;
 import com.example.tay.eventi4all_def.entity.Event;
 
 import java.util.ArrayList;
 
-public class ListPublicEventsFragmentEvents implements SwipeRefreshLayout.OnRefreshListener{
+public class ListPublicEventsFragmentEvents implements SwipeRefreshLayout.OnRefreshListener, ListAdapterListOfPublicEventsListener{
     private ListPublicEventsFragment listPublicEventsFragment;
 
 
@@ -44,4 +46,9 @@ public class ListPublicEventsFragmentEvents implements SwipeRefreshLayout.OnRefr
     }
 
 
+    @Override
+    public void accesToEvent(MyViewHolderListOfPublicEvents cell) {
+        System.out.println("Presionada la celda: " + cell.getAdapterPosition());
+        this.listPublicEventsFragment.getIListPublicEventsFragmentListener().accessToPublicEvent(cell.getAdapterPosition());
+    }
 }

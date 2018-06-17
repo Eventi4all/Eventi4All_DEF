@@ -542,7 +542,7 @@ public class FirebaseAdmin {
 
     }
 
-    public void addAssistant(String uuid, int position) {
+    public void addAssistant(String uuid, int position, String from) {
         HashMap<String, Object> addAssisantIntoEvent = new HashMap<String, Object>();
         HashMap<String, Boolean> newAssistant = new HashMap<String, Boolean>();
         newAssistant.put(DataHolder.MyDataHolder.currentUserNickName, true);
@@ -551,12 +551,12 @@ public class FirebaseAdmin {
         Task<Void> docRef = db.collection("events").document(uuid).set(addAssisantIntoEvent, SetOptions.merge()).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                abstractFirebaseAdminListener.addOkNewAssistant(true, position, uuid);
+                abstractFirebaseAdminListener.addOkNewAssistant(true, position, uuid, from);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                abstractFirebaseAdminListener.addOkNewAssistant(false, position, uuid);
+                abstractFirebaseAdminListener.addOkNewAssistant(false, position, uuid, from);
             }
         });
 

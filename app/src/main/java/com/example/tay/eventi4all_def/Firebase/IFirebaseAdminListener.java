@@ -22,7 +22,7 @@ public interface IFirebaseAdminListener {
     public void pushNotification();
     public void giveBackCards(ArrayList<Card> arrCards);
     public void successDeleteInvitation(boolean isDelete, int position);
-    public void addOkNewAssistant(boolean isOk, int position, String uuid);
+    public void addOkNewAssistant(boolean isOk, int position, String uuid, String from);
     public void returnPhotosOfEvent(ArrayList<Photo> arrPhotos);
     public void insertPhotoOfEventOk(boolean isOk, String response);
     public void isUserBelongsToTheEvent(boolean belong, String titleEvent, String adminEvent, String uuidEvent);

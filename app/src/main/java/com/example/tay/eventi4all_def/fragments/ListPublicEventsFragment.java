@@ -58,6 +58,7 @@ public class ListPublicEventsFragment extends Fragment {
         myList.setLayoutManager(new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL));
         myList.setItemAnimator(new DefaultItemAnimator());
         myList.setAdapter(listAdapter);
+        this.listAdapter.setListAdapterListOfPublicEventsListener(this.listPublicEventsFragmentEvents);
         int spanCount = 2; //num de columnas
         int spacing = 30; //espaciado entre columnas
         boolean includeEdge = true; //incluir borde
